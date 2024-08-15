@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import React from "react";
 import CertificatePage from "./components/certificate-page";
 import { createClient } from "@/lib/supabase/server";
+
 export default async function () {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data: userSession } = await readUserSession();
 
   if (!userSession.session) {
