@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import React from "react";
-import { Button } from "./ui/button";
+import SignOut from "./SignOut";
 
 const Header = async () => {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -16,11 +16,21 @@ const Header = async () => {
         <nav className="flex items-center space-x-4 lg:space-x-6">
           <a className="mr-6 flex items-center space-x-2" href="/">
             <span className="font-bold">CMS</span>
-          </a>
+          </a>{" "}
+          {user != null && (
+            <div className="flex items-center gap-4">
+              <Link href={"/create-certificate"}>Create Certificate</Link>
+              <Link href={"/certificate-list"}>Certificate List</Link>
+            </div>
+          )}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <Link href={"/create-certificate"}>Create Certificate</Link>
-          <Link href={"/certificate-list"}>Certificate List</Link>
+          {user != null && (
+            <div className="flex items-center gap-4">
+              <p>{user.email}</p>
+              <SignOut />
+            </div>
+          )}
         </div>
       </div>
     </header>

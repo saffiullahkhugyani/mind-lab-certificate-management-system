@@ -1,0 +1,26 @@
+
+
+export type Certificate = {
+  id: string | null,
+  issue_year: string | null,
+  issue_authority: string | null,
+  certificate_name_arabic: string | null,
+  certificate_name_english: string | null,
+  certificate_country: string | null,
+  number_of_hours: string | null,
+  skill_level: string | null,
+  skill_type: string | null,
+  tags: string[] | null,
+
+}
+
+export type SkillType = {
+  id: string;
+  skill_type_name: string;
+}
+
+export type FormattedSkillTags = {
+  id: number | null;
+  tag: string | null;
+  skill_types: string | null;
+}

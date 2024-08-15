@@ -1,11 +1,19 @@
-import { createClient } from "@/lib/supabase/server";
 import React from "react";
 
-export default async function Login({
-  searchParams,
-}: {
-  searchParams: { message: string };
-}) {
-  const supabase = await createClient();
-  return <div>Login</div>;
+import { readUserSession } from "@/lib/actions/action";
+import LoginForm from "./components/LoginForm";
+import { redirect } from "next/navigation";
+
+export default async function Login() {
+  const { data: userSession } = await readUserSession();
+
+  if (userSession.session) {
+    return redirect("/create-certificate");
+  }
+
+  return (
+    <div>
+      <LoginForm searchParams={{ message: "" }} />
+    </div>
+  );
 }
