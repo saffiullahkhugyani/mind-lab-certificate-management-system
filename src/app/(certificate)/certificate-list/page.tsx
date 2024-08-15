@@ -5,7 +5,7 @@ import { DataTable } from "./components/data-table";
 import { columns } from "./components/columns";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function () {
+export default async function page() {
   const supabase = createClient();
   const { data: userSession } = await readUserSession();
 

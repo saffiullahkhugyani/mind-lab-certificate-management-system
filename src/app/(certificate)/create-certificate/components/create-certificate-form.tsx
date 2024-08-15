@@ -92,9 +92,6 @@ const CreateCertificate = ({
   // use effect hook for disabling the form
   useEffect(() => {
     setDisableCertificate(disabled || isPending);
-    console.log("use state triggered", disableCertificate);
-    console.log("use state triggered: disabled =>", disabled);
-    console.log("use state triggered: isPending =>", isPending);
   }, [disabled, isPending]);
 
   const form = useForm<FormFields>({

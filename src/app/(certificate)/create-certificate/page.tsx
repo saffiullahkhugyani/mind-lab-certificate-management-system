@@ -4,7 +4,7 @@ import React from "react";
 import CertificatePage from "./components/certificate-page";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function () {
+export default async function page() {
   const supabase = createClient();
   const { data: userSession } = await readUserSession();
 
