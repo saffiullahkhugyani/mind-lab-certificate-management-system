@@ -41,7 +41,7 @@ export function DataTable({
 }: DataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
-    { id: "certificate_name_english", value: searchInitial },
+    { id: "issue_authority", value: searchInitial },
   ]);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   const table = useReactTable({
@@ -70,22 +70,6 @@ export function DataTable({
     <div>
       <div className="flex gap-4 p-4">
         <div className="w-full">
-          <Label>Certificate Name</Label>
-          <Input
-            placeholder="Certificate name..."
-            value={
-              (table
-                .getColumn("certificate_name_english")
-                ?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table
-                .getColumn("certificate_name_english")
-                ?.setFilterValue(event.target.value)
-            }
-          />
-        </div>
-        <div className="w-full">
           <Label>Issue Authority</Label>
           <Input
             placeholder="Issue authority..."
@@ -97,6 +81,22 @@ export function DataTable({
             onChange={(event) =>
               table
                 .getColumn("issue_authority")
+                ?.setFilterValue(event.target.value)
+            }
+          />
+        </div>
+        <div className="w-full">
+          <Label>Certificate Name</Label>
+          <Input
+            placeholder="Certificate name..."
+            value={
+              (table
+                .getColumn("certificate_name_english")
+                ?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table
+                .getColumn("certificate_name_english")
                 ?.setFilterValue(event.target.value)
             }
           />
@@ -152,30 +152,30 @@ export function DataTable({
                       </TableCell>
                     ))}
                   </TableRow>
-                  {/* {expandedRows[row.id] && ( */}
-                  <TableRow>
-                    <TableCell>
-                      <div className="p-4 space-y-2">
-                        <div className=" flex items-center justify-center ps-2 2mb-2 font-semibold text-md border border-black rounded-lg bg-white">
-                          Details
+                  {expandedRows[row.id] && (
+                    <TableRow>
+                      <TableCell>
+                        <div className="p-4 space-y-2">
+                          <div className=" flex items-center justify-center ps-2 2mb-2 font-semibold text-md border border-black rounded-lg bg-white">
+                            Details
+                          </div>
+                          <div className="mb-2">
+                            Skill Level: {row.original.skill_level}
+                          </div>
+                          <div className="mb-2">
+                            Skills Type: {row.original.skill_type}
+                          </div>
+                          <div className="mb-2">Tags: {row.original.tags}</div>
+                          <Button
+                            onClick={() => onAddCertificate(row.original)}
+                            className="mt-2 rounded-lg"
+                          >
+                            Add Certificate
+                          </Button>
                         </div>
-                        <div className="mb-2">
-                          Skill Level: {row.original.skill_level}
-                        </div>
-                        <div className="mb-2">
-                          Skills Type: {row.original.skill_type}
-                        </div>
-                        <div className="mb-2">Tags: {row.original.tags}</div>
-                        <Button
-                          onClick={() => onAddCertificate(row.original)}
-                          className="mt-2 rounded-lg"
-                        >
-                          Add Certificate
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  {/* )} */}
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </>
               ))
             ) : (

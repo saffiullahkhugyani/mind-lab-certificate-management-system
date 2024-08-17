@@ -32,6 +32,7 @@ import {
   Options,
 } from "@/components/ui/multi-select";
 import { addCertificate } from "../actions";
+import { useToast } from "@/components/ui/use-toast";
 
 // const optionSchema = z.object({
 //   label: z.string(),
@@ -84,6 +85,7 @@ const CreateCertificate = ({
   const [formValues, setFormValues] = useState<Certificate>();
   const [filteredTags, setFilteredTags] = useState<Options[]>([]);
   const [disableCertificate, setDisableCertificate] = useState<boolean>(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     setFormValues(certificate!);
@@ -97,7 +99,7 @@ const CreateCertificate = ({
   const form = useForm<FormFields>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      issue_year: certificate?.issue_year || "",
+      issue_year: "",
       issue_authority: certificate?.issue_authority || "",
       certificate_name_english: certificate?.certificate_name_english || "",
       certificate_name_arabic: certificate?.certificate_name_arabic || "",
@@ -113,7 +115,7 @@ const CreateCertificate = ({
 
   useEffect(() => {
     reset({
-      issue_year: certificate?.issue_year || "",
+      issue_year: "",
       issue_authority: certificate?.issue_authority || "",
       certificate_name_english: certificate?.certificate_name_english || "",
       certificate_name_arabic: certificate?.certificate_name_arabic || "",
@@ -195,7 +197,15 @@ const CreateCertificate = ({
         tags: data.tags,
       };
 
-      await addCertificate(certificateData);
+      const res = await addCertificate(certificateData);
+      if (res != null) {
+        console.log("ok");
+        toast({
+          description: "Certificate has been added successfully",
+          variant: "success",
+        });
+      }
+
       reset({
         issue_year: "",
         issue_authority: "",
@@ -233,6 +243,7 @@ const CreateCertificate = ({
                       <Input
                         placeholder="Issue year"
                         type="number"
+                        onWheel={(e) => (e.target as HTMLElement).blur()}
                         {...field}
                       />
                     </FormControl>
@@ -310,6 +321,7 @@ const CreateCertificate = ({
                       <Input
                         placeholder="Number of hours"
                         type="number"
+                        onWheel={(e) => (e.target as HTMLElement).blur()}
                         {...field}
                       ></Input>
                     </FormControl>

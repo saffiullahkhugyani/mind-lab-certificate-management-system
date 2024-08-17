@@ -1,5 +1,6 @@
 import "./globals.css";
 import Header from "@/components/header";
+import { Toaster } from "@/components/ui/toaster";
 import { GeistSans } from "geist/font/sans";
 
 export const metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({
         <main className="flex min-h-screen flex-col  items-center bg-gray-200">
           {children}
         </main>
+        <Toaster />
       </body>
     </html>
   );
