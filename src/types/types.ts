@@ -1,3 +1,4 @@
+import { Profiles } from "./customs";
 
 
 export type Certificate = {
@@ -23,4 +24,10 @@ export type FormattedSkillTags = {
   id: number | null;
   tag: string | null;
   skill_types: string | null;
+}
+
+export type CustomUploadedCertificate = {
+  id: string
+  certificate_image_url: string | null
+  profiles: Profiles | null
 }
