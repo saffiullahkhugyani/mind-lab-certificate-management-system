@@ -23,7 +23,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "../create-certificate-module.css";
 // import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
-import { Certificate, FormattedSkillTags } from "@/types/types";
+import {
+  Certificate,
+  CustomUploadedCertificate,
+  FormattedSkillTags,
+} from "@/types/types";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { SkillTags, SkillType } from "@/types/customs";
 import {
@@ -31,7 +35,7 @@ import {
   MultiSelectProps,
   Options,
 } from "@/components/ui/multi-select";
-import { addCertificate } from "../actions";
+import { addCertificate, addCertificateMapping } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
 
 // const optionSchema = z.object({
@@ -69,6 +73,7 @@ type FormFields = z.infer<typeof FormSchema>;
 
 interface CreateCertificateProps {
   certificate?: Certificate | null;
+  v1Certificate?: CustomUploadedCertificate | null;
   skillType: Array<SkillType>;
   skillTags: Array<FormattedSkillTags>;
   disabled: boolean;
@@ -76,6 +81,7 @@ interface CreateCertificateProps {
 
 const CreateCertificate = ({
   certificate,
+  v1Certificate,
   skillType,
   skillTags,
   disabled,
@@ -198,8 +204,14 @@ const CreateCertificate = ({
       };
 
       const res = await addCertificate(certificateData);
-      if (res != null) {
-        console.log("ok");
+      const v2Id = res?.at(0)?.id;
+      const resCertificateMapping = await addCertificateMapping({
+        userId: v1Certificate?.profiles?.id!,
+        certificateV1Id: v1Certificate?.id!,
+        certificateV2Id: v2Id!,
+      });
+
+      if (resCertificateMapping != null) {
         toast({
           description: "Certificate has been added successfully",
           variant: "success",

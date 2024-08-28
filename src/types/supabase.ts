@@ -51,6 +51,39 @@ export type Database = {
         }
         Relationships: []
       }
+       certificate_v1_v2_mapping: {
+        Row: {
+          id: number
+          v1_certificate_id: string | null
+          v2_certificate_id: string | null
+        }
+        Insert: {
+          id?: number
+          v1_certificate_id?: string | null
+          v2_certificate_id?: string | null
+        }
+        Update: {
+          id?: number
+          v1_certificate_id?: string | null
+          v2_certificate_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_v1_v2_mapping_v1_certificate_id_fkey"
+            columns: ["v1_certificate_id"]
+            isOneToOne: false
+            referencedRelation: "upload_certificate"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificate_v1_v2_mapping_v2_certificate_id_fkey"
+            columns: ["v2_certificate_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_master"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           age: string | null

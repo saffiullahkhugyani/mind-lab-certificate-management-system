@@ -11,8 +11,33 @@ export async function addCertificate(formData: Certificate) {
 
   const { data, error } = await supabase.from("certificate_master").insert(certificateData).select();
 
+  if (data != null)
+  {
+
+    console.log("data interted to certificate master: ",data);
+  } else {
+    console.log("Error insertinf data into certificate master: ",error)
+  }
+
   revalidatePath("/create-certificate")
 
   return data;
 
+}
+
+export async function addCertificateMapping({userId, certificateV1Id, certificateV2Id}: {userId: string, certificateV1Id: string, certificateV2Id: string}) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.from("certificate_v1_v2_mapping")
+    .insert({ user_id: userId ,v1_certificate_id: certificateV1Id, v2_certificate_id: certificateV2Id }).select();
+
+  if (data != null) {
+    console.log("Data inserted into v1 and v2 mapping: " , data);
+  } else {
+    console.log("Error inserting data into v1 and v2 mapping: ", error);
+    }
+  
+  revalidatePath("/create-certificate")
+
+  return data;
 }
