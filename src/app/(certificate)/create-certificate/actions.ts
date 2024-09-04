@@ -41,3 +41,19 @@ export async function addCertificateMapping({userId, certificateV1Id, certificat
 
   return data;
 }
+
+export async function certificateAsserted({ certificateV1Id }: { certificateV1Id: string }) {
+
+  const supabase = createClient();
+
+  const { data, error } = await supabase.from("upload_certificate").update({ certificate_asserted: "1" }).eq("id", certificateV1Id).select();
+  
+
+  if (data != null) {
+    console.log("Certificate Asserted: " , data);
+  } else {
+    console.log("Certificaete Assertion error: ", error);
+  }
+  
+  return data;
+}

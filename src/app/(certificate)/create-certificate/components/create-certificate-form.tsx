@@ -35,7 +35,11 @@ import {
   MultiSelectProps,
   Options,
 } from "@/components/ui/multi-select";
-import { addCertificate, addCertificateMapping } from "../actions";
+import {
+  addCertificate,
+  addCertificateMapping,
+  certificateAsserted,
+} from "../actions";
 import { useToast } from "@/components/ui/use-toast";
 
 // const optionSchema = z.object({
@@ -212,10 +216,15 @@ const CreateCertificate = ({
       });
 
       if (resCertificateMapping != null) {
-        toast({
-          description: "Certificate has been added successfully",
-          variant: "success",
+        const certificateAssertion = await certificateAsserted({
+          certificateV1Id: v1Certificate?.id!,
         });
+
+        if (certificateAssertion != null)
+          toast({
+            description: "Certificate has been added successfully",
+            variant: "success",
+          });
       }
 
       reset({
@@ -342,7 +351,6 @@ const CreateCertificate = ({
                 )}
               ></FormField>
             </div>
-            {/* <Button type="submit">Submit</Button> */}
           </div>
 
           {/* Section 3: Level */}
@@ -357,6 +365,7 @@ const CreateCertificate = ({
                     onValueChange={field.onChange}
                     value={field.value}
                     defaultValue={field.value}
+                    disabled={disableCertificate}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -390,6 +399,7 @@ const CreateCertificate = ({
                     onValueChange={field.onChange}
                     value={field.value}
                     defaultValue={field.value}
+                    disabled={disableCertificate}
                   >
                     <FormControl>
                       <SelectTrigger>

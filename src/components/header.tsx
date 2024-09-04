@@ -21,7 +21,7 @@ const Header = async () => {
             <div className="flex items-center gap-4">
               <Link href={"/create-certificate"}>Create Certificate</Link>
               <Link href={"/certificate-list"}>Certificate List</Link>
-              <Link href={"/uploaded-certificates"}>Uploaded Certificates</Link>
+              {/* <Link href={"/uploaded-certificates"}>Uploaded Certificates</Link> */}
             </div>
           )}
         </nav>

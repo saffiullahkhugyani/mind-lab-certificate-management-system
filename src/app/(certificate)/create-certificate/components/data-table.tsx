@@ -154,21 +154,28 @@ export function DataTable({
                   </TableRow>
                   {expandedRows[row.id] && (
                     <TableRow>
-                      <TableCell>
-                        <div className="p-4 space-y-2">
-                          <div className=" flex items-center justify-center ps-2 2mb-2 font-semibold text-md border border-black rounded-lg bg-white">
-                            Details
+                      <TableCell colSpan={columns.length} className="p-0">
+                        <div className="w-full flex justify-between items-center p-4 bg-gray-100">
+                          <div className="flex gap-1 font-bold">
+                            Skill Level:{" "}
+                            <p className="font-normal">
+                              {row.original.skill_level}
+                            </p>
                           </div>
-                          <div className="mb-2">
-                            Skill Level: {row.original.skill_level}
+                          <div className="flex gap-1 font-bold">
+                            Skills Type:
+                            <p className="font-normal">
+                              {row.original.skill_type}
+                            </p>
                           </div>
-                          <div className="mb-2">
-                            Skills Type: {row.original.skill_type}
+                          <div className="flex gap-1 font-bold">
+                            Tags:{" "}
+                            <p className="font-normal"> {row.original.tags}</p>
                           </div>
-                          <div className="mb-2">Tags: {row.original.tags}</div>
                           <Button
                             onClick={() => onAddCertificate(row.original)}
-                            className="mt-2 rounded-lg"
+                            className="rounded-lg"
+                            size={"sm"}
                           >
                             Add Certificate
                           </Button>

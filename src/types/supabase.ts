@@ -289,18 +289,21 @@ export type Database = {
       }
       upload_certificate: {
         Row: {
+          certificate_asserted?: string | null
           certificate_image_url: string | null
           id: string
           skill_id: number
           user_id: string
         }
         Insert: {
+          certificate_asserted?: string | null
           certificate_image_url?: string | null
           id: string
           skill_id: number
           user_id: string
         }
         Update: {
+          certificate_asserted?: string | null
           certificate_image_url?: string | null
           id?: string
           skill_id?: number

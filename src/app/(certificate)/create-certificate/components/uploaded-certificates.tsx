@@ -49,7 +49,7 @@ function UploadedCertificates({
     >
       <div className="flex items-center space-x-4 px-4">
         <h4 className="text-sm font-semibold">
-          @total certificates: {uploadedCertificates!.length}
+          @total certificates to be asserted: {uploadedCertificates!.length}
         </h4>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm">

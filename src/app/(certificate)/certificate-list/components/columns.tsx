@@ -12,9 +12,9 @@ import { ArrowUpDown } from "lucide-react";
 export const columns: ColumnDef<Certificate>[] = [
   {
     accessorKey: "id",
-    header: () => <div className="tet-right">ID</div>,
+    header: () => <div className="tet-right">Sr. No</div>,
     cell: ({ row }) => {
-      return <div className="font-medium">{row.getValue("id")}</div>;
+      return <div className="font-medium">{row.index + 1}</div>;
     },
   },
   {
