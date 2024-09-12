@@ -155,30 +155,36 @@ export function DataTable({
                   {expandedRows[row.id] && (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="p-0">
-                        <div className="w-full flex justify-between items-center p-4 bg-gray-100">
-                          <div className="flex gap-1 font-bold">
-                            Skill Level:{" "}
-                            <p className="font-normal">
-                              {row.original.skill_level}
-                            </p>
+                        <div className="bg-gray-200 p-4 shadow-md m-2 rounded-md">
+                          {/* Row for Skill Level, Skill Type, and Tags */}
+                          <div className="flex items-center justify-evenly gap-4">
+                            <div className="font-bold">
+                              Skill Level:
+                              <p className="font-normal">
+                                {row.original.skill_level}
+                              </p>
+                            </div>
+                            <div className="font-bold">
+                              Skills Type:
+                              <p className="font-normal">
+                                {row.original.skill_type}
+                              </p>
+                            </div>
+                            <div className="font-bold">
+                              Tags:
+                              <p className="font-normal">{row.original.tags}</p>
+                            </div>
                           </div>
-                          <div className="flex gap-1 font-bold">
-                            Skills Type:
-                            <p className="font-normal">
-                              {row.original.skill_type}
-                            </p>
+                          {/* Row for Add Certificate button */}
+                          <div className="flex justify-center mt-4">
+                            <Button
+                              onClick={() => onAddCertificate(row.original)}
+                              className="rounded-lg"
+                              size={"sm"}
+                            >
+                              Add Certificate
+                            </Button>
                           </div>
-                          <div className="flex gap-1 font-bold">
-                            Tags:{" "}
-                            <p className="font-normal"> {row.original.tags}</p>
-                          </div>
-                          <Button
-                            onClick={() => onAddCertificate(row.original)}
-                            className="rounded-lg"
-                            size={"sm"}
-                          >
-                            Add Certificate
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
