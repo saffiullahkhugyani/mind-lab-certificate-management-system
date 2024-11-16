@@ -26,7 +26,8 @@ export default async function page() {
   // fetching certificates uploaded by admin
   const { data: certificateList } = await supabase
     .from("certificate_master")
-    .select();
+    .select()
+    .eq("certificate_status", true);
 
   // fetching skill type and tags
   const { data: skillType } = await supabase.from("skill_types").select();

@@ -22,6 +22,7 @@ export type Database = {
           skill_level: string | null
           skill_type: string | null
           tags: string[] | null
+          certificate_status: boolean | null
         }
         Insert: {
           certificate_country?: string | null
@@ -48,6 +49,7 @@ export type Database = {
           skill_level?: string | null
           skill_type?: string | null
           tags?: string[] | null
+          certificate_status: boolean | null
         }
         Relationships: []
       }

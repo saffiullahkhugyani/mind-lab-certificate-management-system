@@ -14,6 +14,7 @@ import {
 import { SkillType } from "@/types/customs";
 import UploadedCertificates from "./uploaded-certificates";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 // props types
 interface CertificatePageProps {
@@ -40,6 +41,11 @@ const CertificatePage = ({
   const [certificateAssertion, setCertificateAssertion] = useState(false);
   const [selectedV1Certificate, setSelectedV1Certificate] =
     useState<CustomUploadedCertificate | null>(null);
+
+  // hooks for edit/updating certificate
+  // using same hook for selected certificate for edit
+  const searchParams = useSearchParams();
+  const [isEdit, setIsEdit] = useState(false);
 
   // function for handinling add certificate from exisiting certificate
   const handleOnAddCertificate = (data: Certificate | null) => {
@@ -72,33 +78,59 @@ const CertificatePage = ({
     setAddCertificate(true);
   }, [certificates]);
 
+  useEffect(() => {
+    // Get the values from search params
+    const isEditParam = searchParams.get("isEdit");
+    const certificateDataParam = searchParams.get("certificateData");
+
+    // Log the raw values from search params
+    console.log("Raw isEdit:", isEditParam);
+    console.log("Raw certificateData:", certificateDataParam);
+
+    // Parse the values safely
+    if (isEditParam) setIsEdit(JSON.parse(isEditParam));
+    else setIsEdit(false);
+
+    if (certificateDataParam)
+      setSelectedCertificate(
+        JSON.parse(decodeURIComponent(certificateDataParam))
+      );
+    else setSelectedCertificate(null);
+  }, [searchParams]);
+
   return (
     <>
-      <ResponsiveDialog
-        isOpen={isSearchOpen}
-        setIsOpen={setIsSearchOpen}
-        title="Search Certificate"
-      >
-        <DataTable
-          columns={columns()}
-          data={listData}
-          searchInitial={searchString}
-          onAddCertificate={handleOnAddCertificate}
-        />
-      </ResponsiveDialog>
+      {!isEdit && (
+        <ResponsiveDialog
+          isOpen={isSearchOpen}
+          setIsOpen={setIsSearchOpen}
+          title="Search Certificate"
+        >
+          <DataTable
+            columns={columns()}
+            data={listData}
+            searchInitial={searchString}
+            onAddCertificate={handleOnAddCertificate}
+          />
+        </ResponsiveDialog>
+      )}
       <div className="container ">
         {/* Section zero uploaded sertificates from students */}
-        <UploadedCertificates
-          uploadedCertificates={uploadedCertificates}
-          setCertificateUrl={setSelectedV1Certificate}
-          setCertificateImageDisplay={setCertificateAssertion}
-        />
 
+        {!isEdit && (
+          <UploadedCertificates
+            uploadedCertificates={uploadedCertificates}
+            setCertificateUrl={setSelectedV1Certificate}
+            setCertificateImageDisplay={setCertificateAssertion}
+          />
+        )}
         {/* Section 1: Search */}
-        <SearchCertificate
-          searchString={setOnSearch}
-          openSearch={setIsSearchOpen}
-        />
+        {!isEdit && (
+          <SearchCertificate
+            searchString={setOnSearch}
+            openSearch={setIsSearchOpen}
+          />
+        )}
         {/* Section 2: Certificate Details */}
         <div className="flex flex-row">
           <div className="w-full">
@@ -107,7 +139,9 @@ const CertificatePage = ({
               v1Certificate={selectedV1Certificate} // for mapping version 1 certificate with version 2 certificate
               skillTags={skillTags}
               skillType={skillType}
-              disabled={addCertificate}
+              disabled={!isEdit ? addCertificate : false}
+              isEdit={isEdit}
+              buttonLabel={isEdit ? "Update Certificate" : "Add Certificate"}
             />
           </div>
           {/* {certificateAssertion && (

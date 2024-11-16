@@ -157,22 +157,56 @@ export function DataTable({
                       <TableCell colSpan={columns.length} className="p-0">
                         <div className="bg-gray-200 p-4 shadow-md m-2 rounded-md">
                           {/* Row for Skill Level, Skill Type, and Tags */}
-                          <div className="flex items-center justify-evenly gap-4">
-                            <div className="font-bold">
-                              Skill Level:
-                              <p className="font-normal">
-                                {row.original.skill_level}
-                              </p>
+                          <div className="flex flex-col gap-6 p-6 rounded-lg bg-gray-100">
+                            <div className="grid grid-cols-3 gap-4 text-center">
+                              <div>
+                                <p className="font-bold text-gray-700">
+                                  Certificate Country:
+                                </p>
+                                <p className="font-normal">
+                                  {row.original.certificate_country}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="font-bold text-gray-700">
+                                  Num of hours:
+                                </p>
+                                <p className="font-normal">
+                                  {row.original.number_of_hours}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="font-bold text-gray-700">
+                                  Certificate Arabic name:
+                                </p>
+                                <p className="font-normal">
+                                  {row.original.certificate_name_arabic}
+                                </p>
+                              </div>
                             </div>
-                            <div className="font-bold">
-                              Skills Type:
-                              <p className="font-normal">
-                                {row.original.skill_type}
-                              </p>
-                            </div>
-                            <div className="font-bold">
-                              Tags:
-                              <p className="font-normal">{row.original.tags}</p>
+                            <div className="grid grid-cols-3 gap-4 text-center">
+                              <div>
+                                <p className="font-bold text-gray-700">
+                                  Skill Level:
+                                </p>
+                                <p className="font-normal">
+                                  {row.original.skill_level}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="font-bold text-gray-700">
+                                  Skills Type:
+                                </p>
+                                <p className="font-normal">
+                                  {row.original.skill_type}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="font-bold text-gray-700">Tags:</p>
+                                <p className="font-normal">
+                                  {row.original.tags}
+                                </p>
+                              </div>
                             </div>
                           </div>
                           {/* Row for Add Certificate button */}

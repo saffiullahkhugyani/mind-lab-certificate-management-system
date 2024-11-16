@@ -30,17 +30,15 @@ import {
 } from "@/types/types";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { SkillTags, SkillType } from "@/types/customs";
-import {
-  MultiSelect,
-  MultiSelectProps,
-  Options,
-} from "@/components/ui/multi-select";
+import { MultiSelect, Options } from "@/components/ui/multi-select";
 import {
   addCertificate,
   addCertificateMapping,
   certificateAsserted,
+  updateCertificate,
 } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 // const optionSchema = z.object({
 //   label: z.string(),
@@ -81,6 +79,8 @@ interface CreateCertificateProps {
   skillType: Array<SkillType>;
   skillTags: Array<FormattedSkillTags>;
   disabled: boolean;
+  isEdit: boolean;
+  buttonLabel: string;
 }
 
 const CreateCertificate = ({
@@ -89,6 +89,8 @@ const CreateCertificate = ({
   skillType,
   skillTags,
   disabled,
+  isEdit,
+  buttonLabel,
 }: CreateCertificateProps) => {
   const skillLevel = ["Basic", "Intermediate", "Advanced", "Professional"];
   const [isPending, startTransition] = useTransition();
@@ -96,6 +98,7 @@ const CreateCertificate = ({
   const [filteredTags, setFilteredTags] = useState<Options[]>([]);
   const [disableCertificate, setDisableCertificate] = useState<boolean>(true);
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     setFormValues(certificate!);
@@ -106,35 +109,46 @@ const CreateCertificate = ({
     setDisableCertificate(disabled || isPending);
   }, [disabled, isPending]);
 
+  // Default values for "add certificate" mode
+  const addCertificateDefaults = {
+    issue_year: "",
+    issue_authority: certificate?.issue_authority || "", // Example of pre-filling some fields
+    certificate_name_english: certificate?.certificate_name_english || "",
+    certificate_name_arabic: certificate?.certificate_name_arabic || "",
+    certificate_country: certificate?.certificate_country || "",
+    number_of_hours: "",
+    skill_level: "",
+    skill_type: "",
+    tags: [],
+  };
+
+  // Default values for "edit certificate" mode (when certificate is available)
+  const editCertificateDefaults = {
+    issue_year: certificate?.issue_year || "",
+    issue_authority: certificate?.issue_authority || "",
+    certificate_name_arabic: certificate?.certificate_name_arabic || "",
+    certificate_name_english: certificate?.certificate_name_english || "",
+    certificate_country: certificate?.certificate_country || "",
+    number_of_hours: certificate?.number_of_hours || "",
+    skill_level: certificate?.skill_level || "",
+    skill_type: certificate?.skill_type || "",
+    tags: certificate?.tags || [],
+  };
+
+  // Decide which set of default values to use based on whether we are editing or adding
+  const defaultValues = isEdit
+    ? editCertificateDefaults
+    : addCertificateDefaults;
+
   const form = useForm<FormFields>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      issue_year: "",
-      issue_authority: certificate?.issue_authority || "",
-      certificate_name_english: certificate?.certificate_name_english || "",
-      certificate_name_arabic: certificate?.certificate_name_arabic || "",
-      certificate_country: certificate?.certificate_country || "",
-      number_of_hours: "",
-      skill_level: "",
-      skill_type: "",
-      tags: [],
-    },
+    defaultValues,
   });
 
   const { reset, watch } = form;
 
   useEffect(() => {
-    reset({
-      issue_year: "",
-      issue_authority: certificate?.issue_authority || "",
-      certificate_name_english: certificate?.certificate_name_english || "",
-      certificate_name_arabic: certificate?.certificate_name_arabic || "",
-      certificate_country: certificate?.certificate_country || "",
-      number_of_hours: "",
-      skill_level: "",
-      skill_type: "",
-      tags: [],
-    });
+    reset(defaultValues);
   }, [certificate, reset]);
 
   // on focus the layout will change to arabic
@@ -162,12 +176,15 @@ const CreateCertificate = ({
   refill the form again.
   */
   useEffect(() => {
-    const subscription = watch((value) => {
-      localStorage.setItem("formData", JSON.stringify(value));
-    });
+    localStorage.removeItem("formData");
+    if (!isEdit) {
+      const subscription = watch((value) => {
+        localStorage.setItem("formData", JSON.stringify(value));
+      });
 
-    return () => subscription.unsubscribe();
-  }, [watch]);
+      return () => subscription.unsubscribe();
+    }
+  }, [watch, isEdit]);
 
   /*
     retriving the form values if the page was refreshed before submitting the form.
@@ -195,7 +212,7 @@ const CreateCertificate = ({
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     startTransition(async () => {
       const certificateData = {
-        id: null,
+        id: isEdit ? certificate?.id! : null,
         issue_year: data.issue_year,
         issue_authority: data.issue_authority,
         certificate_name_arabic: data.certificate_name_arabic,
@@ -205,40 +222,54 @@ const CreateCertificate = ({
         skill_level: data.skill_level,
         skill_type: data.skill_type,
         tags: data.tags,
+        certificate_status: null,
       };
 
-      const res = await addCertificate(certificateData);
-      const v2Id = res?.at(0)?.id;
-      const resCertificateMapping = await addCertificateMapping({
-        userId: v1Certificate?.profiles?.id!,
-        certificateV1Id: v1Certificate?.id!,
-        certificateV2Id: v2Id!,
-      });
+      if (isEdit) {
+        const response = await updateCertificate(certificateData);
 
-      if (resCertificateMapping != null) {
-        const certificateAssertion = await certificateAsserted({
-          certificateV1Id: v1Certificate?.id!,
-        });
-
-        if (certificateAssertion != null)
+        if (response != null) {
           toast({
-            description: "Certificate has been added successfully",
+            description: "Certificate has been updated successfully",
             variant: "success",
           });
-      }
 
-      reset({
-        issue_year: "",
-        issue_authority: "",
-        certificate_name_arabic: "",
-        certificate_name_english: "",
-        certificate_country: "",
-        number_of_hours: "",
-        skill_level: "",
-        skill_type: "",
-        tags: [],
-      });
-      localStorage.removeItem("formData");
+          router.back();
+        }
+      } else {
+        const res = await addCertificate(certificateData);
+        const v2Id = res?.at(0)?.id;
+        const resCertificateMapping = await addCertificateMapping({
+          userId: v1Certificate?.profiles?.id!,
+          certificateV1Id: v1Certificate?.id!,
+          certificateV2Id: v2Id!,
+        });
+
+        if (resCertificateMapping != null) {
+          const certificateAssertion = await certificateAsserted({
+            certificateV1Id: v1Certificate?.id!,
+          });
+
+          if (certificateAssertion != null)
+            toast({
+              description: "Certificate has been added successfully",
+              variant: "success",
+            });
+        }
+
+        reset({
+          issue_year: "",
+          issue_authority: "",
+          certificate_name_arabic: "",
+          certificate_name_english: "",
+          certificate_country: "",
+          number_of_hours: "",
+          skill_level: "",
+          skill_type: "",
+          tags: [],
+        });
+        localStorage.removeItem("formData");
+      }
     });
   };
   return (
@@ -251,7 +282,9 @@ const CreateCertificate = ({
         <fieldset disabled={disableCertificate}>
           <div className="bg-white shadow-md p-4 rounded-md m-2 space-y-4">
             <div>
-              <Label className="font-bold text-xl">Certificate Details </Label>
+              <FormLabel className="font-bold text-2xl">
+                {isEdit ? "Update Certificate" : "Certificate Details"}
+              </FormLabel>
             </div>
             <div className="space-y-2">
               <FormField
@@ -450,7 +483,7 @@ const CreateCertificate = ({
           </div>
           <div className="flex  justify-center m-2 ">
             <LoadingButton loading={isPending} className="w-auto gap-4 m-2">
-              Create Certificate{" "}
+              {buttonLabel}
             </LoadingButton>
           </div>
         </fieldset>

@@ -16,7 +16,28 @@ export async function addCertificate(formData: Certificate) {
 
     console.log("data interted to certificate master: ",data);
   } else {
-    console.log("Error insertinf data into certificate master: ",error)
+    console.log("Error inserting data into certificate master: ",error)
+  }
+
+  revalidatePath("/create-certificate")
+
+  return data;
+
+}
+
+export async function updateCertificate(formData: Certificate) {
+  const supabase = createClient();
+   const { id, ...rest } = formData;
+  const certificateData = id === null ? rest : formData;
+
+  const { data, error } = await supabase.from("certificate_master").update(certificateData).eq("id", formData.id!).select();
+
+  if (data != null)
+  {
+
+    console.log("data updated to certificate master: ",data);
+  } else {
+    console.log("Error updating data into certificate master: ",error)
   }
 
   revalidatePath("/create-certificate")

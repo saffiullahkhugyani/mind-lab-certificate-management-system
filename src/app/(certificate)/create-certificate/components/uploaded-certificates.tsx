@@ -48,12 +48,12 @@ function UploadedCertificates({
       className=" space-y-2 bg-white shadow-md rounded-sm m-2 p-2"
     >
       <div className="flex items-center space-x-4 px-4">
-        <h4 className="text-sm font-semibold">
-          @total certificates to be asserted: {uploadedCertificates!.length}
+        <h4 className="text-lg font-semibold">
+          Total certificates to be asserted: {uploadedCertificates!.length}
         </h4>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm">
-            <CaretSortIcon className="h-4 w-4" />
+            <CaretSortIcon className="h-6 w-6" />
             <span className="sr-only">Toggle</span>
           </Button>
         </CollapsibleTrigger>

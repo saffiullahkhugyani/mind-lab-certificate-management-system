@@ -12,6 +12,7 @@ export type Certificate = {
   skill_level: string | null,
   skill_type: string | null,
   tags: string[] | null,
+  certificate_status: boolean  | null,
 
 }
 
