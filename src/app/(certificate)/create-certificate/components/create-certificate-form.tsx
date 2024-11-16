@@ -222,7 +222,7 @@ const CreateCertificate = ({
         skill_level: data.skill_level,
         skill_type: data.skill_type,
         tags: data.tags,
-        certificate_status: null,
+        certificate_status: true,
       };
 
       if (isEdit) {
