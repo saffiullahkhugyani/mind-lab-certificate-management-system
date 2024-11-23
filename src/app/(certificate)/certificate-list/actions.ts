@@ -25,3 +25,19 @@ export async function switchCertificateState(certificateId: String, value: boole
   return data;
 
 }
+
+export async function certificateList() {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("certificate_master")
+    .select().order("id", { ascending: true });
+    
+    if (data != null)
+  {
+
+    console.log("Certificate list: ",data);
+  } else {
+    console.log("Error fetching certificate list: ",error)
+  }
+
+  return data;
+}

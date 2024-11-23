@@ -41,6 +41,7 @@ const CertificatePage = ({
   const [certificateAssertion, setCertificateAssertion] = useState(false);
   const [selectedV1Certificate, setSelectedV1Certificate] =
     useState<CustomUploadedCertificate | null>(null);
+  const [dataReady, setDataReady] = useState(false); // New flag to indicate data readiness
 
   // hooks for edit/updating certificate
   // using same hook for selected certificate for edit
@@ -96,6 +97,9 @@ const CertificatePage = ({
         JSON.parse(decodeURIComponent(certificateDataParam))
       );
     else setSelectedCertificate(null);
+
+    // Mark data as ready after processing search params
+    setDataReady(true);
   }, [searchParams]);
 
   return (
@@ -132,19 +136,20 @@ const CertificatePage = ({
           />
         )}
         {/* Section 2: Certificate Details */}
-        <div className="flex flex-row">
-          <div className="w-full">
-            <CreateCertificate
-              certificate={selectedCertificate!} // to add data from v2 existing certificate
-              v1Certificate={selectedV1Certificate} // for mapping version 1 certificate with version 2 certificate
-              skillTags={skillTags}
-              skillType={skillType}
-              disabled={!isEdit ? addCertificate : false}
-              isEdit={isEdit}
-              buttonLabel={isEdit ? "Update Certificate" : "Add Certificate"}
-            />
-          </div>
-          {/* {certificateAssertion && (
+        {dataReady && (
+          <div className="flex flex-row">
+            <div className="w-full">
+              <CreateCertificate
+                certificate={selectedCertificate!} // to add data from v2 existing certificate
+                v1Certificate={selectedV1Certificate} // for mapping version 1 certificate with version 2 certificate
+                skillTags={skillTags}
+                skillType={skillType}
+                disabled={!isEdit ? addCertificate : false}
+                isEdit={isEdit}
+                buttonLabel={isEdit ? "Update Certificate" : "Add Certificate"}
+              />
+            </div>
+            {/* {certificateAssertion && (
             <div className="w-full flex items-center justify-center bg-white p-2 m-2 rounded-sm shadow-md">
               <Image
                 src={selectedV1Certificate?.certificate_image_url!}
@@ -154,7 +159,8 @@ const CertificatePage = ({
               />
             </div>
           )} */}
-        </div>
+          </div>
+        )}
       </div>
     </>
   );

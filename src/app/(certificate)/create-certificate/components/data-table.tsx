@@ -169,7 +169,7 @@ export function DataTable({
                               </div>
                               <div>
                                 <p className="font-bold text-gray-700">
-                                  Num of hours:
+                                  Certificate number of hours:
                                 </p>
                                 <p className="font-normal">
                                   {row.original.number_of_hours}
@@ -204,7 +204,7 @@ export function DataTable({
                               <div>
                                 <p className="font-bold text-gray-700">Tags:</p>
                                 <p className="font-normal">
-                                  {row.original.tags}
+                                  {row.original.tags?.join(", ")}
                                 </p>
                               </div>
                             </div>

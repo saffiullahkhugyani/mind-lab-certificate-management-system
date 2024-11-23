@@ -176,13 +176,14 @@ const CreateCertificate = ({
   refill the form again.
   */
   useEffect(() => {
-    localStorage.removeItem("formData");
     if (!isEdit) {
       const subscription = watch((value) => {
         localStorage.setItem("formData", JSON.stringify(value));
       });
 
       return () => subscription.unsubscribe();
+    } else {
+      localStorage.removeItem("formData");
     }
   }, [watch, isEdit]);
 
@@ -370,10 +371,10 @@ const CreateCertificate = ({
                 name="number_of_hours"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Number of hours</FormLabel>
+                    <FormLabel>Certificate Number of hours</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Number of hours"
+                        placeholder="Certificate Number of hours"
                         type="number"
                         onWheel={(e) => (e.target as HTMLElement).blur()}
                         {...field}

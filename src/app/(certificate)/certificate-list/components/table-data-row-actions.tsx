@@ -63,9 +63,9 @@ export const DataTableRowActions: React.FC<DataTableRowActionsProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
-        <DropdownMenuItem>
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <span className="text-sm">{isToggled ? "Active" : "Inactive"}</span>
+        <DropdownMenuItem className={isToggled ? "bg-green-500" : "bg-acent"}>
+          <label className="flex items-center justify-between w-full cursor-pointer">
+            <span className="text-sm">Active</span>
             <input
               type="checkbox"
               checked={isToggled}
@@ -73,6 +73,12 @@ export const DataTableRowActions: React.FC<DataTableRowActionsProps> = ({
               className="toggle-checkbox"
             />
           </label>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={!isToggled ? "bg-red-500" : "bg-acent"}
+          onClick={handleToggle}
+        >
+          Inactive
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

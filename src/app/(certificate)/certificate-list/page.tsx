@@ -4,6 +4,7 @@ import React from "react";
 import { DataTable } from "./components/data-table";
 import { columns } from "./components/columns";
 import { createClient } from "@/lib/supabase/server";
+import { certificateList } from "./actions";
 
 export default async function page() {
   const supabase = createClient();
@@ -13,15 +14,15 @@ export default async function page() {
     return redirect("/login");
   }
 
-  const { data: certificate } = await supabase
-    .from("certificate_master")
-    .select();
+  // const { data: certificate } = await supabase
+  //   .from("certificate_master")
+  //   .select();
 
-  console.log(certificate);
+  const response = await certificateList();
 
   return (
     <div className="container">
-      <DataTable columns={columns} data={certificate!} />
+      <DataTable columns={columns} data={response!} />
     </div>
   );
 }
