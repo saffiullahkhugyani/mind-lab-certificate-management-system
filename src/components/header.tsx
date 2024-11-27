@@ -1,10 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import React from "react";
 import SignOut from "./SignOut";
 
 const Header = async () => {
-  const supabase = createClient();
+  const supabase = createSupabaseServerClient();
 
   const {
     data: { user },

@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { readUserSession } from "@/lib/actions/action";
-import { createClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { CustomUploadedCertificate } from "@/types/types";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
@@ -12,7 +12,7 @@ export default async function UploadedCertificates({
 }: {
   params: { certificateId: string };
 }) {
-  const supabase = createClient();
+  const supabase = createSupabaseServerClient();
   const { data: userSession } = await readUserSession();
 
   if (!userSession.session) {
