@@ -1,0 +1,38 @@
+import React, { useState } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import DonationReceiptForm from "./components/donation-receipt-form";
+import { programsList, sponsorList } from "./actions";
+import DonationAllocationForm from "./components/donation-allocation-form";
+
+export default async function Page() {
+  const sponsors = await sponsorList();
+  // const programs = await programsList();
+
+  return (
+    <div className="p-6 space-x-3 bg-gray-100 w-full">
+      <h1 className="text-2xl font-semibold mb-6">Donation Management</h1>
+
+      {/* Tabs */}
+      <Tabs
+        defaultValue="receipt"
+        className="bg-white p-6 rounded-lg shadow-md"
+      >
+        <TabsList className="mb-4">
+          <TabsTrigger value="receipt">Donation Receipt</TabsTrigger>
+          <TabsTrigger value="allocation">
+            Donation Management Tab 2
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="receipt">
+          <DonationReceiptForm sponsors={sponsors} />
+        </TabsContent>
+
+        <TabsContent value="allocation">
+          <div>Donation management tab 2</div>
+          {/* <DonationAllocationForm programs={programs} /> */}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

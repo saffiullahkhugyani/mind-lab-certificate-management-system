@@ -32,3 +32,37 @@ export type CustomUploadedCertificate = {
   certificate_image_url: string | null
   profiles: Profiles | null
 }
+
+export type Sponsors = {
+    sponsor_id: number,
+    user_id: string | null,
+    name: string | null,
+    email: string | null,
+    phone_number: string | null
+}
+
+export type Donation = {
+  amount?: number | null
+  bank_charges?: number | null
+  date?: string | null
+  donation_description?: string | null
+  donation_id?: number
+  remaining_amount?: number | null
+  source_of_amount?: string | null
+  sponsor_id: number
+}
+
+export type Programs = {
+  club?: string | null
+  period?: string | null
+  program_arabic_name?: string | null
+  program_english_name?: string | null
+  program_id?: number
+  subscription_value?: string | null
+}
+
+export type DonationAllocation = {
+  amount: number | null
+  created_at?: string
+  program_id: number | null
+}
