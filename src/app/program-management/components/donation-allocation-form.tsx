@@ -60,7 +60,7 @@ export default function DonationAllocationForm({
     defaultValues: {},
   });
 
-  const { reset, watch } = form;
+  const { reset } = form;
 
   // Handle form submission with explicit typing
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
@@ -78,7 +78,7 @@ export default function DonationAllocationForm({
 
       if (result.success) {
         setSubmissionDetails({
-          id: result.data?.at(0)?.id!,
+          id: result.data?.id!,
           programName:
             selectedProgram?.program_english_name || "Unknown Program",
           amount: data.amount,
@@ -145,7 +145,7 @@ export default function DonationAllocationForm({
                   {programs.map((program) => (
                     <SelectItem
                       key={program.program_id}
-                      value={program.program_english_name || ""}
+                      value={program.program_english_name!}
                     >
                       {program.program_english_name}
                     </SelectItem>

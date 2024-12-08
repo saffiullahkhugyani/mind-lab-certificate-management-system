@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       certificate_master: {
@@ -99,23 +124,23 @@ export type Database = {
       }
       clubs: {
         Row: {
-          club_name: string | null
           club_id: number
+          club_name: string | null
           created_at: string
         }
         Insert: {
-          club_name?: string | null
           club_id?: number
+          club_name?: string | null
           created_at?: string
         }
         Update: {
-          club_name?: string | null
           club_id?: number
+          club_name?: string | null
           created_at?: string
         }
         Relationships: []
       }
-       coupons: {
+      coupons: {
         Row: {
           club_id: number | null
           coupon_duration: string | null
@@ -125,7 +150,6 @@ export type Database = {
           start_date: string | null
           start_period: string | null
           student_id: string | null
-          number_of_coupons: number | null
         }
         Insert: {
           club_id?: number | null
@@ -136,8 +160,6 @@ export type Database = {
           start_date?: string | null
           start_period?: string | null
           student_id?: string | null
-          number_of_coupons?: number | null
-          
         }
         Update: {
           club_id?: number | null
@@ -148,7 +170,6 @@ export type Database = {
           start_date?: string | null
           start_period?: string | null
           student_id?: string | null
-          number_of_coupons?: number | null
         }
         Relationships: [
           {
@@ -379,7 +400,6 @@ export type Database = {
       }
       programs: {
         Row: {
-          club: string | null
           club_id: number | null
           created_at: string
           period: string | null
@@ -391,7 +411,6 @@ export type Database = {
           total_remaining_donation: number
         }
         Insert: {
-          club?: string | null
           club_id?: number | null
           created_at?: string
           period?: string | null
@@ -403,7 +422,6 @@ export type Database = {
           total_remaining_donation?: number
         }
         Update: {
-          club?: string | null
           club_id?: number | null
           created_at?: string
           period?: string | null

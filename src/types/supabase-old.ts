@@ -85,34 +85,40 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-       }
+      }
        donation: {
         Row: {
-          amount: string | null
-          bank_charges: string | null
+          amount: number | null
+          bank_charges: number | null
+          created_at: string | null
           date: string | null
-          donation_id: number
-          source_of_amount: string | null
-           sponsor_id: number
           donation_description: string | null
-        }
-        Insert: {
-          amount: string | null
-          bank_charges?: string | null
-          date?: string | null
-          donation_id?: number | null
+          donation_id: number
+          remaining_amount: number | null
           source_of_amount: string | null
           sponsor_id: number
+        }
+        Insert: {
+          amount?: number | null
+          bank_charges?: number | null
+          created_at?: string | null
+          date?: string | null
           donation_description?: string | null
+          donation_id?: number
+          remaining_amount?: number | null
+          source_of_amount?: string | null
+          sponsor_id: number
         }
         Update: {
-          amount?: string | null
-          bank_charges?: string | null
+          amount?: number | null
+          bank_charges?: number | null
+          created_at?: string | null
           date?: string | null
+          donation_description?: string | null
           donation_id?: number
+          remaining_amount?: number | null
           source_of_amount?: string | null
           sponsor_id?: number
-          donation_description: string | null
         }
         Relationships: [
           {
@@ -124,35 +130,32 @@ export type Database = {
           },
         ]
       }
-       sponsor: {
+      donation_allocation: {
         Row: {
-          email: string | null
-          name: string | null
-          phone_number: string | null
-          sponsor_id: number
-          user_id: string | null
+          amount: number | null
+          created_at: string
+          id: number
+          program_id: number | null
         }
         Insert: {
-          email?: string | null
-          name?: string | null
-          phone_number?: string | null
-          sponsor_id?: number
-          user_id?: string | null
+          amount?: number | null
+          created_at?: string
+          id?: number
+          program_id?: number | null
         }
         Update: {
-          email?: string | null
-          name?: string | null
-          phone_number?: string | null
-          sponsor_id?: number
-          user_id?: string | null
+          amount?: number | null
+          created_at?: string
+          id?: number
+          program_id?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "sponsor_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "donation_allocation_program_id_fkey"
+            columns: ["program_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedRelation: "programs"
+            referencedColumns: ["program_id"]
           },
         ]
       }
@@ -197,7 +200,7 @@ export type Database = {
           },
         ]
       }
-      programs: {
+       programs: {
         Row: {
           club: string | null
           created_at: string
@@ -326,6 +329,38 @@ export type Database = {
             columns: ["skill_hashtag_id"]
             isOneToOne: false
             referencedRelation: "skill_hashtags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sponsor: {
+        Row: {
+          email: string | null
+          name: string | null
+          phone_number: string | null
+          sponsor_id: number
+          user_id: string | null
+        }
+        Insert: {
+          email?: string | null
+          name?: string | null
+          phone_number?: string | null
+          sponsor_id?: number
+          user_id?: string | null
+        }
+        Update: {
+          email?: string | null
+          name?: string | null
+          phone_number?: string | null
+          sponsor_id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsor_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

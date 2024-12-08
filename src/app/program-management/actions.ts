@@ -4,6 +4,29 @@ import { createClient } from "@/lib/supabase/server"
 import { DonationAllocation, Programs } from "@/types/types";
 
 
+export async function clubsList() {
+  const supabase = createClient();
+
+  try {
+    const { data: clubs, error: fetchError } = await supabase
+      .from("clubs")
+      .select()
+      .order("created_at", { ascending: true });
+  
+    
+    if (fetchError) {
+      throw new Error("Failed to fetch clubs. Please try again later.");
+    }
+
+    return {success: true, data: clubs}
+    
+  } catch (error: any) {
+    // Handle and return the error to be displayed as a toast
+    console.error("Error in fetchinng clubs", error.message);
+    return { success: false, error: error.message };
+  }
+  
+}
 
 export async function addProgram(programData: Programs) {
     const supabase = createClient();
@@ -91,12 +114,31 @@ export async function donationAllocation(formData: DonationAllocation) {
     const { data: allocationData, error: insertError } = await supabase
       .from("donation_allocation")
       .upsert(formData)
-      .select();
+      .select()
+      .single();
 
     if (insertError) {
       console.log(insertError);
       throw new Error("Failed to record the allocation. Please try again later.");
     }
+
+    // Step 5: Updating Prorams Table with total sum of all donations of the programs
+    const { data: allocatedDonation, error: donationAllocationError } = await supabase
+      .from("donation_allocation")
+      .select()
+      .eq("program_id", allocationData.program_id!);
+    
+    if (donationAllocationError) throw donationAllocationError;
+
+    const totalSumOfProgramDonations = allocatedDonation.reduce((sum, donation) => sum + donation.amount!, 0);
+
+
+    // Step 6: Storing the total sum of donation amount to the programs table
+    const { data, error } = await supabase
+      .from("programs")
+      .update({"total_allocated_donation":totalSumOfProgramDonations, "total_remaining_donation": totalSumOfProgramDonations,})
+      .eq("program_id", allocationData.program_id!)
+      .select();
 
     return { success: true, data: allocationData };
 

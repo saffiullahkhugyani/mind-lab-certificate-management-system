@@ -23,6 +23,7 @@ const Header = async () => {
               <Link href={"/certificate-list"}>Certificate List</Link>
               <Link href={"/donation-management"}>Donation Management</Link>
               <Link href={"/program-management"}>Program Management</Link>
+              <Link href={"/coupon-management"}>Coupon Management</Link>
             </div>
           )}
         </nav>

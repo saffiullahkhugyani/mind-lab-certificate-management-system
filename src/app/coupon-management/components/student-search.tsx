@@ -30,7 +30,7 @@ interface SearchableDropdownProps<T> {
 export function SearchableDropdown<T>({
   items,
   placeholder = "Search...",
-  buttonClassName = "w-[200px] justify-between",
+  buttonClassName = "w-full justify-between",
   onSelect,
   getLabel,
   getValue,
@@ -61,7 +61,7 @@ export function SearchableDropdown<T>({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[500px] p-0">
         <Command>
           <CommandInput
             placeholder={placeholder}
@@ -69,11 +69,9 @@ export function SearchableDropdown<T>({
             onValueChange={setSearchQuery}
           />
           <CommandList>
-            <CommandEmpty>No sponsors found.</CommandEmpty>
+            <CommandEmpty>No Students found.</CommandEmpty>
             <CommandGroup>
               {filteredItems.map((item) => {
-                console.log(searchQuery);
-                console.log(filteredItems.length);
                 const value = getValue(item);
                 const label = getLabel(item);
                 return (

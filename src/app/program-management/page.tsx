@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CreateProgramForm from "./components/create-program-form";
 import DonationAllocationForm from "./components/donation-allocation-form";
-import { programsList } from "./actions";
+import { clubsList, programsList } from "./actions";
+
 export default async function Page() {
+  const clubs = await clubsList();
   const programs = await programsList();
   return (
     <div className="p-6 space-x-3 bg-gray-100 w-full">
@@ -20,7 +22,7 @@ export default async function Page() {
         </TabsList>
 
         <TabsContent value="program">
-          <CreateProgramForm />
+          <CreateProgramForm clubsList={clubs.data!} />
         </TabsContent>
 
         <TabsContent value="allocation">

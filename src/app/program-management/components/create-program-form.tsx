@@ -22,19 +22,10 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { addProgram } from "../actions";
 import { toast } from "@/components/ui/use-toast";
+import { Clubs } from "@/types/types";
 
 export const CreateProgramFormSchema = z.object({
-  club: z.enum(
-    [
-      "Robotics Club",
-      "Aeronautic Club",
-      "Gravity Race Club",
-      "Little inventors Club",
-    ],
-    {
-      invalid_type_error: "Source of Amount must be selected",
-    }
-  ),
+  club_id: z.coerce.number().min(1, { message: "Club is required" }),
   program_english_name: z
     .string()
     .min(2, { message: "Program english name is required" }),
@@ -50,21 +41,12 @@ export const CreateProgramFormSchema = z.object({
 //  type from schema
 type FormFields = z.infer<typeof CreateProgramFormSchema>;
 
-export default function CreateProgramForm() {
-  const clubs = [
-    "Robotics Club",
-    "Aeronautic Club",
-    "Gravity Race Club",
-    "Little inventors Club",
-  ];
-  const [isPending, startTransition] = useTransition();
+interface CreateProgramProps {
+  clubsList: Clubs[] | null;
+}
 
-  enum Clubs {
-    robotics_club = "Robotics Club",
-    aeronautic_club = "Aeronautic Club",
-    gravity_race_club = "Gravity Race Club",
-    little_inventors_club = "Little inventors Club",
-  }
+export default function CreateProgramForm({ clubsList }: CreateProgramProps) {
+  const [isPending, startTransition] = useTransition();
 
   // initializing form reference from HTML FORM ELEMENT
   const formRef = useRef<HTMLFormElement>(null);
@@ -89,7 +71,7 @@ export default function CreateProgramForm() {
         });
 
         reset({
-          club: Clubs.robotics_club,
+          club_id: 0,
           program_english_name: "",
           program_arabic_name: "",
           period: "",
@@ -108,26 +90,37 @@ export default function CreateProgramForm() {
       >
         <FormField
           control={form.control}
-          name="club"
+          name="club_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Clubs</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                value={field.value}
-                defaultValue={field.value}
+                value={field.value?.toString()}
+                defaultValue={field.value?.toString()}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a club"></SelectValue>
+                    <SelectValue placeholder="Select a club">
+                      {field.value
+                        ? clubsList?.find(
+                            (club) => club.club_id === Number(field.value)
+                          )?.club_name
+                        : "Select a club"}
+                    </SelectValue>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {clubs.map((club, index) => {
+                  {clubsList!.map((club) => {
                     return (
-                      <SelectItem value={club} key={index}>
-                        {club}
-                      </SelectItem>
+                      club.club_id && (
+                        <SelectItem
+                          value={club.club_id.toString()}
+                          key={club.club_id}
+                        >
+                          {club.club_name}
+                        </SelectItem>
+                      )
                     );
                   })}
                 </SelectContent>

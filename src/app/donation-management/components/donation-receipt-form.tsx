@@ -27,7 +27,7 @@ import { toast } from "@/components/ui/use-toast";
 import { SearchableDropdown } from "./sponsor-search";
 
 export const donationReceiptFormSchema = z.object({
-  sponsor_id: z.string().optional(),
+  sponsor_id: z.string().min(1, "Sponsor id is required"),
   sponsor_name: z.string().optional(),
   sponsor_number: z.string().optional(),
   company: z.string().optional(),
@@ -121,8 +121,8 @@ export default function DonationReceiptForm({
           items={sponsors!}
           placeholder="Search sponsors..."
           onSelect={(sponsor) => handleSponsorSelect(sponsor)}
-          getLabel={(item) => item.name!}
-          getValue={(item) => item.sponsor_id.toString()}
+          getLabel={(item) => item.name!.trim()}
+          getValue={(item) => item.sponsor_id.toString().trim()}
         />
       </div>
       <Form {...form}>

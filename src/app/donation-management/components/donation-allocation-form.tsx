@@ -23,7 +23,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import SuccessNotification from "./success-notification";
 import { Input } from "@/components/ui/input";
-import { donationAllocation } from "../actions";
+// import { donationAllocation } from "../actions";
 import { toast } from "@/components/ui/use-toast";
 
 // Updated Donation Allocation Form Schema
@@ -66,31 +66,31 @@ export default function DonationAllocationForm({
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     console.log("Form Submitted Directly:", data);
 
-    startTransition(async () => {
-      const result = await donationAllocation(data);
+    // startTransition(async () => {
+    //   const result = await donationAllocation(data);
 
-      if (!result.success) {
-        toast({
-          description: result.error || "An unexpected error occurred",
-          variant: "destructive",
-        });
-      }
+    //   if (!result.success) {
+    //     toast({
+    //       description: result.error || "An unexpected error occurred",
+    //       variant: "destructive",
+    //     });
+    //   }
 
-      if (result.success) {
-        setSubmissionDetails({
-          id: result.data?.at(0)?.id!,
-          programName:
-            selectedProgram?.program_english_name || "Unknown Program",
-          amount: data.amount,
-        });
-        setIsSubmitted(true);
+    //   if (result.success) {
+    //     setSubmissionDetails({
+    //       id: result.data?.at(0)?.id!,
+    //       programName:
+    //         selectedProgram?.program_english_name || "Unknown Program",
+    //       amount: data.amount,
+    //     });
+    //     setIsSubmitted(true);
 
-        reset({
-          program_id: undefined,
-          amount: 0,
-        });
-      }
-    });
+    //     reset({
+    //       program_id: undefined,
+    //       amount: 0,
+    //     });
+    //   }
+    // });
   };
 
   const handleDismiss = () => {

@@ -1,4 +1,4 @@
-import { Profiles } from "./customs";
+
 
 
 export type Certificate = {
@@ -53,6 +53,7 @@ export type Donation = {
 }
 
 export type Programs = {
+  club_id?: number | null
   club?: string | null
   period?: string | null
   program_arabic_name?: string | null
@@ -65,4 +66,33 @@ export type DonationAllocation = {
   amount: number | null
   created_at?: string
   program_id: number | null
+}
+
+export type Clubs = {
+  club_name?: string | null
+  club_id?: number
+  created_at?: string
+}
+
+export type Profiles = {
+  age?: string | null
+  email?: string | null
+  gender?: string | null
+  id: string
+  mobile?: string | null
+  name?: string | null
+  profile_image_url?: string | null
+  updated_at?: string | null
+}
+
+export type Coupons = {
+  club_id?: number | null
+  coupon_duration?: string | null
+  coupon_id?: number
+  created_at?: string
+  program_id?: number | null
+  start_date?: string | null
+  start_period?: string | null
+  student_id?: string | null
+  number_of_coupons?: number | null
 }
