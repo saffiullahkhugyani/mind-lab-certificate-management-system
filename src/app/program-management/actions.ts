@@ -132,13 +132,32 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     const totalSumOfProgramDonations = allocatedDonation.reduce((sum, donation) => sum + donation.amount!, 0);
 
-
     // Step 6: Storing the total sum of donation amount to the programs table
-    const { data, error } = await supabase
+    // Fetch the current value of total_remaining_donation
+    const { data: totalRemainingDonation, error: errorTotalRemainingDonation } = await supabase
       .from("programs")
-      .update({"total_allocated_donation":totalSumOfProgramDonations, "total_remaining_donation": totalSumOfProgramDonations,})
+      .select("total_remaining_donation")
       .eq("program_id", allocationData.program_id!)
-      .select();
+      .single();
+    
+    if (errorTotalRemainingDonation) {
+      console.error("Error fetching current donation:", errorTotalRemainingDonation!.message);
+    } else {
+      const currentRemainingDonation = totalRemainingDonation?.total_remaining_donation || 0;
+
+      // Calculate new total_remaining_donation
+      const updatedRemainingDonation = currentRemainingDonation + formData.amount!;
+
+      const { data, error } = await supabase
+        .from("programs")
+        .update({
+          "total_allocated_donation": totalSumOfProgramDonations,
+          "total_remaining_donation": updatedRemainingDonation,
+        })
+        .eq("program_id", allocationData.program_id!)
+        .select();
+    }
+
 
     return { success: true, data: allocationData };
 
