@@ -173,6 +173,35 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+       }
+        coupon_codes: {
+        Row: {
+          coupon_code: string | null
+          coupon_id: number | null
+          created_at: string
+          id: number
+        }
+        Insert: {
+          coupon_code?: string | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          coupon_code?: string | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_codes_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+        ]
       }
       donation: {
         Row: {

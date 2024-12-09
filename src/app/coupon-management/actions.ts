@@ -95,7 +95,7 @@ export async function addStudentCoupon(formData: Coupons) {
     let remainingDeduction = subscriptionValue * couponDurationInMonths;
     const deduction = totalRemainingDonation - remainingDeduction;
 
-    if (totalRemainingDonation >= subscriptionValue && deduction > 0) {
+    if (totalRemainingDonation >= subscriptionValue && deduction >= 0) {
      
 
       // Step 3: Update the donation record with deducted amount
@@ -112,13 +112,16 @@ export async function addStudentCoupon(formData: Coupons) {
         ...rest, program_id, student_id, coupon_duration, start_period,
         start_date: startDate, number_of_coupons: couponDurationInMonths,
       };
-      console.log(finalData);
 
       // Step 4: Inserting coupon record
       const { data: couponData , error: insertCouponError } = await supabase
         .from("coupons")
         .insert(finalData)
-        .select();
+        .select()
+        .single();
+      
+      // Generate and storing coupon codes
+      await generateAndStoreCouponCodes(couponData!);
       
       return { success: true, data: couponData}
 
@@ -132,6 +135,45 @@ export async function addStudentCoupon(formData: Coupons) {
     console.error("Error in fetchinng students", error.message);
     return { success: false, error: error.message };
   }
+}
+
+async function generateAndStoreCouponCodes(coupon: Coupons) {
+
+  console.log("coupons from database: ", coupon);
+  const supabase = createClient();
+  if (!coupon.coupon_id || !coupon.number_of_coupons) {
+    console.log("Invalid coupon data: Missing coupon_id or number of coupons");
+    return;
+  }
+
+   // Generate unique codes for coupon
+   for (let i = 0; i < coupon.number_of_coupons!; i++) {
+     let newCode = generateUniqueCode(coupon.coupon_id);
+
+     // Inserting coupon codes
+     const { data, error } = await supabase
+       .from('coupon_codes')
+       .insert({ coupon_id: coupon.coupon_id, coupon_code: newCode })
+       .select();
+
+   }
+
+
+
+}
+
+function generateUniqueCode(couponId: number): string {
+  const timestamp = Date.now(); // Current time in milliseconds
+  const randomOffset = Math.floor(Math.random() * 1000); // Random value to add uniqueness
+
+  // Combine the timestamp and couponId with the random offset
+  const rawCode = timestamp + couponId + randomOffset;
+
+  // Reduce the number to 5 digits using modulo
+  const uniqueCode = rawCode % 100000;
+
+  // Return the code as a string, padded with zeros if necessary
+  return uniqueCode.toString().padStart(5, "0");
 }
 
 // Calculate the start date based on the period

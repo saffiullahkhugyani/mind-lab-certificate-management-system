@@ -140,12 +140,42 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_codes: {
+        Row: {
+          coupon_code: string | null
+          coupon_id: number | null
+          created_at: string
+          id: number
+        }
+        Insert: {
+          coupon_code?: string | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          coupon_code?: string | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_codes_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+        ]
+      }
       coupons: {
         Row: {
           club_id: number | null
           coupon_duration: string | null
           coupon_id: number
           created_at: string
+          number_of_coupons: number | null
           program_id: number | null
           start_date: string | null
           start_period: string | null
@@ -156,6 +186,7 @@ export type Database = {
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
@@ -166,6 +197,7 @@ export type Database = {
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
