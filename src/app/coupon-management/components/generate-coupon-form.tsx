@@ -241,8 +241,10 @@ export default function GenerateCouponForm({
                         {field.value || "Select period"}
                       </SelectTrigger>
                       <SelectContent>
-                        {couponPeriod.map((period) => (
-                          <SelectItem value={period}>{period}</SelectItem>
+                        {couponPeriod.map((period, index) => (
+                          <SelectItem value={period} key={index}>
+                            {period}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

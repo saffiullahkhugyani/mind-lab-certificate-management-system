@@ -1,8 +1,10 @@
 'use server'
 
 import { createClient } from "@/lib/supabase/server";
-import { Coupons } from "@/types/types";
+import { Coupons, StudentInterestData } from "@/types/types";
 
+
+{/*Fething clubs list */}
 export async function clubsList() {
   const supabase = createClient();
 
@@ -27,6 +29,7 @@ export async function clubsList() {
   
 }
 
+{/* Fetching programs list*/}
 export async function programsList() {
   const supabase = createClient();
   const { data, error } = await supabase.from("programs")
@@ -34,8 +37,7 @@ export async function programsList() {
     
     if (data != null)
   {
-
-    console.log("programs list: ",data);
+    // console.log("programs list: ",data);
   } else {
     console.log("Error fetching programs list: ",error)
   }
@@ -44,20 +46,20 @@ export async function programsList() {
   
 }
 
+{/* Fetching students list */ }
+{/* For now fetching all users will be fixed when we add role based access control */}
 export async function studentsList() {
   const supabase = createClient();
   try {
     const { data: students, error: fetchError } = await supabase
       .from("profiles")
-      .select("id, name");
+      .select("id, name, email");
   
     
     if (fetchError) {
       console.log(fetchError)
       throw new Error(`Failed to fetch students list. Please try again later.`);
     }
-
-    console.log(students);
 
     return {success: true, data: students}
     
@@ -71,7 +73,7 @@ export async function studentsList() {
 }
 
 
-// adding/generating studnets coupons
+{ /* adding/generating studnets coupons */ }
 export async function addStudentCoupon(formData: Coupons) {
   const supabase = createClient();
   const { program_id, student_id, coupon_duration, start_period, start_date, number_of_coupons, ...rest} = formData;
@@ -137,6 +139,191 @@ export async function addStudentCoupon(formData: Coupons) {
   }
 }
 
+{/* Inserting student intrest record data */ }
+// export async function AddStudentInterest(studentInterest: StudentInterestData[]) {
+//   const supabase = createClient();
+
+//   for (const interest of studentInterest) {
+//     const { user_email, club_id, program_id, date_submitted } = interest;
+
+//     try {
+//     // Check if the record already exists
+//     // Build dynamic filters to handle null values
+//     let query = supabase.from("student_interest").select();
+
+//     if (user_email) {
+//       query = query.eq("user_email", user_email);
+//     }
+
+//     if (program_id !== null) {
+//       query = query.eq("program_id", program_id!);
+//     }
+
+//     if (club_id !== null) {
+//       query = query.eq("club_id", club_id!);
+//     }
+
+//     // Execute the query
+//     const { data: existingRecord, error: existingError } = await query.single();
+
+//     if (existingError) {
+//       if (existingError.code !== "PGRST116") { // Handle unexpected errors
+//         console.error("Error checking for existing record:", existingError);
+//         continue; // Skip to the next record
+//       }
+//     }
+
+//     if (!existingRecord) {
+//       // Insert new record if it doesn't exist
+//       const { error: insertError } = await supabase
+//         .from("student_interest")
+//         .insert({
+//           user_email,
+//           club_id,
+//           program_id,
+//           date_submitted,
+//         });
+
+//       if (insertError) {
+//         console.error("Error inserting record:", insertError);
+//       } else {
+//         console.log("Record inserted successfully:", interest);
+//       }
+//     } else {
+      
+//         console.log("Record already exists, skipping:", interest);
+//       }
+
+//     } catch (error: any) {
+//       return {success: false, message: `Error: ${error.message}`}
+//     }
+//   }
+
+//     return {success: true, message: "Data updated successfully"}
+
+// }
+
+export async function AddStudentInterest(studentInterest: StudentInterestData[]) {
+  const supabase = createClient();
+  const resultMessages: string[] = []; // Store messages for each record
+
+  for (const interest of studentInterest) {
+    const { user_email, club_id, program_id, date_submitted } = interest;
+
+    try {
+      // Check if the record already exists
+      let query = supabase.from("student_interest").select();
+
+      if (user_email) {
+        query = query.eq("user_email", user_email);
+      }
+
+      if (program_id !== null) {
+        query = query.eq("program_id", program_id!);
+      }
+
+      if (club_id !== null) {
+        query = query.eq("club_id", club_id!);
+      }
+
+      // Execute the query
+      const { data: existingRecord, error: existingError } = await query.single();
+
+      if (existingError) {
+        if (existingError.code !== "PGRST116") {
+          console.error("Error checking for existing record:", existingError);
+          resultMessages.push(`Error checking for record ${user_email}: ${existingError.message}`);
+          continue; // Skip to the next record
+        }
+      }
+
+      if (!existingRecord) {
+        // Insert new record if it doesn't exist
+        const { error: insertError } = await supabase
+          .from("student_interest")
+          .insert({
+            user_email,
+            club_id,
+            program_id,
+            date_submitted,
+          }).select();
+
+        if (insertError) {
+          console.error("Error inserting record:", insertError);
+          resultMessages.push(`Error inserting record for ${user_email}: ${insertError.message}`);
+        } else {
+          resultMessages.push(`Data for ${user_email} inserted successfully`);
+          // const { data: userProfile, error: userProfileError } = await supabase
+          //   .from('profiles')
+          //   .select()
+          //   .eq("email", user_email!)
+          //   .single();
+          // console.log(`Yes user exists ${userProfile}`); 
+        
+        }
+      } else {
+        console.log("Record already exists, skipping:", interest);
+        resultMessages.push(`Data for ${user_email} already exists`);
+      }
+
+    } catch (error: any) {
+      resultMessages.push(`Error: ${error.message} for ${user_email}`);
+    }
+  }
+
+  // Return all accumulated messages
+  return {
+    success: true,
+    messages: resultMessages,
+  };
+}
+
+
+
+{/* Fetching coupons list */}
+export async function couponsList() {
+  const supabase = createClient();
+  try {
+    const { data: coupons, error: fetchError } = await supabase
+      .from("coupons")
+      .select(`coupon_id,
+        profiles!coupons_student_id_fkey (
+      name,
+      email
+    ),
+        clubs!coupons_club_id_fkey (
+      club_name
+    ),
+        programs!coupons_program_id_fkey (
+      program_english_name
+    )`);
+  
+    
+    if (fetchError) {
+      console.log(fetchError)
+      throw new Error(`Failed to fetch coupons list. Please try again later.`);
+    }
+
+    const mappedCouponWithDetails = coupons.map((coupon) => ({
+      coupon_id: coupon.coupon_id,
+      student_name: coupon.profiles?.name,
+      student_email: coupon.profiles?.email,
+      program_name: coupon.programs?.program_english_name
+    }))
+
+    // console.log(mappedCouponWithDetails);
+
+    return {success: true, data: coupons}
+    
+  } catch (error: any) {
+    // Handle and return the error to be displayed as a toast
+    console.error("Error in fetchinng Coupons", error.message);
+    return { success: false, error: error.message };
+  }
+  
+}
+
+{ /* FUNCTIONS */}
 async function generateAndStoreCouponCodes(coupon: Coupons) {
 
   console.log("coupons from database: ", coupon);

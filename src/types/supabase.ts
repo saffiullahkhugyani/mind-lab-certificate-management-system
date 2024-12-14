@@ -121,34 +121,33 @@ export type Database = {
           coupon_duration: string | null
           coupon_id: number
           created_at: string
+          number_of_coupons: number | null
           program_id: number | null
           start_date: string | null
           start_period: string | null
           student_id: string | null
-          number_of_coupons: number | null
         }
         Insert: {
           club_id?: number | null
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
           student_id?: string | null
-          number_of_coupons?: number | null
-          
         }
         Update: {
           club_id?: number | null
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
           student_id?: string | null
-          number_of_coupons?: number | null
         }
         Relationships: [
           {
@@ -173,7 +172,7 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-       }
+      }
         coupon_codes: {
         Row: {
           coupon_code: string | null
@@ -614,6 +613,49 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      
+      student_interest: {
+        Row: {
+          club_id: number | null
+          created_at: string
+          date_submitted: string | null
+          id: number
+          program_id: number | null
+          user_email: string | null
+        }
+        Insert: {
+          club_id?: number | null
+          created_at?: string
+          date_submitted?: string | null
+          id?: number
+          program_id?: number | null
+          user_email?: string | null
+        }
+        Update: {
+          club_id?: number | null
+          created_at?: string
+          date_submitted?: string | null
+          id?: number
+          program_id?: number | null
+          user_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_interest_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["club_id"]
+          },
+          {
+            foreignKeyName: "student_interest_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["program_id"]
           },
         ]
       }
