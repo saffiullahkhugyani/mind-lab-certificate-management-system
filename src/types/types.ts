@@ -98,13 +98,13 @@ export type Coupons = {
 }
 
 export type StudentInterestData = {
-  email?: string | null
-  club?: string | null
-  program?: string | null
-  club_id?: number | null
-  created_at?: string
-  date_submitted?: string | null
   id?: number
-  program_id?: number | null
+  email?: string | null
   user_email?: string | null
+  club_id?: number | null
+  club?: string | null
+  program_id?: number | null
+  program?: string | null
+  date_submitted?: string | null
+  created_at?: string
 }

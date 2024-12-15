@@ -27,32 +27,86 @@ export function StudentInterest({
   const [interestData, setInterestData] = useState<StudentInterestData[]>([]);
   const [rawJsonData, setRawJsonData] = useState<string>("");
   const [isPending, startTransition] = useTransition();
+  const [dataUploaded, setDataUploaded] = useState<StudentInterestData[]>([]);
+  const [displayInsertedData, setDisplayInsertedData] =
+    useState<boolean>(false);
 
   // Reference to the file input element
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Function to handle file reading and data extraction
-  function readDataFromFile() {
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = e.target?.result;
-        if (data) {
-          const workBook = XLSX.read(data, { type: "binary" });
-          const sheetName = workBook.SheetNames[0];
-          const workSheet = workBook.Sheets[sheetName];
-
-          // Convert worksheet to JSON
-          const rawJson: Array<Record<string, any>> =
-            XLSX.utils.sheet_to_json(workSheet);
-
-          const formattedData = formatRawData(rawJson);
-          setRawJsonData(JSON.stringify(rawJson, null, 2));
-          setInterestData(formattedData);
-        }
-      };
-      reader.readAsArrayBuffer(file);
+  async function saveData() {
+    if (!file) {
+      toast({
+        description: "Please select a file to read and save student interest",
+        variant: "destructive",
+      });
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const data = e.target?.result;
+      if (!data) {
+        toast({
+          description: "Error reading the file. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        // Parse Excel file
+        const workBook = XLSX.read(data, { type: "binary" });
+        const sheetName = workBook.SheetNames[0];
+        const workSheet = workBook.Sheets[sheetName];
+
+        // Convert worksheet to JSON
+        const rawJson =
+          XLSX.utils.sheet_to_json<Record<string, any>>(workSheet);
+        const formattedData = formatRawData(rawJson);
+
+        // Update state
+        setRawJsonData(JSON.stringify(rawJson, null, 2));
+        setInterestData(formattedData);
+
+        // Process and save data
+        const processedData = processStudentInterestData(formattedData);
+
+        // Start processing data with transitions
+        startTransition(async () => {
+          const result = await AddStudentInterest(processedData);
+
+          if (result.success) {
+            setDisplayInsertedData(true);
+            setInterestData(result.data!);
+          }
+
+          // Display messages with toasts
+          result.messages.forEach((message, index) => {
+            setTimeout(() => {
+              toast({
+                description: message,
+                variant: message.includes("Error") ? "destructive" : "success",
+              });
+            }, index * 500); // Delay between toasts
+          });
+
+          // Optional: Handle results as needed
+          if (result.success && result.data!.length > 0) {
+            console.log(`Successfully inserted data:`, result.data);
+          }
+        });
+      } catch (error) {
+        console.error("Error processing the file:", error);
+        toast({
+          description: "An error occurred while processing the file.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    // Read the file as ArrayBuffer
+    reader.readAsArrayBuffer(file);
   }
 
   // Function to format raw Excel data into the expected structure
@@ -68,8 +122,8 @@ export function StudentInterest({
   }
 
   // Function to process student interest data and prepare it for insertion
-  function processStudentInterestData() {
-    return interestData.map((studentInterest) => {
+  function processStudentInterestData(data: StudentInterestData[]) {
+    return data.map((studentInterest) => {
       const clubId = clubs.find(
         (club) =>
           club.club_name?.toLowerCase() === studentInterest.club?.toLowerCase()
@@ -82,78 +136,20 @@ export function StudentInterest({
       )?.program_id;
 
       return {
+        email: studentInterest.email || null,
         user_email: studentInterest.email || null,
         club_id: clubId || null,
+        club: studentInterest.club || null,
+        program: studentInterest.program || null,
         program_id: programId || null,
         date_submitted: studentInterest.date_submitted || null,
       };
     });
   }
 
-  // Function to save student interest data
-  async function saveData() {
-    startTransition(async () => {
-      if (interestData.length > 0) {
-        const processedData = processStudentInterestData();
-
-        const result = await AddStudentInterest(processedData);
-
-        // Display success or error messages via toast
-        // Show toasts sequentially with a slight delay
-        for (let i = 0; i < result.messages.length; i++) {
-          const message = result.messages[i];
-
-          // Display a toast based on whether it's an error or success
-          setTimeout(() => {
-            if (message.includes("Error")) {
-              toast({
-                description: message,
-                variant: "destructive", // For errors
-              });
-            } else {
-              toast({
-                description: message,
-                variant: "success", // For success
-              });
-            }
-          }, i * 500); // 300ms delay between each toast
-        }
-        // result.messages.forEach((message) => {
-        //   if (message.includes("Error")) {
-        //     toast({
-        //       description: message,
-        //       variant: "destructive",
-        //     });
-        //   } else {
-        //     toast({
-        //       description: message,
-        //       variant: "success",
-        //     });
-        //   }
-        // });
-
-        // if (result.success) {
-        //   toast({
-        //     description: result.message,
-        //     variant: "success",
-        //   });
-        // } else {
-        //   toast({
-        //     description: result.message,
-        //     variant: "destructive",
-        //   });
-        // }
-      } else {
-        toast({
-          description: "Please select a file to read and save student interest",
-          variant: "destructive",
-        });
-      }
-    });
-  }
-
   // Function to clear uploaded data
   function clearData() {
+    setDisplayInsertedData(false);
     setInterestData([]);
     setRawJsonData("");
     setFile(null);
@@ -176,10 +172,7 @@ export function StudentInterest({
             onChange={(e) => setFile(e.target.files![0])}
           />
         </div>
-        <div className="flex items-end gap-8">
-          <Button variant="outline" onClick={readDataFromFile}>
-            Preview data
-          </Button>
+        <div className="flex items-end gap-6">
           <LoadingButton
             loading={isPending}
             variant="default"
@@ -187,7 +180,7 @@ export function StudentInterest({
           >
             Save data
           </LoadingButton>
-          <Button variant="destructive" onClick={clearData}>
+          <Button variant="destructive" onClick={clearData} className="h-10">
             Clear data
           </Button>
         </div>
@@ -195,7 +188,7 @@ export function StudentInterest({
 
       {/* Displaying the data table */}
       <div>
-        {interestData.length > 0 && (
+        {displayInsertedData && (
           <DataTable columns={columns} data={interestData} />
         )}
       </div>

@@ -205,78 +205,96 @@ export async function addStudentCoupon(formData: Coupons) {
 
 export async function AddStudentInterest(studentInterest: StudentInterestData[]) {
   const supabase = createClient();
-  const resultMessages: string[] = []; // Store messages for each record
+  const resultMessages: string[] = [];
+  const insertedInterestData: StudentInterestData[] = [];
+  let successCount = 0;
+  let skipCount = 0;
+  let failureCount = 0;
 
-  for (const interest of studentInterest) {
-    const { user_email, club_id, program_id, date_submitted } = interest;
+  try {
+    // Fetch all existing records in one query
+    const { data: existingRecords, error: fetchError } = await supabase
+      .from("student_interest")
+      .select("user_email, club_id, program_id");
 
-    try {
-      // Check if the record already exists
-      let query = supabase.from("student_interest").select();
-
-      if (user_email) {
-        query = query.eq("user_email", user_email);
-      }
-
-      if (program_id !== null) {
-        query = query.eq("program_id", program_id!);
-      }
-
-      if (club_id !== null) {
-        query = query.eq("club_id", club_id!);
-      }
-
-      // Execute the query
-      const { data: existingRecord, error: existingError } = await query.single();
-
-      if (existingError) {
-        if (existingError.code !== "PGRST116") {
-          console.error("Error checking for existing record:", existingError);
-          resultMessages.push(`Error checking for record ${user_email}: ${existingError.message}`);
-          continue; // Skip to the next record
-        }
-      }
-
-      if (!existingRecord) {
-        // Insert new record if it doesn't exist
-        const { error: insertError } = await supabase
-          .from("student_interest")
-          .insert({
-            user_email,
-            club_id,
-            program_id,
-            date_submitted,
-          }).select();
-
-        if (insertError) {
-          console.error("Error inserting record:", insertError);
-          resultMessages.push(`Error inserting record for ${user_email}: ${insertError.message}`);
-        } else {
-          resultMessages.push(`Data for ${user_email} inserted successfully`);
-          // const { data: userProfile, error: userProfileError } = await supabase
-          //   .from('profiles')
-          //   .select()
-          //   .eq("email", user_email!)
-          //   .single();
-          // console.log(`Yes user exists ${userProfile}`); 
-        
-        }
-      } else {
-        console.log("Record already exists, skipping:", interest);
-        resultMessages.push(`Data for ${user_email} already exists`);
-      }
-
-    } catch (error: any) {
-      resultMessages.push(`Error: ${error.message} for ${user_email}`);
+    if (fetchError) {
+      console.error("Error fetching existing records:", fetchError);
+      return {
+        success: false,
+        messages: [`Failed to fetch existing records: ${fetchError.message}`],
+      };
     }
+
+    for (const interest of studentInterest) {
+      const { user_email, club_id, program_id, date_submitted } = interest;
+
+      // Check for duplicates
+      const isDuplicate = existingRecords?.some((record) => {
+
+        // Check if the user_email and club_id match
+        const emailAndClubMatch =
+          record.user_email === user_email && record.club_id === club_id;
+
+          // Check if the program_id matches or is redundant
+          const programMatch =
+          record.program_id === program_id;
+
+        // Skip inserting if email and club match and program conditions overlap
+        return emailAndClubMatch && programMatch;
+        
+    });
+
+      if (isDuplicate) {
+        skipCount++;
+        resultMessages.push(`Record for ${user_email} with club ${club_id} and program ${program_id} already exists.`);
+        continue;
+      }
+
+      // storing interest record that is to be inserted
+      insertedInterestData.push(interest);
+
+      // Insert the record if not a duplicate
+      const { data: insertedData, error: insertError } = await supabase
+        .from("student_interest")
+        .insert({
+          user_email,
+          club_id,
+          program_id,
+          date_submitted,
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("Error inserting record:", insertError);
+        resultMessages.push(`Error inserting record for ${user_email}: ${insertError.message}`);
+        failureCount++;
+      } else {
+        successCount++;
+        resultMessages.push(`Record for ${user_email} inserted successfully.`);
+        // insertedInterestData.push(insertedData);
+      }
+    }
+  } catch (error: any) {
+    console.error("Unexpected error:", error);
+    return {
+      success: false,
+      messages: [`Unexpected error occurred: ${error.message}`],
+    };
   }
 
-  // Return all accumulated messages
   return {
     success: true,
     messages: resultMessages,
+    summary: {
+      successCount,
+      skipCount,
+      failureCount,
+    },
+    data: insertedInterestData,
   };
 }
+
 
 
 
