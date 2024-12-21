@@ -54,7 +54,6 @@ export type Donation = {
 
 export type Programs = {
   club_id?: number | null
-  club?: string | null
   period?: string | null
   program_arabic_name?: string | null
   program_english_name?: string | null

@@ -119,7 +119,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     // Step 2: Check if donations are sufficient
     const couponDurationInMonths = parseInt(coupon_duration!); 
     let remainingDeduction = subscriptionValue * couponDurationInMonths;
-    const deduction = totalRemainingDonation - remainingDeduction;
+    const deduction = totalRemainingDonation! - remainingDeduction;
 
     if (deduction < 0) {
       return {success: false, error: "Insufficient donations for this program"}
@@ -489,7 +489,7 @@ async function findProgramWithSufficientDonation(clubId: number) {
   // Find a program with enough donation
   return programs?.find(
     (program) =>
-      program.total_remaining_donation >= Number(program.subscription_value)
+      program.total_remaining_donation! >= Number(program.subscription_value)
   );
 }
 

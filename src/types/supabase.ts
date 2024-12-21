@@ -462,7 +462,6 @@ export type Database = {
       }
       programs: {
         Row: {
-          club: string | null
           club_id: number | null
           created_at: string
           period: string | null
@@ -470,11 +469,10 @@ export type Database = {
           program_english_name: string | null
           program_id: number
           subscription_value: string | null
-          total_allocated_donation: number
-          total_remaining_donation: number
+          total_allocated_donation: number | null
+          total_remaining_donation: number | null
         }
         Insert: {
-          club?: string | null
           club_id?: number | null
           created_at?: string
           period?: string | null
@@ -482,11 +480,10 @@ export type Database = {
           program_english_name?: string | null
           program_id?: number
           subscription_value?: string | null
-          total_allocated_donation?: number
-          total_remaining_donation?: number
+          total_allocated_donation?: number | null
+          total_remaining_donation?: number | null
         }
         Update: {
-          club?: string | null
           club_id?: number | null
           created_at?: string
           period?: string | null
@@ -494,8 +491,8 @@ export type Database = {
           program_english_name?: string | null
           program_id?: number
           subscription_value?: string | null
-          total_allocated_donation?: number
-          total_remaining_donation?: number
+          total_allocated_donation?: number | null
+          total_remaining_donation?: number | null
         }
         Relationships: [
           {
