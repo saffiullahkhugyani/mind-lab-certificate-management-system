@@ -2,7 +2,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import GenerateCouponForm from "./components/generate-coupon-form";
 import { StudentInterest } from "./components/student-interest";
 import { clubsList, couponsList, programsList, studentsList } from "./actions";
-// import CouponBatchProcess from "./components/coupon-batch-process";
+import CouponBatchProcess from "./components/coupon-batch-process";
 
 export default async function Page() {
   const clubs = await clubsList();
@@ -22,9 +22,9 @@ export default async function Page() {
         <TabsList className="mb-4">
           <TabsTrigger value="generate-coupon">Generate Coupon</TabsTrigger>
           <TabsTrigger value="student-interest">Student Interest</TabsTrigger>
-          {/* <TabsTrigger value="coupon-batch-process">
+          <TabsTrigger value="coupon-batch-process">
             Coupon Batch Process
-          </TabsTrigger> */}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="generate-coupon">
@@ -43,9 +43,9 @@ export default async function Page() {
           />
         </TabsContent>
 
-        {/* <TabsContent value="coupon-batch-process">
-          <CouponBatchProcess />
-        </TabsContent> */}
+        <TabsContent value="coupon-batch-process">
+          <CouponBatchProcess clubs={clubs.data!} programs={programs} />
+        </TabsContent>
       </Tabs>
     </div>
   );

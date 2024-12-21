@@ -162,7 +162,7 @@ export default function CreateProgramForm({ clubsList }: CreateProgramProps) {
             <FormItem>
               <FormLabel>Program period</FormLabel>
               <FormControl>
-                <Input placeholder="program period" {...field} />
+                <Input placeholder="In days" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

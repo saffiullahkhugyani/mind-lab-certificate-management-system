@@ -115,6 +115,71 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_interest_mapping: {
+        Row: {
+          coupon_id: number | null
+          created_at: string
+          id: number
+          student_email: string | null
+        }
+        Insert: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          student_email?: string | null
+        }
+        Update: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          student_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_interest_mapping_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+        ]
+      }
+      coupon_user_mapping: {
+        Row: {
+          coupon_id: number | null
+          created_at: string
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_user_mapping_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+          {
+            foreignKeyName: "coupon_user_mapping_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
        coupons: {
         Row: {
           club_id: number | null
@@ -125,7 +190,6 @@ export type Database = {
           program_id: number | null
           start_date: string | null
           start_period: string | null
-          student_id: string | null
         }
         Insert: {
           club_id?: number | null
@@ -136,7 +200,6 @@ export type Database = {
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
-          student_id?: string | null
         }
         Update: {
           club_id?: number | null
@@ -147,7 +210,6 @@ export type Database = {
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
-          student_id?: string | null
         }
         Relationships: [
           {
@@ -163,13 +225,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "programs"
             referencedColumns: ["program_id"]
-          },
-          {
-            foreignKeyName: "coupons_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -750,6 +805,42 @@ export type Database = {
           },
           {
             foreignKeyName: "upload_certificate_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_interest_mapping: {
+        Row: {
+          created_at: string
+          id: number
+          interest_id: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          interest_id?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          interest_id?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_interest_mapping_interest_id_fkey"
+            columns: ["interest_id"]
+            isOneToOne: false
+            referencedRelation: "student_interest"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_interest_mapping_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

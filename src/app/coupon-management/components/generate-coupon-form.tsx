@@ -30,6 +30,7 @@ import { toast } from "@/components/ui/use-toast";
 const generateCouponFormSchema = z.object({
   student_id: z.string().min(1, "Student ID is required"),
   student_name: z.string().optional(),
+  student_email: z.string().optional(),
   club_id: z.coerce.number().min(1, "Please select a club"),
   program_id: z.coerce.number().min(1, "Please select a program"),
   coupon_duration: z.string().min(1, "Please select a period"),
@@ -76,6 +77,7 @@ export default function GenerateCouponForm({
     defaultValues: {
       student_id: "",
       student_name: "",
+      student_email: "",
       club_id: 0,
       program_id: 0,
       coupon_duration: "",
@@ -101,11 +103,12 @@ export default function GenerateCouponForm({
         club_id: data.club_id,
         program_id: data.program_id,
         student_id: data.student_id,
+        student_email: data.student_email,
         coupon_duration: data.coupon_duration,
         start_period: data.start_period,
       };
 
-      const result = await addStudentCoupon(couponData);
+      const result = await addStudentCoupon(couponData, true);
 
       if (result.success) {
         toast({
@@ -116,9 +119,7 @@ export default function GenerateCouponForm({
         reset();
       } else {
         toast({
-          description: `Error generating coupons: ${
-            result.error ? result.error : result.data
-          }`,
+          description: `Error generating coupons: ${result.error}`,
           variant: "destructive",
         });
       }
@@ -128,6 +129,7 @@ export default function GenerateCouponForm({
   const handleStudentSelect = (student: Profiles) => {
     form.setValue("student_id", student.id);
     form.setValue("student_name", student.name!);
+    form.setValue("student_email", student.email!);
   };
 
   return (
@@ -314,6 +316,20 @@ export default function GenerateCouponForm({
                     <FormLabel>Student Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Student name" {...field} readOnly />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="student_email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Student Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Student email" {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

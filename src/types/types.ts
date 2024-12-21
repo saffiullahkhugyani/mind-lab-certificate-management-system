@@ -60,6 +60,8 @@ export type Programs = {
   program_english_name?: string | null
   program_id?: number
   subscription_value?: string | null
+  total_allocated_donation?: number | null
+  total_remaining_donation?: number | null
 }
 
 export type DonationAllocation = {
@@ -94,6 +96,7 @@ export type Coupons = {
   start_date?: string | null
   start_period?: string | null
   student_id?: string | null
+  student_email?: string | null
   number_of_coupons?: number | null
 }
 

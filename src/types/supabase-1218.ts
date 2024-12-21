@@ -169,6 +169,78 @@ export type Database = {
           },
         ]
       }
+      coupon_interest_mapping: {
+        Row: {
+          coupon_id: number | null
+          created_at: string
+          id: number
+          interest_id: number | null
+        }
+        Insert: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          interest_id?: number | null
+        }
+        Update: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          interest_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_interest_mapping_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+          {
+            foreignKeyName: "coupon_interest_mapping_interest_id_fkey"
+            columns: ["interest_id"]
+            isOneToOne: false
+            referencedRelation: "student_interest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupon_user_mapping: {
+        Row: {
+          coupon_id: number | null
+          created_at: string
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_user_mapping_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+          {
+            foreignKeyName: "coupon_user_mapping_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupons: {
         Row: {
           club_id: number | null
@@ -778,6 +850,42 @@ export type Database = {
           },
         ]
       }
+      user_interest_mapping: {
+        Row: {
+          created_at: string
+          id: number
+          interest_id: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          interest_id?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          interest_id?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_interest_mapping_interest_id_fkey"
+            columns: ["interest_id"]
+            isOneToOne: false
+            referencedRelation: "student_interest"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_interest_mapping_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -799,6 +907,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      calculate_player_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       calculate_top_speed: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -810,6 +922,16 @@ export type Database = {
       delete_user: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_top_speed: {
+        Args: {
+          player_id: string
+          race_type: string
+        }
+        Returns: {
+          race_type_selected: string
+          top_speed: number
+        }[]
       }
     }
     Enums: {
