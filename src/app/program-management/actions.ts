@@ -29,17 +29,43 @@ export async function clubsList() {
 }
 
 export async function addProgram(programData: Programs) {
-    const supabase = createClient();
+  const supabase = createClient();
+
+  try { 
+
+    const { data: existingProgram, error: existingProgramError } = await supabase
+      .from("programs")
+      .select("*")
+      .eq("program_english_name", programData.program_english_name!.trim());
+    
+      if (existingProgramError) {
+        // console.log("Existing Program Error: ", existingProgramError);      
+        throw new Error(existingProgramError.message);
+    }
+    
+    if (existingProgram.length > 0) {
+      console.log("Existing: ", existingProgram);
+      throw new Error("Program already exists");
+    }
+      
     const { data, error } = await supabase.from("programs")
         .insert(programData).select()
     
     if (data != null) {
-        console.log("Program added successfully", data)
-    } else {
-        console.log("Error while adding program", error)
+      return {success: true, message: data}
     }
-
-    return data;
+    
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+      
+  } catch (error: any) {
+    // Handle and return the error to be displayed as a toast
+    console.error("Error in adding a program: ", error.message);
+    return { success: false, error: error.message };
+  }
+  
 }
 
 export async function programsList() {

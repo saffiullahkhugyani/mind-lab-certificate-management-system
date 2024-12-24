@@ -63,14 +63,17 @@ export function StudentInterest({
         // Convert worksheet to JSON
         const rawJson =
           XLSX.utils.sheet_to_json<Record<string, any>>(workSheet);
-        const formattedData = formatRawData(rawJson);
+        let formattedData = formatRawData(rawJson);
+
+        // removing duplication before insertion
+        const preProcessedData = removeDuplicates(formattedData!);
 
         // Update state
         setRawJsonData(JSON.stringify(rawJson, null, 2));
-        setInterestData(formattedData);
+        setInterestData(preProcessedData);
 
         // Process and save data
-        const processedData = processStudentInterestData(formattedData);
+        const processedData = processStudentInterestData(preProcessedData);
 
         // Start processing data with transitions
         startTransition(async () => {
@@ -145,6 +148,21 @@ export function StudentInterest({
         date_submitted: studentInterest.date_submitted || null,
       };
     });
+  }
+
+  function removeDuplicates(data: StudentInterestData[]) {
+    const seen = new Set();
+    const filteredData = data.filter((item) => {
+      // Create a composite key based on the specified keys
+      const compositeKey = `${item.email}-${item.club}-${item.program}`;
+      if (seen.has(compositeKey)) {
+        return false; // Duplicate, exclude from the result
+      }
+      seen.add(compositeKey);
+      return true; // Not a duplicate, include in the result
+    });
+
+    return filteredData;
   }
 
   // Function to clear uploaded data

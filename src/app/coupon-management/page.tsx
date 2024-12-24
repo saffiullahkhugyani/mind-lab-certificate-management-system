@@ -3,12 +3,20 @@ import GenerateCouponForm from "./components/generate-coupon-form";
 import { StudentInterest } from "./components/student-interest";
 import { clubsList, couponsList, programsList, studentsList } from "./actions";
 import CouponBatchProcess from "./components/coupon-batch-process";
+import { readUserSession } from "@/lib/actions/action";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
   const clubs = await clubsList();
   const programs = await programsList();
   const students = await studentsList();
   const coupons = await couponsList();
+
+  const { data: userSession } = await readUserSession();
+
+  if (!userSession.session) {
+    return redirect("/login");
+  }
 
   return (
     <div className="p-6 space-x-3 bg-gray-100 w-full">

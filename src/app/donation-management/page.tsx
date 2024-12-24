@@ -3,10 +3,18 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DonationReceiptForm from "./components/donation-receipt-form";
 import { programsList, sponsorList } from "./actions";
 import DonationAllocationForm from "./components/donation-allocation-form";
+import { readUserSession } from "@/lib/actions/action";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
   const sponsors = await sponsorList();
   // const programs = await programsList();
+
+  const { data: userSession } = await readUserSession();
+
+  if (!userSession.session) {
+    return redirect("/login");
+  }
 
   return (
     <div className="p-6 space-x-3 bg-gray-100 w-full">

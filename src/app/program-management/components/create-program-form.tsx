@@ -64,7 +64,7 @@ export default function CreateProgramForm({ clubsList }: CreateProgramProps) {
     startTransition(async () => {
       const response = await addProgram(data);
 
-      if (response) {
+      if (response?.success) {
         toast({
           description: "Program has been added successfully",
           variant: "success",
@@ -76,6 +76,13 @@ export default function CreateProgramForm({ clubsList }: CreateProgramProps) {
           program_arabic_name: "",
           period: "",
           subscription_value: "",
+        });
+      }
+
+      if (response?.error) {
+        toast({
+          description: response.error,
+          variant: "destructive",
         });
       }
     });
