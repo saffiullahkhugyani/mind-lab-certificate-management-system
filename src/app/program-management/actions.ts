@@ -71,7 +71,7 @@ export async function addProgram(programData: Programs) {
 export async function programsList() {
   const supabase = createClient();
   const { data, error } = await supabase.from("programs")
-    .select().order("program_id", { ascending: true });
+    .select().order("program_english_name", { ascending: true });
     
     if (data != null)
   {
