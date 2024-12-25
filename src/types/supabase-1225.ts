@@ -161,7 +161,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "coupon_codes_1_coupon_id_fkey"
+            foreignKeyName: "coupon_codes_coupon_id_fkey"
             columns: ["coupon_id"]
             isOneToOne: false
             referencedRelation: "coupons"
@@ -174,19 +174,19 @@ export type Database = {
           coupon_id: number | null
           created_at: string
           id: number
-          interest_id: number | null
+          student_email: string | null
         }
         Insert: {
           coupon_id?: number | null
           created_at?: string
           id?: number
-          interest_id?: number | null
+          student_email?: string | null
         }
         Update: {
           coupon_id?: number | null
           created_at?: string
           id?: number
-          interest_id?: number | null
+          student_email?: string | null
         }
         Relationships: [
           {
@@ -195,13 +195,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "coupons"
             referencedColumns: ["coupon_id"]
-          },
-          {
-            foreignKeyName: "coupon_interest_mapping_interest_id_fkey"
-            columns: ["interest_id"]
-            isOneToOne: false
-            referencedRelation: "student_interest"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -251,7 +244,6 @@ export type Database = {
           program_id: number | null
           start_date: string | null
           start_period: string | null
-          student_id: string | null
         }
         Insert: {
           club_id?: number | null
@@ -262,7 +254,6 @@ export type Database = {
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
-          student_id?: string | null
         }
         Update: {
           club_id?: number | null
@@ -273,7 +264,6 @@ export type Database = {
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
-          student_id?: string | null
         }
         Relationships: [
           {
@@ -289,13 +279,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "programs"
             referencedColumns: ["program_id"]
-          },
-          {
-            foreignKeyName: "coupons_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -680,6 +663,8 @@ export type Database = {
       }
       sponsor: {
         Row: {
+          address: string | null
+          company: string | null
           email: string | null
           name: string | null
           phone_number: string | null
@@ -687,6 +672,8 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          address?: string | null
+          company?: string | null
           email?: string | null
           name?: string | null
           phone_number?: string | null
@@ -694,6 +681,8 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          address?: string | null
+          company?: string | null
           email?: string | null
           name?: string | null
           phone_number?: string | null

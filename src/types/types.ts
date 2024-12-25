@@ -34,11 +34,13 @@ export type CustomUploadedCertificate = {
 }
 
 export type Sponsors = {
-    sponsor_id: number,
-    user_id: string | null,
-    name: string | null,
-    email: string | null,
-    phone_number: string | null
+  sponsor_id: number,
+  user_id: string | null,
+  name: string | null,
+  email: string | null,
+  phone_number: string | null,
+  company: string | null,
+  address: string | null
 }
 
 export type Donation = {

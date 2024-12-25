@@ -46,6 +46,7 @@ export default function CouponBatchProcess({
   const [isPending, startTransition] = useTransition();
   const [filteredPrograms, setFilteredPrograms] = useState<Programs[]>([]);
   const [addedCoupons, setAddedCoupons] = useState<Coupons[]>([]);
+  const [totalStudents, setTotalStudents] = useState<number>(0);
   const [errors, setErrors] = useState<{ email: string; message: string }[]>(
     []
   );
@@ -75,14 +76,14 @@ export default function CouponBatchProcess({
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     startTransition(async () => {
-      console.log(data);
-
       const result = await couponBatchProcess(data.club_id, data.program_id);
       if (result?.success) {
         setAddedCoupons(result.addedCoupons!);
+        setTotalStudents(result.totalStudents!);
+
         toast({
-          description: result?.message,
-          variant: "success",
+          description: `Batch process completed, ${result.addedCoupons?.length} coupons added`,
+          variant: result.addedCoupons?.length! > 0 ? "success" : "destructive",
         });
       } else {
         setErrors(result.errors!);
@@ -175,9 +176,23 @@ export default function CouponBatchProcess({
       <div className="w-px bg-gray-300 h-auto"></div>
 
       {/* Right: Added Students Section */}
-      <div className="space-y-2">
-        <Label className="text-md font-bold">Number of added students</Label>
-        <Input value={addedCoupons && addedCoupons.length.toString()}></Input>
+      <div className="flex-auto space-y-4">
+        <div>
+          <Label className="text-md font-bold">Number of added students</Label>
+          <Input
+            value={addedCoupons && addedCoupons.length.toString()}
+            disabled={true}
+          ></Input>
+        </div>
+        <div>
+          <Label className="text-md font-bold">
+            Total num of students in the program
+          </Label>
+          <Input
+            value={totalStudents && totalStudents.toString()}
+            disabled={true}
+          ></Input>
+        </div>
       </div>
     </div>
   );

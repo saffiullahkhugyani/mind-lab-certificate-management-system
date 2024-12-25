@@ -98,9 +98,8 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       console.log("Error for existing coupons: ", existingCouponError);
       console.log("Data fetched: ", existingCoupon);
 
-      if (existingCoupon?.length! > 0) {
-        return { success: false, error: "Coupon already exists for this user and program." };
-      }
+      if (existingCoupon?.length! > 0)
+        throw new Error("Coupon already exists for this user and program.");
     }
 
     // Step 1: Fetching program details
@@ -121,9 +120,9 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     let remainingDeduction = subscriptionValue * couponDurationInMonths;
     const deduction = totalRemainingDonation! - remainingDeduction;
 
-    if (deduction < 0) {
-      return {success: false, error: "Insufficient donations for this program"}
-    }
+    if (deduction < 0)
+      throw new Error("Insufficient donations for this program")
+    
 
       // Step 3: Update the donation record with deducted amount
       const { error: updateError } = await supabase
@@ -250,25 +249,6 @@ export async function AddStudentInterest(studentInterest: StudentInterestData[])
       } else {
         successCount++;
         resultMessages.push(`Record for ${user_email} inserted successfully.`);
-        // insertedInterestData.push(insertedData);
-
-        // const { data: user, error: userError } = await supabase
-        //   .from("profiles")
-        //   .select("id")
-        //   .eq("email", user_email!)
-        //   .single();
-        
-        // if(userError)
-        //   console.log(`Error: ${userError.message}`)
-        
-        // if (user) {
-        //   const { data: interestMapping, error: mappingError } = await supabase
-        //     .from("user_interest_mapping")
-        //     .insert({ user_id: user.id, interest_id: insertedData.id })
-        //     .select()
-        //     .single()
-        // }
-
       }
     }
   } catch (error: any) {
@@ -316,160 +296,314 @@ export async function couponsList() {
   }
   
 }
-
 export async function couponBatchProcess(clubId: number, programId: number) {
   const supabase = createClient();
   let addedCouponsList: Coupons[] = []; // to store successfully added coupons
   let errorList: { email: string; message: string }[] = []; // to store errors with email
 
-  // Step 1: Fetch data from `student_interest` table
-  const { data: interestData, error: interestError } = await supabase
-    .from('student_interest')
-    .select("*")
-    .eq("club_id", clubId)
-    .eq("program_id", programId);
-
-  if (interestError) {
-    console.error("Error fetching student interest:", interestError.message);
-    return { success: false, message: "Failed to fetch student interest data." }
-  }
-  
-// If no matching records for club and program, fetch students with null `program_id` in the same club
-  let studentsWithNullProgram: StudentInterestData[] = [];
-  if (!interestData || interestData.length === 0) {
-
-    // fetching students with 'null' program
-     const { data: nullProgramData, error: nullProgramError } = await supabase
-      .from("student_interest")
+  try {
+    // Step 1: Fetch all data from the `student_interest` table
+    const { data: interestData, error: interestError } = await supabase
+      .from('student_interest')
       .select("*")
-      .eq("club_id", clubId)
-      .is("program_id", null);
-    
-     if (nullProgramError) {
-      console.error(
-        "Error fetching students with null program:",
-        nullProgramError.message
+      .eq("club_id", clubId);
+
+    if (interestError) {
+      console.error("Error fetching student interest:", interestError.message);
+      return { success: false, message: "Failed to fetch student interest data." };
+    }
+
+    if (!interestData || interestData.length === 0) {
+      return { success: false, message: "No students found for the selected club." };
+    }
+
+    // Step 2: Filter students with and without the programId
+    const studentsWithProgram = interestData.filter(student => student.program_id === programId);
+    const studentsWithoutProgram = interestData.filter(student => !student.program_id);
+
+    // Step 3: Process students without a program (assign program and generate coupons)
+    for (const student of studentsWithoutProgram) {
+      // Check if the student already has the selected program in their interest
+      const isProgramAlreadyAssigned = interestData.some(
+        s => s.user_email === student.user_email && s.program_id === programId
       );
-      return { success: false, message: "Failed to fetch students with null program." };
-    }
 
-    if (!nullProgramData || nullProgramData.length === 0) {
-      return { success: false, message: "No Students for the selected club" };  
-    }
-
-    studentsWithNullProgram = nullProgramData || [];
-    // return { success: false, message: "No Students for the selected club and program" };
-  }
-
-  // Combine interest data and null-program data
-  const studentsToProcess: StudentInterestData[] = interestData || [];
-
-  for (const student of studentsWithNullProgram) {
-    // Assign the program with sufficient donation
-    const sufficientProgram = await findProgramWithSufficientDonation(clubId);
-    if (sufficientProgram) {
-      student.program_id = sufficientProgram.program_id;
-      studentsToProcess.push(student); // Add student to the processing list
-
-      // Update student in interest table with program id
-      const { data: updateInterestData, error: updateError } = await supabase
-        .from("student_interest")
-        .update({ "program_id": sufficientProgram.program_id })
-        .eq("id", student.id!)
-        .select()
-        .single();
-
-        console.log("Sufficient Program: ", sufficientProgram);
-        console.log("Update Interest Data:", updateInterestData);
-    }
-  }
-
-
-  // Step 2: Pre-fetch existing coupons for efficiency
-  const { data: userCoupons, error: userCouponError } = await supabase
-    .from('coupon_user_mapping')
-    .select("id, coupons (coupon_id, program_id), profiles (email)");
-
-  const { data: interestCoupons, error: interestCouponError } = await supabase
-    .from('coupon_interest_mapping')
-    .select("id, student_email, coupons (coupon_id, program_id)");
-
-  if (userCouponError || interestCouponError) {
-    console.error("Error fetching coupons data:", userCouponError?.message || interestCouponError?.message);
-     return { success: false, message: "Failed to fetch existing coupons data." };
- 
-  }
-
-  // Combine user and interest coupons for unified existence checks
-  const allCoupons = [
-    ...(userCoupons || []).map((mappedCoupons) => ({
-      email: mappedCoupons.profiles?.email,
-      programId: mappedCoupons.coupons?.program_id,
-    })),
-    ...(interestCoupons || []).map((mappedCoupons) => ({
-      email: mappedCoupons.student_email,
-      programId: mappedCoupons.coupons?.program_id,
-    })),
-  ];
-
-  // Step 3: Process each user in the interest data
-  for (const student of studentsToProcess) {
-    const { user_email, program_id, club_id } = student;
-
-    // Check if user already has a coupon in either table
-    const userHasCoupon = allCoupons.some(
-      (coupon) => coupon.email === user_email && coupon.programId === program_id
-    );
-
-    if (!userHasCoupon) {
-      // Check if the user is registered
-      const { data: registeredUser } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("email", user_email!)
-        .single(); // Get a single record if found
-
-      // Construct the newCoupon object
-      const newCoupon = registeredUser
-        ? {
-            club_id: club_id,
-            program_id: program_id,
-            student_id: registeredUser.id, // For registered users
-            coupon_duration: "1 month",
-            start_period: "Future period",
-          }
-        : {
-            club_id: club_id,
-            program_id: program_id,
-            student_email: user_email, // For unregistered users
-            coupon_duration: "1 month",
-            start_period: "Future period",
-          };
-
-      // Pass the newCoupon to the existing addStudentCoupon function
-      const addCouponResult = await addStudentCoupon(newCoupon);
-
-      if (addCouponResult.success) {
-        console.log(`Coupon added: ${addCouponResult.data}`);
-        addedCouponsList.push(addCouponResult.data!);
-      } else {
-        console.error(`Error adding coupon: ${addCouponResult.data}`);
-        errorList.push({ email: user_email!, message: addCouponResult.error });
-      
+      if (isProgramAlreadyAssigned) {
+        console.log(`Skipping student ${student.user_email} - Program already assigned.`);
+        continue;
       }
-    } else {
-      console.log(`User ${user_email} already has a coupon for program ${program_id}`);
-    }
-  }
 
-  // Returning results for display o the UI
-   return {
-    success: true,
-    message: "Batch process completed",
-    addedCoupons: addedCouponsList,
-    errors: errorList,
-  };
+      // Assign the selected program to the student
+      const { error: updateError } = await supabase
+        .from('student_interest')
+        .update({ program_id: programId })
+        .eq('id', student.id);
+
+      if (updateError) {
+        console.error(`Failed to assign program to ${student.user_email}:`, updateError.message);
+        errorList.push({ email: student.user_email!, message: "Failed to assign program." });
+      } else {
+        console.log(`Assigned program ${programId} to student ${student.user_email}.`);
+
+        // Add the student to the "studentsWithProgram" list for coupon generation
+        studentsWithProgram.push({ ...student, program_id: programId });
+      }
+    }
+
+    // Step 4: Process students with the program for coupons
+    if (studentsWithProgram.length > 0) {
+      console.log(`Found ${studentsWithProgram.length} students with the selected program.`);
+
+      // Pre-fetch all existing coupons to avoid repeated queries
+      const { data: userCoupons, error: userCouponError } = await supabase
+        .from('coupon_user_mapping')
+        .select("id, coupons (coupon_id, program_id), profiles (email)");
+
+      const { data: interestCoupons, error: interestCouponError } = await supabase
+        .from('coupon_interest_mapping')
+        .select("id, student_email, coupons (coupon_id, program_id)");
+
+      if (userCouponError || interestCouponError) {
+        console.error(
+          "Error fetching coupons data:",
+          userCouponError?.message || interestCouponError?.message
+        );
+        return { success: false, message: "Failed to fetch existing coupons data." };
+      }
+
+      // Combine user and interest coupons for unified existence checks
+      const allCoupons = [
+        ...(userCoupons || []).map((mappedCoupons) => ({
+          email: mappedCoupons.profiles?.email,
+          programId: mappedCoupons.coupons?.program_id,
+        })),
+        ...(interestCoupons || []).map((mappedCoupons) => ({
+          email: mappedCoupons.student_email,
+          programId: mappedCoupons.coupons?.program_id,
+        })),
+      ];
+
+      for (const student of studentsWithProgram) {
+        const { user_email  } = student;
+
+        // Check if the student already has a coupon for this program
+        const userHasCoupon = allCoupons.some(
+          (coupon) => coupon.email === user_email && coupon.programId === programId
+        );
+
+        if (!userHasCoupon) {
+          // Generate a coupon for the student
+          const { data: registeredUser } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("email", user_email!)
+            .single(); // Get a single record if found
+
+          // Construct the newCoupon object
+          const newCoupon = registeredUser
+            ? {
+                club_id: clubId,
+                program_id: programId,
+                student_id: registeredUser.id, // For registered users
+                coupon_duration: "1 month",
+                start_period: "Future period",
+              }
+            : {
+                club_id: clubId,
+                program_id: programId,
+                student_email: user_email, // For unregistered users
+                coupon_duration: "1 month",
+                start_period: "Future period",
+              };
+
+          // Add the coupon using the existing logic
+          const addCouponResult = await addStudentCoupon(newCoupon);
+
+          if (addCouponResult.success) {
+            console.log(`Coupon added: ${addCouponResult.data}`);
+            addedCouponsList.push(addCouponResult.data!);
+          } else {
+            console.error(`Error adding coupon: ${addCouponResult.data}`);
+            errorList.push({ email: user_email!, message: addCouponResult.error });
+          }
+        } else {
+          console.log(`User ${user_email} already has a coupon for program ${programId}`);
+        }
+      }
+    }
+
+    const { data: totalStudents, error: totalError } = await supabase
+      .from("coupons")
+      .select("*")
+      .eq("program_id", programId);
+
+    // Return the results
+    return {
+      success: true,
+      addedCoupons: addedCouponsList,
+      totalStudents: totalStudents?.length,
+      errors: errorList,
+    };
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return { success: false, message: "An unexpected error occurred." };
+  }
 }
+
+
+// export async function couponBatchProcess(clubId: number, programId: number) {
+//   const supabase = createClient();
+//   let addedCouponsList: Coupons[] = []; // to store successfully added coupons
+//   let errorList: { email: string; message: string }[] = []; // to store errors with email
+
+//   // Step 1: Fetch data from `student_interest` table
+//   const { data: interestData, error: interestError } = await supabase
+//     .from('student_interest')
+//     .select("*")
+//     .eq("club_id", clubId)
+//     .eq("program_id", programId);
+
+//   if (interestError) {
+//     console.error("Error fetching student interest:", interestError.message);
+//     return { success: false, message: "Failed to fetch student interest data." }
+//   }
+  
+// // If no matching records for club and program, fetch students with null `program_id` in the same club
+//   let studentsWithNullProgram: StudentInterestData[] = [];
+//   if (!interestData || interestData.length === 0) {
+
+//     // fetching students with 'null' program
+//      const { data: nullProgramData, error: nullProgramError } = await supabase
+//       .from("student_interest")
+//       .select("*")
+//       .eq("club_id", clubId)
+//       .is("program_id", null);
+    
+//      if (nullProgramError) {
+//       console.error(
+//         "Error fetching students with null program:",
+//         nullProgramError.message
+//       );
+//       return { success: false, message: "Failed to fetch students with null program." };
+//     }
+
+//     if (!nullProgramData || nullProgramData.length === 0) {
+//       return { success: false, message: "No Students for the selected club" };  
+//     }
+
+//     studentsWithNullProgram = nullProgramData || [];
+//     // return { success: false, message: "No Students for the selected club and program" };
+//   }
+
+//   // Combine interest data and null-program data
+//   const studentsToProcess: StudentInterestData[] = interestData || [];
+
+//   for (const student of studentsWithNullProgram) {
+//     // Assign the program with sufficient donation
+//     const sufficientProgram = await findProgramWithSufficientDonation(clubId);
+//     if (sufficientProgram) {
+//       student.program_id = sufficientProgram.program_id;
+//       studentsToProcess.push(student); // Add student to the processing list
+
+//       // Update student in interest table with program id
+//       const { data: updateInterestData, error: updateError } = await supabase
+//         .from("student_interest")
+//         .update({ "program_id": sufficientProgram.program_id })
+//         .eq("id", student.id!)
+//         .select()
+//         .single();
+
+//         console.log("Sufficient Program: ", sufficientProgram);
+//         console.log("Update Interest Data:", updateInterestData);
+//     }
+//   }
+
+
+//   // Step 2: Pre-fetch existing coupons for efficiency
+//   const { data: userCoupons, error: userCouponError } = await supabase
+//     .from('coupon_user_mapping')
+//     .select("id, coupons (coupon_id, program_id), profiles (email)");
+
+//   const { data: interestCoupons, error: interestCouponError } = await supabase
+//     .from('coupon_interest_mapping')
+//     .select("id, student_email, coupons (coupon_id, program_id)");
+
+//   if (userCouponError || interestCouponError) {
+//     console.error("Error fetching coupons data:", userCouponError?.message || interestCouponError?.message);
+//      return { success: false, message: "Failed to fetch existing coupons data." };
+ 
+//   }
+
+//   // Combine user and interest coupons for unified existence checks
+//   const allCoupons = [
+//     ...(userCoupons || []).map((mappedCoupons) => ({
+//       email: mappedCoupons.profiles?.email,
+//       programId: mappedCoupons.coupons?.program_id,
+//     })),
+//     ...(interestCoupons || []).map((mappedCoupons) => ({
+//       email: mappedCoupons.student_email,
+//       programId: mappedCoupons.coupons?.program_id,
+//     })),
+//   ];
+
+//   // Step 3: Process each user in the interest data
+//   for (const student of studentsToProcess) {
+//     const { user_email, program_id, club_id } = student;
+
+//     // Check if user already has a coupon in either table
+//     const userHasCoupon = allCoupons.some(
+//       (coupon) => coupon.email === user_email && coupon.programId === program_id
+//     );
+
+//     if (!userHasCoupon) {
+//       // Check if the user is registered
+//       const { data: registeredUser } = await supabase
+//         .from("profiles")
+//         .select("*")
+//         .eq("email", user_email!)
+//         .single(); // Get a single record if found
+
+//       // Construct the newCoupon object
+//       const newCoupon = registeredUser
+//         ? {
+//             club_id: club_id,
+//             program_id: program_id,
+//             student_id: registeredUser.id, // For registered users
+//             coupon_duration: "1 month",
+//             start_period: "Future period",
+//           }
+//         : {
+//             club_id: club_id,
+//             program_id: program_id,
+//             student_email: user_email, // For unregistered users
+//             coupon_duration: "1 month",
+//             start_period: "Future period",
+//           };
+
+//       // Pass the newCoupon to the existing addStudentCoupon function
+//       const addCouponResult = await addStudentCoupon(newCoupon);
+
+//       if (addCouponResult.success) {
+//         console.log(`Coupon added: ${addCouponResult.data}`);
+//         addedCouponsList.push(addCouponResult.data!);
+//       } else {
+//         console.error(`Error adding coupon: ${addCouponResult.data}`);
+//         errorList.push({ email: user_email!, message: addCouponResult.error });
+      
+//       }
+//     } else {
+//       console.log(`User ${user_email} already has a coupon for program ${program_id}`);
+//     }
+//   }
+
+//   // Returning results for display o the UI
+//    return {
+//     success: true,
+//     message: "Batch process completed",
+//     addedCoupons: addedCouponsList,
+//     errors: errorList,
+//   };
+// }
 
 { /* FUNCTIONS */ }
 

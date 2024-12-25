@@ -636,8 +636,10 @@ export type Database = {
           },
         ]
       }
-      sponsor: {
+       sponsor: {
         Row: {
+          address: string | null
+          company: string | null
           email: string | null
           name: string | null
           phone_number: string | null
@@ -645,6 +647,8 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          address?: string | null
+          company?: string | null
           email?: string | null
           name?: string | null
           phone_number?: string | null
@@ -652,6 +656,8 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          address?: string | null
+          company?: string | null
           email?: string | null
           name?: string | null
           phone_number?: string | null
@@ -668,7 +674,6 @@ export type Database = {
           },
         ]
       }
-      
       student_interest: {
         Row: {
           club_id: number | null

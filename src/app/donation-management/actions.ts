@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { Donation, DonationAllocation, Programs } from "@/types/types";
+import { revalidatePath } from "next/cache";
 
 export async function sponsorList() {
   const supabase = createClient();
@@ -36,6 +37,7 @@ export async function addSponsorDonation(formData: Donation) {
       throw new Error("Failed to insert donations. Please try again later.");
     }
 
+    revalidatePath("/donation-management")
     return {success: true, data: donation}
   
   } catch (error: any) {

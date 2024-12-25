@@ -17,6 +17,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils/utils";
+import { Label } from "@/components/ui/label";
 
 interface SearchableDropdownProps<T> {
   items: T[];
@@ -51,15 +52,18 @@ export function SearchableDropdown<T>({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn("w-[200px] justify-between", buttonClassName)}
-        >
-          {selectedItem ? getLabel(selectedItem) : "Select a sponsor..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+        <div className="grid space-y-2">
+          <Label className="text-xl font-bold">Search</Label>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn("w-[200px] justify-between", buttonClassName)}
+          >
+            {selectedItem ? getLabel(selectedItem) : "Search for sponsor..."}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>

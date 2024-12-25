@@ -149,7 +149,7 @@ export default function GenerateCouponForm({
         <form
           ref={formRef}
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 gap-4"
+          className="grid grid-cols-[1fr_auto_1fr] gap-4"
         >
           <div className="col-span-1 space-y-3">
             {/* Student ID */}
@@ -292,8 +292,10 @@ export default function GenerateCouponForm({
             />
           </div>
 
+          {/* Vertical Divider */}
+          <div className="w-px bg-gray-300 h-auto"></div>
+
           <div className="col-span-1">
-            {/* <h3 className="text-lg font-medium mb-2">Student Info</h3> */}
             <div className="space-y-3">
               <FormField
                 control={form.control}
@@ -302,7 +304,12 @@ export default function GenerateCouponForm({
                   <FormItem>
                     <FormLabel>Student Id</FormLabel>
                     <FormControl>
-                      <Input placeholder="Student Id" {...field} readOnly />
+                      <Input
+                        placeholder="Student Id"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -315,7 +322,12 @@ export default function GenerateCouponForm({
                   <FormItem>
                     <FormLabel>Student Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Student name" {...field} readOnly />
+                      <Input
+                        placeholder="Student name"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -329,7 +341,12 @@ export default function GenerateCouponForm({
                   <FormItem>
                     <FormLabel>Student Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Student email" {...field} readOnly />
+                      <Input
+                        placeholder="Student email"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -338,7 +355,7 @@ export default function GenerateCouponForm({
             </div>
           </div>
           {/* Buttons */}
-          <div className="col-span-2 flex justify-end gap-4 mt-4 mr-4">
+          <div className="">
             <LoadingButton loading={isPending} className="">
               Generate
             </LoadingButton>

@@ -30,7 +30,7 @@ interface SearchableDropdownProps<T> {
 export function SearchableDropdown<T>({
   items,
   placeholder = "Search...",
-  buttonClassName = "w-full justify-between",
+  buttonClassName = " justify-between",
   onSelect,
   getLabel,
   getValue,
@@ -55,9 +55,9 @@ export function SearchableDropdown<T>({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-[200px] justify-between", buttonClassName)}
+          className={cn("w-[500px] justify-between", buttonClassName)}
         >
-          {selectedItem ? getLabel(selectedItem) : "Select an option..."}
+          {selectedItem ? getLabel(selectedItem) : "Select a student..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

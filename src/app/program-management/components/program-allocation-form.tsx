@@ -39,7 +39,7 @@ interface DonationAllocationProps {
   programs: Programs[] | null;
 }
 
-export default function DonationAllocationForm({
+export default function ProgramAllocationForm({
   programs,
 }: DonationAllocationProps) {
   const [isPending, startTransition] = useTransition();
@@ -137,11 +137,11 @@ export default function DonationAllocationForm({
                 disabled={programs.length === 0}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-[280px]">
                     <SelectValue placeholder="Select a Program" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="overflow-y-scroll max-h-[20rem]">
                   {programs.map((program) => (
                     <SelectItem
                       key={program.program_id}
@@ -167,7 +167,7 @@ export default function DonationAllocationForm({
                   type="number"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
-                  className="w-full border p-2"
+                  className=""
                 />
               </FormControl>
               <FormMessage />

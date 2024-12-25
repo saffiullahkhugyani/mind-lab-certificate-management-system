@@ -27,18 +27,10 @@ export default async function Page() {
       >
         <TabsList className="mb-4">
           <TabsTrigger value="receipt">Donation Receipt</TabsTrigger>
-          <TabsTrigger value="allocation">
-            Donation Management Tab 2
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="receipt">
           <DonationReceiptForm sponsors={sponsors} />
-        </TabsContent>
-
-        <TabsContent value="allocation">
-          <div>Donation management tab 2</div>
-          {/* <DonationAllocationForm programs={programs} /> */}
         </TabsContent>
       </Tabs>
     </div>

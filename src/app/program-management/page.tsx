@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CreateProgramForm from "./components/create-program-form";
-import DonationAllocationForm from "./components/donation-allocation-form";
+import ProgramAllocationForm from "./components/program-allocation-form";
 import { clubsList, programsList } from "./actions";
 import { readUserSession } from "@/lib/actions/action";
 import { redirect } from "next/navigation";
@@ -35,7 +35,7 @@ export default async function Page() {
         </TabsContent>
 
         <TabsContent value="allocation">
-          <DonationAllocationForm programs={programs} />
+          <ProgramAllocationForm programs={programs} />
         </TabsContent>
       </Tabs>
     </div>

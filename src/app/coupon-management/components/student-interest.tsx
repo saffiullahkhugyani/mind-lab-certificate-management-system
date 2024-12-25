@@ -82,21 +82,17 @@ export function StudentInterest({
           if (result.success) {
             setDisplayInsertedData(true);
             setInterestData(result.data!);
-          }
 
-          // Display messages with toasts
-          result.messages.forEach((message, index) => {
-            setTimeout(() => {
-              toast({
-                description: message,
-                variant: message.includes("Error") ? "destructive" : "success",
-              });
-            }, index * 500); // Delay between toasts
-          });
-
-          // Optional: Handle results as needed
-          if (result.success && result.data!.length > 0) {
-            console.log(`Successfully inserted data:`, result.data);
+            toast({
+              description: `Student interest proccess completed ${result.summary?.successCount} record added`,
+              variant:
+                result.summary?.successCount! > 0 ? "success" : "destructive",
+            });
+          } else {
+            toast({
+              description: "An Error occured while inserting the data",
+              variant: "destructive",
+            });
           }
         });
       } catch (error) {

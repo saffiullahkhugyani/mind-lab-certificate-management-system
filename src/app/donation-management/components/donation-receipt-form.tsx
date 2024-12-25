@@ -31,6 +31,7 @@ export const donationReceiptFormSchema = z.object({
   sponsor_name: z.string().optional(),
   sponsor_number: z.string().optional(),
   company: z.string().optional(),
+  address: z.string().optional(),
   source_of_amount: z.enum(["Card", "Cash", "Bank transfer"], {
     invalid_type_error: "Source of Amount must be selected",
   }),
@@ -97,7 +98,19 @@ export default function DonationReceiptForm({
           description: "Donation has been added successfully",
           variant: "success",
         });
-        reset();
+
+        reset({
+          source_of_amount: "Bank transfer",
+          donation_date: "",
+          donation_description: "",
+          amount: 0,
+          bank_charges: 0,
+          sponsor_id: "",
+          sponsor_name: "",
+          sponsor_number: "",
+          company: "",
+          address: "",
+        });
       } else {
         toast({
           description: `Error adding donation: ${result.error}`,
@@ -111,6 +124,8 @@ export default function DonationReceiptForm({
     form.setValue("sponsor_id", sponsor.sponsor_id.toString());
     form.setValue("sponsor_name", sponsor.name!);
     form.setValue("sponsor_number", sponsor.phone_number!);
+    form.setValue("company", sponsor.company ? sponsor.company : "");
+    form.setValue("address", sponsor.address ? sponsor.address : "");
   };
 
   return (
@@ -129,67 +144,8 @@ export default function DonationReceiptForm({
         <form
           ref={formRef}
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 gap-4"
+          className="grid grid-cols-[1fr_auto_1fr] gap-4"
         >
-          {/* Receipt Info */}
-          <div className="col-span-1">
-            <h3 className="text-lg font-medium mb-2">Receipt Info</h3>
-            <div className="space-y-3">
-              <FormField
-                control={form.control}
-                name="sponsor_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sponsor Id</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Sponsor Id" {...field} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="sponsor_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sponsor Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Sponsor name" {...field} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="sponsor_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sponsor Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Sponsor number" {...field} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Company" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
           {/* Source of Amount */}
           <div className="col-span-1">
             <h3 className="text-lg font-medium mb-2">Source of Amount</h3>
@@ -301,8 +257,108 @@ export default function DonationReceiptForm({
             </div>
           </div>
 
+          {/* Vertical Divider */}
+          <div className="w-px bg-gray-300 h-auto"></div>
+
+          {/* Receipt Info */}
+          <div className="col-span-1">
+            <h3 className="text-lg font-medium mb-2">Receipt Info</h3>
+            <div className="space-y-3">
+              <FormField
+                control={form.control}
+                name="sponsor_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sponsor Id</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Sponsor Id"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sponsor_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sponsor Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Sponsor name"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sponsor_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sponsor Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Sponsor number"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Company</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Company"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Address"
+                        {...field}
+                        readOnly
+                        disabled={true}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
           {/* Buttons */}
-          <div className="col-span-2 flex justify-end gap-4 mt-4">
+          <div>
             <LoadingButton loading={isPending} className="">
               Add Donation
             </LoadingButton>
