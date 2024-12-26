@@ -122,28 +122,55 @@ export function StudentInterest({
 
   // Function to process student interest data and prepare it for insertion
   function processStudentInterestData(data: StudentInterestData[]) {
-    return data.map((studentInterest) => {
-      const clubId = clubs.find(
-        (club) =>
-          club.club_name?.toLowerCase() === studentInterest.club?.toLowerCase()
-      )?.club_id;
+    return data
+      .filter((studentData) => {
+        // skip if email is null
+        if (!studentData.email || !studentData.club) return false;
 
-      const programId = programs.find(
-        (program) =>
-          program.program_english_name?.toLowerCase() ===
-          studentInterest.program?.toLowerCase()
-      )?.program_id;
+        // skip  if program is provided but does not  belong to the given club
+        if (studentData.program) {
+          const club = clubs.find(
+            (c) =>
+              c.club_name?.toLowerCase() === studentData.club?.toLowerCase()
+          );
 
-      return {
-        email: studentInterest.email || null,
-        user_email: studentInterest.email || null,
-        club_id: clubId || null,
-        club: studentInterest.club || null,
-        program: studentInterest.program || null,
-        program_id: programId || null,
-        date_submitted: studentInterest.date_submitted || null,
-      };
-    });
+          if (!club) return false; // club not found
+
+          const program = programs.find(
+            (p) =>
+              p.program_english_name?.toLowerCase() ===
+                studentData.program?.toLowerCase() && p.club_id === club.club_id
+          );
+
+          if (!program) return false; // program exist but the club is different
+        }
+
+        // pass all the checks
+        return true;
+      })
+      .map((studentInterest) => {
+        const clubId = clubs.find(
+          (club) =>
+            club.club_name?.toLowerCase() ===
+            studentInterest.club?.toLowerCase()
+        )?.club_id;
+
+        const programId = programs.find(
+          (program) =>
+            program.program_english_name?.toLowerCase() ===
+            studentInterest.program?.toLowerCase()
+        )?.program_id;
+
+        return {
+          email: studentInterest.email || null,
+          user_email: studentInterest.email || null,
+          club_id: clubId || null,
+          club: studentInterest.club || null,
+          program: studentInterest.program || null,
+          program_id: programId || null,
+          date_submitted: studentInterest.date_submitted || null,
+        };
+      });
   }
 
   function removeDuplicates(data: StudentInterestData[]) {

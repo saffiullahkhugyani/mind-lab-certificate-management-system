@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { addStudentCoupon } from "../actions";
 import { toast } from "@/components/ui/use-toast";
+import { Label } from "@/components/ui/label";
 
 const generateCouponFormSchema = z.object({
   student_id: z.string().min(1, "Student ID is required"),
@@ -295,7 +296,8 @@ export default function GenerateCouponForm({
           {/* Vertical Divider */}
           <div className="w-px bg-gray-300 h-auto"></div>
 
-          <div className="col-span-1">
+          <div className="col-span-1 space-y-3">
+            <Label className="text-lg font-bold">Student Info</Label>
             <div className="space-y-3">
               <FormField
                 control={form.control}

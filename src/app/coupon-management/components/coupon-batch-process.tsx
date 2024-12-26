@@ -186,7 +186,7 @@ export default function CouponBatchProcess({
         </div>
         <div>
           <Label className="text-md font-bold">
-            Total num of students in the program
+            Total number of students in the program
           </Label>
           <Input
             value={totalStudents && totalStudents.toString()}
