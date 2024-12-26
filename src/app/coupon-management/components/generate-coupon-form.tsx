@@ -30,7 +30,7 @@ import { toast } from "@/components/ui/use-toast";
 const generateCouponFormSchema = z.object({
   student_id: z.string().min(1, "Student ID is required"),
   student_name: z.string().optional(),
-  student_email: z.string().optional(),
+  student_email: z.string().min(1, "Email is mendatory"),
   club_id: z.coerce.number().min(1, "Please select a club"),
   program_id: z.coerce.number().min(1, "Please select a program"),
   coupon_duration: z.string().min(1, "Please select a period"),
@@ -127,9 +127,9 @@ export default function GenerateCouponForm({
   };
 
   const handleStudentSelect = (student: Profiles) => {
-    form.setValue("student_id", student.id);
-    form.setValue("student_name", student.name!);
-    form.setValue("student_email", student.email!);
+    form.setValue("student_id", student.id ? student.id : "");
+    form.setValue("student_name", student.name ? student.name : "");
+    form.setValue("student_email", student.email ? student.email : "");
   };
 
   return (

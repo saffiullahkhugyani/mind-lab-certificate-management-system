@@ -53,8 +53,7 @@ export async function studentsList() {
   try {
     const { data: students, error: fetchError } = await supabase
       .from("profiles")
-      .select("id, name, email")
-      .order("name", { ascending: true });;
+      .select("id, name, email");
   
     
     if (fetchError) {
