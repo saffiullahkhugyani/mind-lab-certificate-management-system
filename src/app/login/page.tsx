@@ -13,7 +13,7 @@ export default async function Login() {
 
   return (
     <div>
-      <LoginForm searchParams={{ message: "" }} />
+      <LoginForm />
     </div>
   );
 }

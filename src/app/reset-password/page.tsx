@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitHandler, useForm } from "react-hook-form";
-import React, { useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { AuthTokenResponse } from "@supabase/supabase-js";
@@ -27,6 +27,8 @@ import { log } from "console";
 import { AiOutlineAlert, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { cn } from "@/lib/utils/utils";
 import { LoadingButton } from "@/components/ui/loading-button";
+import { updatePassword } from "./actions";
+import { toast } from "@/components/ui/use-toast";
 
 const FormSchema = z
   .object({
@@ -53,12 +55,11 @@ const FormSchema = z
 
 type FormFields = z.infer<typeof FormSchema>;
 
-export default function LoginForm({
-  searchParams,
-}: {
-  searchParams: { message: string };
-}) {
+export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [resetPasswordSuccess, setResetPasswordSuccess] =
+    useState<boolean>(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -67,70 +68,119 @@ export default function LoginForm({
     },
   });
 
+  // Function to extract query parameters from URL
+  function getQueryParams() {
+    const url = window.location.href;
+    const params = new URLSearchParams(url.split("#")[1]); // Split at # and use the second part
+    return {
+      accessToken: params.get("access_token"),
+      refreshToken: params.get("refresh_token"),
+    };
+  }
+
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    startTransition(async () => {});
+    const { accessToken, refreshToken } = getQueryParams();
+
+    console.log(accessToken);
+
+    if (!accessToken || !refreshToken) {
+      toast({
+        description: "Missing access token or refresh token in URL.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await updatePassword({ ...data, accessToken, refreshToken });
+
+      if (res?.success) {
+        setResetPasswordSuccess(res.success);
+        toast({
+          description: "Your password has been updated",
+          variant: "success",
+        });
+      } else {
+        toast({
+          description: res?.error || "An error occurred",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   return (
     <section className="h-[calc(100vh-57px)] flex justify-center items-center">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Reset Password</CardTitle>
-          <CardDescription>Enter your new password</CardDescription>
-          <CardContent className="flex flex-col gap-4">
-            <Form {...form}>
-              <form
-                className="grid gap-4"
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          {...field}
-                          className="w-full border p-2"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          {...field}
-                          className="w-full border p-2"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {searchParams.message && (
-                  <div className="text-sm font-medium text-destructive">
-                    {searchParams.message}
+      {!resetPasswordSuccess ? (
+        <Card className="mx-auto max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl">Reset Password</CardTitle>
+            <CardDescription>Enter your new password</CardDescription>
+            <CardContent className="flex flex-col gap-4">
+              <Form {...form}>
+                <form
+                  className="grid gap-4"
+                  onSubmit={form.handleSubmit(onSubmit)}
+                >
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            {...field}
+                            className="w-full border p-2"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            {...field}
+                            className="w-full border p-2"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div
+                    className="cursor-pointer hover:underline"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <p className="text-sm">show password</p>
                   </div>
-                )}
-                <LoadingButton className="w-full gap-2" disabled={isPending}>
-                  {"Reset"}
-                </LoadingButton>
-              </form>
-            </Form>
-          </CardContent>
-        </CardHeader>
-      </Card>
+
+                  <LoadingButton
+                    className="w-full gap-2"
+                    disabled={isPending}
+                    loading={isPending}
+                  >
+                    {"Reset"}
+                  </LoadingButton>
+                </form>
+              </Form>
+            </CardContent>
+          </CardHeader>
+        </Card>
+      ) : (
+        <div className="bg-green-100 text-green-600 text-xl px-2 py-4 rounded-md border-gray-300 border-2">
+          Your password has been updated successfully, please use your new
+          password to login.
+        </div>
+      )}
     </section>
   );
 }
