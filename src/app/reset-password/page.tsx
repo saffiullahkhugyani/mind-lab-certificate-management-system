@@ -111,7 +111,12 @@ export default function LoginForm() {
 
   return (
     <section className="h-[calc(100vh-57px)] flex justify-center items-center">
-      {!resetPasswordSuccess ? (
+      {resetPasswordSuccess ? (
+        <div className="bg-green-100 text-green-600 text-xl px-2 py-4 rounded-md border-gray-300 border-2">
+          Your password has been updated successfully, please use your new
+          password to login.
+        </div>
+      ) : (
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-2xl">Reset Password</CardTitle>
@@ -175,11 +180,6 @@ export default function LoginForm() {
             </CardContent>
           </CardHeader>
         </Card>
-      ) : (
-        <div className="bg-green-100 text-green-600 text-xl px-2 py-4 rounded-md border-gray-300 border-2">
-          Your password has been updated successfully, please use your new
-          password to login.
-        </div>
       )}
     </section>
   );

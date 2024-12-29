@@ -52,7 +52,7 @@ export async function updatePassword(data: {
         }
 
     } catch (error: any) {
-        return { success: false, error: error || "An unexpected error occurred." };
+        return { success: false, error: error.message || "An unexpected error occurred." };
     }
 
 }
