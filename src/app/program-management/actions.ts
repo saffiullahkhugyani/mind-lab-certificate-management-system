@@ -113,7 +113,7 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     // Step 3: Allocate amount using FIFO
     let remainingToAllocate = formData.amount!;
-    const allocationLog: { donation_id: number; allocated: number }[] = [];
+    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number}[] = [];
 
     for (const donation of donations) {
       if (remainingToAllocate <= 0) break;
@@ -131,10 +131,24 @@ export async function donationAllocation(formData: DonationAllocation) {
         throw new Error(`Failed to update donation ID ${donation.donation_id}.`);
       }
 
-      allocationLog.push({ donation_id: donation.donation_id, allocated: allocation });
+      allocationLog.push({
+        donation_id: donation.donation_id,
+        allocated_amount: allocation,
+        program_id: formData.program_id!
+      });
     }
 
     console.log("Allocation log:", allocationLog);
+  
+    const { error: donationLogError } = await supabase
+      .from("donation_allocation_log")
+      .insert(allocationLog)
+      .select()
+    
+    if (donationLogError) {
+      console.log(donationLogError);
+      throw new Error("Failed to insert allocation log, Please try again");
+    }
 
     // Step 4: Insert the allocation record into the donation_allocation table
     const { data: allocationData, error: insertError } = await supabase

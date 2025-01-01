@@ -355,6 +355,45 @@ export type Database = {
           },
         ]
       }
+      donation_allocation_log: {
+        Row: {
+          allocated_amount: number
+          created_at: string
+          donation_id: number
+          id: number
+          program_id: number
+        }
+        Insert: {
+          allocated_amount: number
+          created_at?: string
+          donation_id: number
+          id?: number
+          program_id: number
+        }
+        Update: {
+          allocated_amount?: number
+          created_at?: string
+          donation_id?: number
+          id?: number
+          program_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donation_allocation_log_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donation"
+            referencedColumns: ["donation_id"]
+          },
+          {
+            foreignKeyName: "donation_allocation_log_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["program_id"]
+          },
+        ]
+      }
       player_data_testing: {
         Row: {
           eliminated: string | null
