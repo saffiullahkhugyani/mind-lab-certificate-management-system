@@ -1,7 +1,13 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import Donation from "../components/donation";
-export default function Dashboard() {
+import Donation from "../components/donation/donation";
+import Programs from "../components/program/programs";
+import Students from "../components/student/students";
+import { studentList } from "../actions";
+
+export default async function Dashboard() {
+  const students = await studentList();
+
   return (
     <div className=" mx-auto p-8">
       {/* Background Banner */}
@@ -38,10 +44,10 @@ export default function Dashboard() {
           <Donation />
         </TabsContent>
         <TabsContent value="program">
-          <div>Program content goes here</div>
+          <Programs />
         </TabsContent>
         <TabsContent value="student">
-          <div>Student content goes here</div>
+          <Students students={students.data!} />
         </TabsContent>
       </Tabs>
     </div>

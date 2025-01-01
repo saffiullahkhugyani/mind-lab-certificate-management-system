@@ -8,7 +8,8 @@ export default async function Login() {
   const { data: userSession } = await readUserSession();
 
   if (userSession.session) {
-    return redirect("/create-certificate");
+    // return redirect("/create-certificate");
+    return redirect("/dashboard");
   }
 
   return (
