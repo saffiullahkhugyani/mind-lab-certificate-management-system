@@ -6,6 +6,12 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  const publicUrls = ['/reset-password']
+
+  if (publicUrls.includes(request.nextUrl.pathname)) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     process.env.PUBLIC_SUPABASE_URL!,
     process.env.PUBLIC_SUPABASE_ANON_KEY!,

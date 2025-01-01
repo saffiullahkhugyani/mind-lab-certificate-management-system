@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       certificate_master: {
@@ -99,21 +124,50 @@ export type Database = {
       }
       clubs: {
         Row: {
-          club_name: string | null
           club_id: number
+          club_name: string | null
           created_at: string
         }
         Insert: {
-          club_name?: string | null
           club_id?: number
+          club_name?: string | null
           created_at?: string
         }
         Update: {
-          club_name?: string | null
           club_id?: number
+          club_name?: string | null
           created_at?: string
         }
         Relationships: []
+      }
+      coupon_codes: {
+        Row: {
+          coupon_code: string | null
+          coupon_id: number | null
+          created_at: string
+          id: number
+        }
+        Insert: {
+          coupon_code?: string | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          coupon_code?: string | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_codes_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+        ]
       }
       coupon_interest_mapping: {
         Row: {
@@ -180,7 +234,7 @@ export type Database = {
           },
         ]
       }
-       coupons: {
+      coupons: {
         Row: {
           club_id: number | null
           coupon_duration: string | null
@@ -225,35 +279,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "programs"
             referencedColumns: ["program_id"]
-          },
-        ]
-      }
-        coupon_codes: {
-        Row: {
-          coupon_code: string | null
-          coupon_id: number | null
-          created_at: string
-          id: number
-        }
-        Insert: {
-          coupon_code?: string | null
-          coupon_id?: number | null
-          created_at?: string
-          id?: number
-        }
-        Update: {
-          coupon_code?: string | null
-          coupon_id?: number | null
-          created_at?: string
-          id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "coupon_codes_coupon_id_fkey"
-            columns: ["coupon_id"]
-            isOneToOne: false
-            referencedRelation: "coupons"
-            referencedColumns: ["coupon_id"]
           },
         ]
       }
@@ -330,7 +355,7 @@ export type Database = {
           },
         ]
       }
-       donation_allocation_log: {
+      donation_allocation_log: {
         Row: {
           allocated_amount: number
           created_at: string
@@ -508,8 +533,8 @@ export type Database = {
           program_english_name: string | null
           program_id: number
           subscription_value: string | null
-          total_allocated_donation: number | null
-          total_remaining_donation: number | null
+          total_allocated_donation: number
+          total_remaining_donation: number
         }
         Insert: {
           club_id?: number | null
@@ -519,8 +544,8 @@ export type Database = {
           program_english_name?: string | null
           program_id?: number
           subscription_value?: string | null
-          total_allocated_donation?: number | null
-          total_remaining_donation?: number | null
+          total_allocated_donation?: number
+          total_remaining_donation?: number
         }
         Update: {
           club_id?: number | null
@@ -530,8 +555,8 @@ export type Database = {
           program_english_name?: string | null
           program_id?: number
           subscription_value?: string | null
-          total_allocated_donation?: number | null
-          total_remaining_donation?: number | null
+          total_allocated_donation?: number
+          total_remaining_donation?: number
         }
         Relationships: [
           {
@@ -675,7 +700,7 @@ export type Database = {
           },
         ]
       }
-       sponsor: {
+      sponsor: {
         Row: {
           address: string | null
           company: string | null
@@ -910,6 +935,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      calculate_player_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       calculate_top_speed: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -921,6 +950,16 @@ export type Database = {
       delete_user: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_top_speed: {
+        Args: {
+          player_id: string
+          race_type: string
+        }
+        Returns: {
+          race_type_selected: string
+          top_speed: number
+        }[]
       }
     }
     Enums: {

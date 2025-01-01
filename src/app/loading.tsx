@@ -1,5 +1,9 @@
 import React from "react";
 
 export default function Loading() {
-  return <h2 className="text-primary">Loading...</h2>;
+  return (
+    <div className="flex items-center justify-center h-screen text-primary text-2xl font-bold ">
+      Loading.....
+    </div>
+  );
 }

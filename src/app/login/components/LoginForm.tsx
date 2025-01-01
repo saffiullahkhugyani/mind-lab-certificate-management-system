@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitHandler, useForm } from "react-hook-form";
-import React, { useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { AuthTokenResponse } from "@supabase/supabase-js";
@@ -21,20 +21,18 @@ import { AiOutlineAlert, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { cn } from "@/lib/utils/utils";
 import { readUserSession } from "@/lib/actions/action";
 import { emailLogin } from "../actions";
+import { useSearchParams } from "next/navigation";
 
 const FormSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1, { message: "Password can not be empty" }),
+  password: z.string().min(6, { message: "Password can not be empty" }),
 });
 
 type FormFields = z.infer<typeof FormSchema>;
 
-export default function LoginForm({
-  searchParams,
-}: {
-  searchParams: { message: string };
-}) {
+export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
+  const [urlMessage, setUrlMessage] = useState<string>("");
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -42,6 +40,13 @@ export default function LoginForm({
       password: "",
     },
   });
+
+  const searchParam = useSearchParams();
+  const message = searchParam.get("message");
+
+  useEffect(() => {
+    setUrlMessage(message!);
+  }, []);
 
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     startTransition(async () => {
@@ -87,9 +92,9 @@ export default function LoginForm({
                     required
                   />
                 </div>
-                {searchParams.message && (
+                {urlMessage && (
                   <div className="text-sm font-medium text-destructive">
-                    {searchParams.message}
+                    {urlMessage}
                   </div>
                 )}
                 <Button className="w-full gap-2" disabled={isPending}>
