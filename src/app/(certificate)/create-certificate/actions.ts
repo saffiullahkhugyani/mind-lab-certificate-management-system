@@ -1,11 +1,11 @@
 "use server"
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { Certificate } from "@/types/types";
 import { revalidatePath } from "next/cache";
 
 export async function addCertificate(formData: Certificate) {
-  const supabase = createSupabaseServerClient();
+  const supabase = createClient();
    const { id, ...rest } = formData;
   const certificateData = id === null ? rest : formData;
 
@@ -26,7 +26,7 @@ export async function addCertificate(formData: Certificate) {
 }
 
 export async function updateCertificate(formData: Certificate) {
-  const supabase = createSupabaseServerClient();
+  const supabase = createClient();
    const { id, ...rest } = formData;
   const certificateData = id === null ? rest : formData;
 
@@ -47,7 +47,7 @@ export async function updateCertificate(formData: Certificate) {
 }
 
 export async function addCertificateMapping({userId, certificateV1Id, certificateV2Id}: {userId: string, certificateV1Id: string, certificateV2Id: string}) {
-  const supabase = createSupabaseServerClient();
+  const supabase = createClient();
 
   const { data, error } = await supabase.from("certificate_v1_v2_mapping")
     .insert({ user_id: userId ,v1_certificate_id: certificateV1Id, v2_certificate_id: certificateV2Id }).select();
@@ -65,7 +65,7 @@ export async function addCertificateMapping({userId, certificateV1Id, certificat
 
 export async function certificateAsserted({ certificateV1Id }: { certificateV1Id: string }) {
 
-  const supabase = createSupabaseServerClient();
+  const supabase = createClient();
 
   const { data, error } = await supabase.from("upload_certificate").update({ certificate_asserted: "1" }).eq("id", certificateV1Id).select();
   

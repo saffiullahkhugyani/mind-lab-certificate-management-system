@@ -1,10 +1,10 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import React from "react";
 import SignOut from "./SignOut";
 
 const Header = async () => {
-  const supabase = createSupabaseServerClient();
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -19,11 +19,11 @@ const Header = async () => {
           </a>{" "}
           {user != null && (
             <div className="flex items-center gap-4">
-              <Link href={"/create-certificate"}>Create Certificate</Link>
+              {/* <Link href={"/create-certificate"}>Create Certificate</Link>
               <Link href={"/certificate-list"}>Certificate List</Link>
               <Link href={"/donation-management"}>Donation Management</Link>
               <Link href={"/program-management"}>Program Management</Link>
-              <Link href={"/coupon-management"}>Coupon Management</Link>
+              <Link href={"/coupon-management"}>Coupon Management</Link> */}
             </div>
           )}
         </nav>

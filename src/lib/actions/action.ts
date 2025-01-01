@@ -1,7 +1,7 @@
-import { createSupabaseServerClientReadOnly } from "../supabase/server";
+import { createClientReadOnly } from "../supabase/server";
 
 export async function readUserSession() {
-    const supabase =  createSupabaseServerClientReadOnly();
+    const supabase =  createClientReadOnly();
 
     return supabase.auth.getSession();
 }

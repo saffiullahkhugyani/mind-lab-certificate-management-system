@@ -2,11 +2,11 @@ import { readUserSession } from "@/lib/actions/action";
 import { redirect } from "next/navigation";
 import React from "react";
 import CertificatePage from "./components/certificate-page";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 async function getCertificateList() {
   // await new Promise((resolve) => setTimeout(resolve, 3000));
-  const supabase = createSupabaseServerClient();
+  const supabase = createClient();
   const { data: uploadedCertificates } = await supabase
     .from("upload_certificate")
     .select(`id, certificate_image_url ,profiles(*)`)
@@ -16,7 +16,7 @@ async function getCertificateList() {
 }
 
 export default async function page() {
-  const supabase = createSupabaseServerClient();
+  const supabase = createClient();
   const { data: userSession } = await readUserSession();
 
   if (!userSession.session) {
