@@ -112,3 +112,13 @@ export type StudentInterestData = {
   date_submitted?: string | null
   created_at?: string
 }
+
+export type SponsorData = {
+  name: string | null;
+  email: string | null;
+  image: string | null | undefined;
+  totalDonationAmount: number;
+  totalRemainingDonation: number;
+  allocatedDonation: number;
+  programs_funded: number;
+}

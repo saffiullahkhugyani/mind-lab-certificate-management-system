@@ -3,10 +3,15 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Donation from "../components/donation/donation";
 import Programs from "../components/program/programs";
 import Students from "../components/student/students";
-import { studentList } from "../actions";
+import sponsorData, { studentList } from "../actions";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function Dashboard() {
+  const sponsor = await sponsorData();
   const students = await studentList();
+
+  console.log(sponsor);
 
   return (
     <div className=" mx-auto p-8">
@@ -15,16 +20,17 @@ export default async function Dashboard() {
 
       {/* Profile Section */}
       <div className="relative -mt-12 flex flex-col items-center">
-        <div className="w-24 h-24 bg-black border-2 border-white overflow-hidden">
-          <img
-            src="https://via.placeholder.com/100" // Replace with actual profile image
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {/* Sponsor Image */}
+        <Avatar className="w-32 h-32 border-white border-2 rounded-none">
+          <AvatarImage src={sponsor?.data?.image!} alt="@SP" />
+          <AvatarFallback className="font-bold text-5xl">
+            {sponsor?.data?.name!.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+
         <div className="text-center mt-4">
-          <h2 className="text-xl font-semibold">Ahmed Kajoor</h2>
-          <p className="text-gray-500">367 Students Sponsored</p>
+          <h2 className="text-xl font-semibold">{sponsor.data?.name}</h2>
+          <p className="text-gray-500">{sponsor.data?.email}</p>
         </div>
       </div>
       {/* Tab Navigation */}
@@ -38,10 +44,10 @@ export default async function Dashboard() {
 
         {/* Tab Content */}
         <TabsContent value="overview">
-          <div>Overview content goes here</div>
+          <div>Coming soon</div>
         </TabsContent>
         <TabsContent value="donations">
-          <Donation />
+          <Donation sponsorData={sponsor.data!} />
         </TabsContent>
         <TabsContent value="program">
           <Programs />

@@ -2,14 +2,28 @@ import React from "react";
 import SummaryCard from "./summaryCard";
 import ProgramCard from "./programCard";
 import DonationTabs from "./donationTabs";
+import { SponsorData } from "@/types/types";
 
-export default function Donation() {
+interface DonationProps {
+  sponsorData: SponsorData | null;
+}
+
+export default function Donation({ sponsorData }: DonationProps) {
   // Data for Donation Summary
   const donationSummaryData = [
-    { label: "Total Donations", value: "$350,000" },
-    { label: "Donations To Be Allocated", value: "$50,000" },
-    { label: "Program Funded", value: "25" },
-    { label: "Students Supported", value: "250" },
+    { label: "Total Donations", value: `$${sponsorData?.totalDonationAmount}` },
+    {
+      label: "Donations Allocated",
+      value: `$${sponsorData?.allocatedDonation}`,
+    },
+    {
+      label: "Program Funded",
+      value: sponsorData?.programs_funded.toString()!,
+    },
+    {
+      label: "Students supported",
+      value: "0",
+    },
   ];
 
   // Data for Recent Program Allocation
