@@ -111,6 +111,16 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     
     if (programError) throw new Error("Failed to fetch program details");
 
+    // Step 1.1 Fetching donation log for the program
+    const { data: donationAllocationLog, error: donationAllocationLogError } = await supabase
+      .from("donation_allocation_log")
+      .select("id, program_id, donation_id, allocated_amount, remaining_allocated_amount")
+      .gte("remaining_allocated_amount", 0)
+      .eq("program_id", program_id!)
+      .order("id", {ascending: true});
+    
+    if (donationAllocationLogError) throw new Error("Failed to fetch donation allocation logs");
+
     // subscription value and remaining donation
     const subscriptionValue = Number(program.subscription_value);
     const totalRemainingDonation = program.total_remaining_donation;
@@ -124,13 +134,36 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       throw new Error("Insufficient donations for this program")
     
 
-      // Step 3: Update the donation record with deducted amount
-      const { error: updateError } = await supabase
-        .from("programs")
-        .update({ "total_remaining_donation": deduction })
-        .eq("program_id", program_id!);
+    // Step 3: Update the donation record with deducted amount
+    const { error: updateError } = await supabase
+      .from("programs")
+      .update({ "total_remaining_donation": deduction })
+      .eq("program_id", program_id!);
       
-      if (updateError) throw new Error("Failed to update remaining donation.");
+    if (updateError) throw new Error("Failed to update remaining donation.");
+    
+    // Step 3.1 Update the donation_allocation_log with the deduction of amounts
+    const totalRemainingAllocatedDonations = donationAllocationLog
+      .reduce((sum, allocatedDonation) => sum + (allocatedDonation.remaining_allocated_amount ?? 0), 0);
+    
+    let remainingToDeductFormLogs = remainingDeduction;
+    for (const allocatedLog of donationAllocationLog) {
+      if (remainingToDeductFormLogs <= 0) break;
+
+      const deduct = Math.min(remainingToDeductFormLogs, allocatedLog.remaining_allocated_amount);
+      remainingToDeductFormLogs -= deduct;
+
+      // Step 3.2 update the donation_allocation_log table with the deducted remaining amount
+      const { data: updateAllocatedLogs, error: updateAllocatedLogError } = await supabase
+        .from("donation_allocation_log")
+        .update({ remaining_allocated_amount: allocatedLog.remaining_allocated_amount - deduct })
+        .eq("program_id", allocatedLog.program_id);
+      
+      if (updateAllocatedLogError) throw new Error(updateAllocatedLogError.message);
+      
+      
+    }
+      
 
       // Step 3.5: fetching start date on the basis of the start_period
       const startDate = calculateStartDate(start_period!);

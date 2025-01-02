@@ -337,6 +337,7 @@ export type Database = {
           donation_id: number
           id: number
           program_id: number
+          remaining_allocated_amount: number
         }
         Insert: {
           allocated_amount: number
@@ -344,6 +345,7 @@ export type Database = {
           donation_id: number
           id?: number
           program_id: number
+          remaining_allocated_amount: number
         }
         Update: {
           allocated_amount?: number
@@ -351,6 +353,7 @@ export type Database = {
           donation_id?: number
           id?: number
           program_id?: number
+          remaining_allocated_amount: number
         }
         Relationships: [
           {

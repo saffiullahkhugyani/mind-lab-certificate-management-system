@@ -113,7 +113,7 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     // Step 3: Allocate amount using FIFO
     let remainingToAllocate = formData.amount!;
-    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number}[] = [];
+    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number}[] = [];
 
     for (const donation of donations) {
       if (remainingToAllocate <= 0) break;
@@ -134,7 +134,8 @@ export async function donationAllocation(formData: DonationAllocation) {
       allocationLog.push({
         donation_id: donation.donation_id,
         allocated_amount: allocation,
-        program_id: formData.program_id!
+        program_id: formData.program_id!,
+        remaining_allocated_amount: allocation
       });
     }
 
