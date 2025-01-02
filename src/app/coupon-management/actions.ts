@@ -153,11 +153,14 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       const deduct = Math.min(remainingToDeductFormLogs, allocatedLog.remaining_allocated_amount);
       remainingToDeductFormLogs -= deduct;
 
+      console.log("after amount: ", remainingToDeductFormLogs);
+
       // Step 3.2 update the donation_allocation_log table with the deducted remaining amount
       const { data: updateAllocatedLogs, error: updateAllocatedLogError } = await supabase
         .from("donation_allocation_log")
         .update({ remaining_allocated_amount: allocatedLog.remaining_allocated_amount - deduct })
-        .eq("program_id", allocatedLog.program_id);
+        .eq("program_id", allocatedLog.program_id)
+        .eq("id", allocatedLog.id);
       
       if (updateAllocatedLogError) throw new Error(updateAllocatedLogError.message);
       
