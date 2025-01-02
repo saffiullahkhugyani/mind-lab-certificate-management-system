@@ -140,16 +140,23 @@ export async function donationAllocation(formData: DonationAllocation) {
     }
 
     console.log("Allocation log:", allocationLog);
+
+    for (const logData of allocationLog) {
+      
+      if (logData.allocated_amount > 0) {
+        const { error: donationLogError } = await supabase
+          .from("donation_allocation_log")
+          .insert(logData)
+          .select()
   
-    const { error: donationLogError } = await supabase
-      .from("donation_allocation_log")
-      .insert(allocationLog)
-      .select()
-    
-    if (donationLogError) {
-      console.log(donationLogError);
-      throw new Error("Failed to insert allocation log, Please try again");
+        if (donationLogError) {  
+          console.log(donationLogError);
+          throw new Error("Failed to insert allocation log, Please try again");
+          }
+      }
     }
+  
+    
 
     // Step 4: Insert the allocation record into the donation_allocation table
     const { data: allocationData, error: insertError } = await supabase
