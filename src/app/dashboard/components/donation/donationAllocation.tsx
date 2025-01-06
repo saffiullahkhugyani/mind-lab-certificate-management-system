@@ -6,15 +6,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Donation, SponsorData } from "@/types/types";
 
-interface DonationReceiptProps {
+interface DonationAllocationProps {
   sponsorDetails: SponsorData | null;
   donationReceipt: Donation[] | null;
 }
 
-export default function DonationReceipt({
+export default function DonationAllocation({
   donationReceipt,
   sponsorDetails,
-}: DonationReceiptProps) {
+}: DonationAllocationProps) {
   const [filteredReceipt, setFilteredReceipt] = useState<Donation[] | null>(
     donationReceipt
   );
@@ -64,7 +64,7 @@ export default function DonationReceipt({
     <div className="grid grid-cols-4 gap-4 bg-white p-4 rounded-lg shadow-md">
       {/* Sidebar */}
       <div className="col-span-1 border-r pr-4">
-        <h2 className="text-lg font-semibold mb-4">Donation Receipt</h2>
+        <h2 className="text-lg font-semibold mb-4">Donation Allocation</h2>
 
         {/* Search Bar */}
         <Input

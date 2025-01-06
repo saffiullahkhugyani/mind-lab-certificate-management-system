@@ -1,17 +1,15 @@
 interface ProgramCardProps {
   programName: String;
-  donation: String;
-  balance: String;
-  couponsUsed: String;
-  couponsRemaining: String;
+  donation: number;
+  balance: number;
+  availableCoupons: number;
   date: String;
 }
 export default function ProgramCard({
   programName,
   donation,
   balance,
-  couponsUsed,
-  couponsRemaining,
+  availableCoupons,
   date,
 }: ProgramCardProps) {
   return (
@@ -21,10 +19,9 @@ export default function ProgramCard({
         <p className="text-sm text-gray-500">Donation of: {donation}</p>
         <p className="text-sm text-gray-500">Balance: {balance}</p>
       </div>
-      <div className="text-sm text-gray-500 mt-2 sm:mt-0">
-        <p>Coupons Used: {couponsUsed}</p>
-        <p>Coupons Remaining: {couponsRemaining}</p>
-        <p>{date}</p>
+      <div className=" flex flex-col justify-between text-sm mt-2 sm:mt-0 h-full">
+        <p className="flex justify-end">{date}</p>
+        <p>Available Coupons: {availableCoupons}</p>
       </div>
     </div>
   );

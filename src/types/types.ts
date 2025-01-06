@@ -114,11 +114,21 @@ export type StudentInterestData = {
 }
 
 export type SponsorData = {
+  sponsor_id: number | null;
   name: string | null;
   email: string | null;
   image: string | null | undefined;
+  number: string | null;
   totalDonationAmount: number;
   totalRemainingDonation: number;
   allocatedDonation: number;
   programs_funded: number;
+}
+
+export type AllocationData = {
+  allocated_amount: number | null;
+  remaining_allocated_amount: number | null;
+  program_name: string | null;
+  created_at: string | null;
+
 }

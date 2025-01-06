@@ -1,17 +1,15 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import Donation from "../components/donation/donation";
 import Programs from "../components/program/programs";
 import Students from "../components/student/students";
 import sponsorData, { studentList } from "../actions";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import DonationTab from "../components/donation/donationTab";
 
 export default async function Dashboard() {
   const sponsor = await sponsorData();
   const students = await studentList();
-
-  console.log(sponsor);
 
   return (
     <div className=" mx-auto p-8">
@@ -22,15 +20,17 @@ export default async function Dashboard() {
       <div className="relative -mt-12 flex flex-col items-center">
         {/* Sponsor Image */}
         <Avatar className="w-32 h-32 border-white border-2 rounded-none">
-          <AvatarImage src={sponsor?.data?.image!} alt="@SP" />
+          <AvatarImage src={sponsor?.data?.sponsorData.image!} alt="@SP" />
           <AvatarFallback className="font-bold text-5xl">
-            {sponsor?.data?.name!.charAt(0).toUpperCase()}
+            {sponsor?.data?.sponsorData.name!.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
 
         <div className="text-center mt-4">
-          <h2 className="text-xl font-semibold">{sponsor.data?.name}</h2>
-          <p className="text-gray-500">{sponsor.data?.email}</p>
+          <h2 className="text-xl font-semibold">
+            {sponsor.data?.sponsorData.name}
+          </h2>
+          <p className="text-gray-500">{sponsor.data?.sponsorData.email}</p>
         </div>
       </div>
       {/* Tab Navigation */}
@@ -47,7 +47,11 @@ export default async function Dashboard() {
           <div>Coming soon</div>
         </TabsContent>
         <TabsContent value="donations">
-          <Donation sponsorData={sponsor.data!} />
+          <DonationTab
+            sponsorData={sponsor.data?.sponsorData!}
+            programAllocationData={sponsor.data?.allocatedProgramData!}
+            donataionData={sponsor.data?.donataionsData!}
+          />
         </TabsContent>
         <TabsContent value="program">
           <Programs />

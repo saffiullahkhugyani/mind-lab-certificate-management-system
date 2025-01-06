@@ -36,7 +36,7 @@ export default async function sponsorData() {
 
         const { data: donationData, error: donationError } = await supabase
             .from("donation")
-            .select("donation_id, sponsor_id, amount, remaining_amount")
+            .select("*")
             .eq("sponsor_id", sponsorData.sponsor_id);
         
         if (donationError) throw new Error(donationError.message);
@@ -56,7 +56,7 @@ export default async function sponsorData() {
 
         const { data: donationLog, error: donationLogError } = await supabase
             .from("donation_allocation_log")
-            .select("id, allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(program_id, program_english_name), created_at")
+            .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(program_id, program_english_name), created_at")
             .eq("donation.sponsor.user_id", userId!)
         
         if (donationLogError) throw new Error(donationLogError.message);
@@ -89,21 +89,25 @@ export default async function sponsorData() {
 
         // console.log("testing the logic", donationLogMap.values());
 
-        console.log("Data for sponsor",
-            donationLog!.map((log) => ({
-                allocatedAmount: log.allocated_amount,
-                user_id: log.donation.sponsor.user_id,
-                sponsor_id: log.donation.sponsor.sponsor_id,
-                sponsorName: log.donation?.sponsor?.name, // Accessing the nested name
-                program_id: log.programs.program_id,
-                programName: log.programs?.program_english_name,
-                createdAt: log.created_at,
+        // console.log("Data for sponsor",
+        //     donationLog!.map((log) => ({
+        //         allocated_amount: log.allocated_amount,
+        //         remaining_allocated_amount: log.remaining_allocated_amount,
+        //         program_name: log.programs?.program_english_name,
+        //         created_at: new Date(log.created_at).toDateString(),
+        //     }))
+        // );
+        const shapredAllocatedProgramData =  donationLog!.map((log) => ({
+                allocated_amount: log.allocated_amount,
+                remaining_allocated_amount: log.remaining_allocated_amount,
+                program_name: log.programs?.program_english_name,
+                created_at: new Date(log.created_at).toDateString(),
             }))
-        );
-
         const shapedSponsorData = {
+            sponsor_id: sponsorData.sponsor_id,
             name: sponsorData.name,
             email: sponsorData.email,
+            number: sponsorData.phone_number,
             image: sponsorData.profiles?.profile_image_url,
             totalDonationAmount: totalDonationAmount,
             totalRemainingDonation: totalRemainingDonation,
@@ -111,7 +115,13 @@ export default async function sponsorData() {
             programs_funded: donationLog?.length,
         }
 
-        return { success: true, data: shapedSponsorData };
+        return {
+            success: true, data: {
+                sponsorData: shapedSponsorData,
+                allocatedProgramData: shapredAllocatedProgramData,
+                donataionsData: donationData
+            }
+        };
 
 
      } catch(error:any) {
