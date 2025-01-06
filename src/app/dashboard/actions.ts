@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { format } from "date-fns";
 
 export async function studentList() {
     const supabase = createClient()
@@ -56,7 +57,7 @@ export default async function sponsorData() {
 
         const { data: donationLog, error: donationLogError } = await supabase
             .from("donation_allocation_log")
-            .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(program_id, program_english_name), created_at")
+            .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
             .eq("donation.sponsor.user_id", userId!)
         
         if (donationLogError) throw new Error(donationLogError.message);
@@ -89,20 +90,26 @@ export default async function sponsorData() {
 
         // console.log("testing the logic", donationLogMap.values());
 
-        // console.log("Data for sponsor",
-        //     donationLog!.map((log) => ({
-        //         allocated_amount: log.allocated_amount,
-        //         remaining_allocated_amount: log.remaining_allocated_amount,
-        //         program_name: log.programs?.program_english_name,
-        //         created_at: new Date(log.created_at).toDateString(),
-        //     }))
-        // );
-        const shapredAllocatedProgramData =  donationLog!.map((log) => ({
+        console.log("Data for sponsor",
+            donationLog!.map((log) => ({
                 allocated_amount: log.allocated_amount,
                 remaining_allocated_amount: log.remaining_allocated_amount,
                 program_name: log.programs?.program_english_name,
-                created_at: new Date(log.created_at).toDateString(),
+                created_at: new Date(log.created_at).toISOString().split("T")[0],
             }))
+        );
+        const shapedAllocatedProgramData = donationLog!.map((log) => ({
+            id: log.id,
+            allocated_amount: log.allocated_amount,
+            subscription_value: log.programs.subscription_value,
+            remaining_allocated_amount: log.remaining_allocated_amount,
+            program_name: log.programs?.program_english_name,
+            period: log.programs.period,
+            created_at: new Date(log.created_at).toISOString().split("T")[0],
+
+             
+        }))
+        
         const shapedSponsorData = {
             sponsor_id: sponsorData.sponsor_id,
             name: sponsorData.name,
@@ -118,7 +125,7 @@ export default async function sponsorData() {
         return {
             success: true, data: {
                 sponsorData: shapedSponsorData,
-                allocatedProgramData: shapredAllocatedProgramData,
+                allocatedProgramData: shapedAllocatedProgramData,
                 donataionsData: donationData
             }
         };

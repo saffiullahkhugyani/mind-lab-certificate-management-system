@@ -1,18 +1,19 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DonationReceipt from "./donationReceipt";
-import { Donation, SponsorData } from "@/types/types";
-import { Sponsor } from "@/types/customs";
-import DonationAllocation from "./donationAllocation";
+import { AllocatedProgramData, Donation, SponsorData } from "@/types/types";
+import DonationAllocationReceipt from "./donationAllocationReceipt";
 
-interface DonationSectionProps {
+interface DonationReceiptProps {
   sponsorDetails: SponsorData | null;
   donationData: Donation[] | null;
+  allocatedProgramData: AllocatedProgramData[] | null;
 }
 
-export default function DonationSectionTabs({
+export default function DonationReceiptTabs({
   donationData,
   sponsorDetails,
-}: DonationSectionProps) {
+  allocatedProgramData,
+}: DonationReceiptProps) {
   console.log(donationData);
 
   return (
@@ -39,8 +40,8 @@ export default function DonationSectionTabs({
         <TabsContent value="allocation">
           <div className="mt-4">
             {/* Render the Donation Allocation Component */}
-            <DonationAllocation
-              donationReceipt={donationData!}
+            <DonationAllocationReceipt
+              allocatedProgramData={allocatedProgramData!}
               sponsorDetails={sponsorDetails!}
             />
           </div>

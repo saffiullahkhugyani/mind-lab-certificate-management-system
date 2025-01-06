@@ -1,23 +1,28 @@
 import { Button } from "@/components/ui/button";
-import { Donation, SponsorData } from "@/types/types";
+import { AllocatedProgramData, SponsorData } from "@/types/types";
 import { Printer, Share } from "lucide-react";
 import React, { useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useReactToPrint } from "react-to-print";
 
-interface ReceiptDetailprops {
+interface DonationAllocationReceiptDetailProps {
   sponsorDetails: SponsorData | null;
-  donationReceipt: Donation | null;
+  allocatedProgramData: AllocatedProgramData | null;
 }
 
-const ReceiptDetails = ({
-  donationReceipt,
+const DonationAllocationReceiptDetail = ({
+  allocatedProgramData,
   sponsorDetails,
-}: ReceiptDetailprops) => {
-  const printRef = useRef(null);
+}: DonationAllocationReceiptDetailProps) => {
+  const contentRef = useRef<HTMLDivElement>(null);
 
+  // print invoice
+  const invoicePrint = useReactToPrint({ contentRef });
+
+  // download invoice via pdf
   const handleDownloadPdf = async () => {
-    const element = printRef.current;
+    const element = contentRef.current;
     if (!element) {
       return;
     }
@@ -36,21 +41,23 @@ const ReceiptDetails = ({
     const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
 
     pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`Receipt-${donationReceipt?.donation_id}`);
+    pdf.save(
+      `${allocatedProgramData?.program_name}-Receipt-${allocatedProgramData?.id}`
+    );
   };
 
   return (
     <>
       <div className="flex justify-end p-2 space-x-2">
-        <Button variant={"outline"} onClick={handleDownloadPdf}>
+        <Button variant={"outline"} onClick={() => invoicePrint()}>
           <Printer />
         </Button>
-        <Button variant={"outline"}>
+        <Button variant={"outline"} onClick={handleDownloadPdf}>
           <Share />
         </Button>
       </div>
       <div className=" mx-auto bg-white border rounded-lg shadow-lg p-3">
-        <div ref={printRef} className="p-3">
+        <div ref={contentRef} className="p-3">
           {/* Header */}
           <h1 className="text-2xl font-bold mb-4">Donation Allocation</h1>
 
@@ -69,38 +76,38 @@ const ReceiptDetails = ({
                 <strong>USERID:</strong> {sponsorDetails?.sponsor_id}
               </p>
               <p>
-                <strong>ReceiptID:</strong> {donationReceipt?.donation_id}
-              </p>
-              <p>
-                <strong>VATID:</strong> {"XXX"}
+                <strong>ReceiptID:</strong> {allocatedProgramData?.id}
               </p>
             </div>
           </div>
 
           {/* Date */}
           <p className="text-right mb-6">
-            <strong>Date:</strong> {donationReceipt?.date}
+            <strong>Date:</strong> {allocatedProgramData?.created_at}
           </p>
 
           {/* Items Table */}
           <table className="w-full border-t border-b mb-6">
             <thead>
               <tr className="bg-gray-200">
-                <th className="py-2 text-left px-2">Type</th>
-                <th className="py-2 text-left px-2">Description</th>
-                <th className="py-2 text-center">Qty.</th>
+                <th className="py-2 text-left px-2">Program Name</th>
+                <th className="py-2 text-left px-2">Program Period</th>
+                <th className="py-2 text-center">Number of Coupons</th>
                 <th className="py-2 text-right px-2">Amount</th>
               </tr>
             </thead>
             <tbody>
-              <tr key={donationReceipt?.donation_id} className="border-b">
-                <td className="py-2 px-2">{"Donation amount"}</td>
+              <tr key={allocatedProgramData?.id} className="border-b">
                 <td className="py-2 px-2">
-                  {donationReceipt?.donation_description}
+                  {allocatedProgramData?.program_name}
                 </td>
-                <td className="py-2 text-center">{"1"}</td>
+                <td className="py-2 px-2">{`${allocatedProgramData?.period}-Days`}</td>
+                <td className="py-2 text-center">{`${
+                  allocatedProgramData?.allocated_amount! /
+                  Number(allocatedProgramData?.subscription_value)
+                }`}</td>
                 <td className="py-2 text-right px-2">
-                  ${donationReceipt?.amount! + donationReceipt?.bank_charges!}
+                  ${allocatedProgramData?.allocated_amount!}
                 </td>
               </tr>
             </tbody>
@@ -111,18 +118,17 @@ const ReceiptDetails = ({
             All donations are tax-deductible, currency is UAE.
           </p>
           <div className="text-right">
-            /{" "}
             <p>
               <strong>Subtotal:</strong>$
-              {donationReceipt?.amount! + donationReceipt?.bank_charges!}
+              {allocatedProgramData?.allocated_amount}
             </p>
             <p className="text-xl font-bold mt-2">
               <strong>Total Amount:</strong>$
-              {donationReceipt?.amount! + donationReceipt?.bank_charges!}
+              {allocatedProgramData?.allocated_amount}
             </p>
             <p className="mt-2">
               <strong>Payment Method:</strong>
-              {donationReceipt?.source_of_amount}
+              {"card"}
             </p>
           </div>
         </div>
@@ -131,4 +137,4 @@ const ReceiptDetails = ({
   );
 };
 
-export default ReceiptDetails;
+export default DonationAllocationReceiptDetail;

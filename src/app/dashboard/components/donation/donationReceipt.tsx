@@ -1,6 +1,6 @@
 "use client";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import ReceiptDetails from "./receiptDetails";
+import ReceiptDetails from "./donationReceiptDetails";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -69,7 +69,7 @@ export default function DonationReceipt({
         {/* Search Bar */}
         <Input
           type="text"
-          placeholder="Search Invoice..."
+          placeholder="Search by invoice Id..."
           className="w-full mb-4 p-2 border rounded"
           onChange={handleSearchReceipt}
         />
@@ -123,7 +123,7 @@ export default function DonationReceipt({
           />
         ) : (
           <p className="flex justify-self-center text-lg">
-            <strong>Please select a receript to download </strong>
+            <strong>Please select a receipt to download </strong>
           </p>
         )}
       </div>

@@ -1,46 +1,47 @@
 "use client";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import ReceiptDetails from "./receiptDetails";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Donation, SponsorData } from "@/types/types";
+import { AllocatedProgramData, SponsorData } from "@/types/types";
+import DonationAllocationReceiptDetail from "./donationAllocationReceiptDetail";
 
-interface DonationAllocationProps {
+interface DonationAllocationReceiptProps {
   sponsorDetails: SponsorData | null;
-  donationReceipt: Donation[] | null;
+  allocatedProgramData: AllocatedProgramData[] | null;
 }
 
-export default function DonationAllocation({
-  donationReceipt,
+export default function DonationAllocationReceipt({
+  allocatedProgramData,
   sponsorDetails,
-}: DonationAllocationProps) {
-  const [filteredReceipt, setFilteredReceipt] = useState<Donation[] | null>(
-    donationReceipt
-  );
+}: DonationAllocationReceiptProps) {
+  const [filteredReceipt, setFilteredReceipt] = useState<
+    AllocatedProgramData[] | null
+  >(allocatedProgramData);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
-  const [selectedReceipt, setSelectedReceipt] = useState<Donation | null>(null);
+  const [selectedReceipt, setSelectedReceipt] =
+    useState<AllocatedProgramData | null>(null);
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.trim();
     if (!query) {
-      setFilteredReceipt(donationReceipt);
+      setFilteredReceipt(allocatedProgramData);
       return;
     }
-    const filter = donationReceipt?.filter(
-      (receipt) => receipt.donation_id === Number(query)
+    const filter = allocatedProgramData?.filter(
+      (receipt) => receipt.id === Number(query)
     );
     setFilteredReceipt(filter || []);
   };
 
   const handleDateFilter = () => {
     if (!startDate && !endDate) {
-      setFilteredReceipt(donationReceipt);
+      setFilteredReceipt(allocatedProgramData);
       return;
     }
-    const filter = donationReceipt?.filter((receipt) => {
-      const donationDate = new Date(receipt.date!).getTime();
+    const filter = allocatedProgramData?.filter((receipt) => {
+      const donationDate = new Date(receipt.created_at!).getTime();
       const start = startDate ? new Date(startDate).getTime() : null;
       const end = endDate ? new Date(endDate).getTime() : null;
       return (!start || donationDate >= start) && (!end || donationDate <= end);
@@ -52,9 +53,9 @@ export default function DonationAllocation({
     handleDateFilter();
   }, [startDate, endDate]);
 
-  const handleReceiptSelection = (donationId: number) => {
+  const handleReceiptSelection = (allocatedId: number) => {
     const selected = filteredReceipt?.find(
-      (receipt) => receipt.donation_id === donationId
+      (receipt) => receipt.id === allocatedId
     );
     setSelectedReceipt(selected || null);
     console.log("Selected Receipt:", selected);
@@ -97,16 +98,13 @@ export default function DonationAllocation({
             onValueChange={(value) => handleReceiptSelection(Number(value))}
           >
             {filteredReceipt?.map((receipt) => (
-              <div
-                key={receipt.donation_id}
-                className="flex items-center space-x-2 m-2"
-              >
+              <div key={receipt.id} className="flex items-center space-x-2 m-2">
                 <RadioGroupItem
-                  value={receipt.donation_id?.toString()!}
-                  id={`r-${receipt.donation_id}`}
+                  value={receipt.id?.toString()!}
+                  id={`r-${receipt.id}`}
                 />
-                <Label htmlFor={`r-${receipt.donation_id}`}>
-                  Donation ID: {receipt.donation_id}
+                <Label htmlFor={`r-${receipt.id}`}>
+                  Donation ID: {receipt.id}
                 </Label>
               </div>
             ))}
@@ -117,13 +115,13 @@ export default function DonationAllocation({
       {/* Donation Details */}
       <div className="col-span-3">
         {selectedReceipt ? (
-          <ReceiptDetails
+          <DonationAllocationReceiptDetail
             sponsorDetails={sponsorDetails}
-            donationReceipt={selectedReceipt}
+            allocatedProgramData={selectedReceipt!}
           />
         ) : (
           <p className="flex justify-self-center text-lg">
-            <strong>Please select a receript to download </strong>
+            <strong>Please select a receipt to download </strong>
           </p>
         )}
       </div>

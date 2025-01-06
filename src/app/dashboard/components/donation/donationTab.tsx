@@ -1,12 +1,12 @@
 import React from "react";
 import SummaryCard from "./summaryCard";
 import ProgramCard from "./programCard";
-import DonationTabs from "./donationSectionTabs";
-import { AllocationData, Donation, SponsorData } from "@/types/types";
+import { AllocatedProgramData, Donation, SponsorData } from "@/types/types";
+import DonationReceiptTabs from "./donationReceiptTabs";
 
 interface DonationProps {
   sponsorData: SponsorData | null;
-  programAllocationData: AllocationData[] | null;
+  programAllocationData: AllocatedProgramData[] | null;
   donataionData: Donation[] | null;
 }
 
@@ -62,7 +62,11 @@ export default function DonationTab({
       </div>
 
       {/*Donation Receipt and Donation Allocation Section*/}
-      <DonationTabs donationData={donataionData} sponsorDetails={sponsorData} />
+      <DonationReceiptTabs
+        donationData={donataionData}
+        sponsorDetails={sponsorData}
+        allocatedProgramData={programAllocationData}
+      />
     </div>
   );
 }
