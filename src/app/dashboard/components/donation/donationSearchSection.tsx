@@ -46,6 +46,7 @@ const DonationSearchSection = ({ donation }: DonataionDataProps) => {
         <div className="space-y-2">
           {donation.map((donation) => (
             <button
+              key={donation.id}
               onClick={() => handleSelectDonation(donation.id)}
               className={`flex items-center justify-between w-full p-3 text-left border rounded-lg cursor-pointer hover:bg-blue-100 transition ${
                 selectedDonation === donation.id
