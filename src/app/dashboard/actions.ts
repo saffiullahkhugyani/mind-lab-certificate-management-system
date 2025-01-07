@@ -21,6 +21,42 @@ export async function studentList() {
     
 }
 
+export async function clubList() {
+    const supabase = createClient()
+    
+    try { 
+        const { data: clubList, error: clubListError } = await supabase
+            .from("clubs")
+            .select("*");
+        
+        if (clubListError) throw new Error(clubListError.message);
+
+        return {success: true, data: clubList}
+
+    } catch (error: any) {
+        return {success:false, error: error.message}
+    }
+    
+}
+
+export async function programList() {
+    const supabase = createClient()
+    
+    try { 
+        const { data: programList, error: programListError } = await supabase
+            .from("programs")
+            .select("*");
+        
+        if (programListError) throw new Error(programListError.message);
+
+        return {success: true, data: programList}
+
+    } catch (error: any) {
+        return {success:false, error: error.message}
+    }
+    
+}
+
 export default async function sponsorData() {
     const supabase = createClient();
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -63,33 +99,6 @@ export default async function sponsorData() {
         if (donationLogError) throw new Error(donationLogError.message);
         if (!donationLog) throw new Error("No record found for allocated");
 
-        // const tempMap = donationLog!.map((log) => ({
-        //     allocated_amount: log.allocated_amount,
-        //     user_id: log.donation.sponsor.user_id,
-        //     sponsor_id: log.donation.sponsor.sponsor_id,
-        //     sponsor_name: log.donation?.sponsor?.name, // Accessing the nested name
-        //     program_id: log.programs.program_id,
-        //     program_name: log.programs?.program_english_name,
-        //     created_at: log.created_at,
-        // }));
-
-        // const donationLogMap = tempMap.reduce((acc, current) => {
-        //     const { program_id, allocated_amount, ...rest } = current;
-            
-        //     if (acc.has(program_id)) {
-        //         // Update the existing program data
-        //         const existing = acc.get(program_id)!; // Get existing entry
-        //         existing.allocated_amount += allocated_amount;
-        //     } else {
-        //         // add a new entry
-        //         acc.set(program_id, { ...rest, program_id, allocated_amount });
-        //     }
-            
-        //     return acc;
-        // }, new Map());
-
-        // console.log("testing the logic", donationLogMap.values());
-
         console.log("Data for sponsor",
             donationLog!.map((log) => ({
                 allocated_amount: log.allocated_amount,
@@ -103,6 +112,8 @@ export default async function sponsorData() {
             allocated_amount: log.allocated_amount,
             subscription_value: log.programs.subscription_value,
             remaining_allocated_amount: log.remaining_allocated_amount,
+            program_id: log.programs.program_id,
+            club_id: log.programs.club_id,
             program_name: log.programs?.program_english_name,
             period: log.programs.period,
             created_at: new Date(log.created_at).toISOString().split("T")[0],

@@ -1,15 +1,17 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import Programs from "../components/program/programs";
 import Students from "../components/student/students";
-import sponsorData, { studentList } from "../actions";
+import sponsorData, { clubList, programList, studentList } from "../actions";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DonationTab from "../components/donation/donationTab";
+import ProgramsTab from "../components/program/programsTab";
 
 export default async function Dashboard() {
   const sponsor = await sponsorData();
   const students = await studentList();
+  const clubs = await clubList();
+  const programs = await programList();
 
   return (
     <div className=" mx-auto p-8">
@@ -54,7 +56,11 @@ export default async function Dashboard() {
           />
         </TabsContent>
         <TabsContent value="program">
-          <Programs />
+          <ProgramsTab
+            allocatedProgramData={sponsor.data?.allocatedProgramData!}
+            clubList={clubs.data!}
+            programList={programs.data!}
+          />
         </TabsContent>
         <TabsContent value="student">
           <Students students={students.data!} />

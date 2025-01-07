@@ -62,6 +62,7 @@ export default function Students({ students }: StudentProps) {
             {filteredStudents?.map((student) => {
               return (
                 <StudentCard
+                  key={student.id}
                   student={student}
                   onClick={async () => hanldeSelectedStudent(student)}
                 />

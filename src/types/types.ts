@@ -130,6 +130,8 @@ export type AllocatedProgramData = {
   allocated_amount: number | null;
   remaining_allocated_amount: number | null;
   program_name: string | null;
+  program_id: number | null;
+  club_id: number | null;
   subscription_value: string | null;
   period: string | null;
   created_at: string | null;
