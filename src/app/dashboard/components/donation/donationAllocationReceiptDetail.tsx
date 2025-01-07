@@ -102,10 +102,10 @@ const DonationAllocationReceiptDetail = ({
                   {allocatedProgramData?.program_name}
                 </td>
                 <td className="py-2 px-2">{`${allocatedProgramData?.period}-Days`}</td>
-                <td className="py-2 text-center">{`${
+                <td className="py-2 text-center">{`${Math.floor(
                   allocatedProgramData?.allocated_amount! /
-                  Number(allocatedProgramData?.subscription_value)
-                }`}</td>
+                    Number(allocatedProgramData?.subscription_value)
+                )}`}</td>
                 <td className="py-2 text-right px-2">
                   ${allocatedProgramData?.allocated_amount!}
                 </td>

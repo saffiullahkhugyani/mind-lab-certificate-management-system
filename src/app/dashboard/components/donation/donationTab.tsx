@@ -54,7 +54,10 @@ export default function DonationTab({
               programName={program.program_name!}
               donation={program.allocated_amount!}
               balance={program.remaining_allocated_amount!}
-              availableCoupons={program.remaining_allocated_amount! / 100}
+              availableCoupons={Math.floor(
+                program.remaining_allocated_amount! /
+                  Number(program.subscription_value!)
+              )}
               date={program.created_at!}
             />
           ))}

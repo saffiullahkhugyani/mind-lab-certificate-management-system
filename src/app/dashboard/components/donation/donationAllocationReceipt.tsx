@@ -21,7 +21,7 @@ export default function DonationAllocationReceipt({
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] =
-    useState<AllocatedProgramData | null>(null);
+    useState<AllocatedProgramData | null>(allocatedProgramData?.at(0)!);
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.trim();
@@ -94,7 +94,7 @@ export default function DonationAllocationReceipt({
         {/* Donation IDs */}
         <div className="space-y-2">
           <RadioGroup
-            defaultValue=""
+            defaultValue={filteredReceipt?.at(0)?.id.toString()}
             onValueChange={(value) => handleReceiptSelection(Number(value))}
           >
             {filteredReceipt?.map((receipt) => (
