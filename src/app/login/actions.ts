@@ -16,7 +16,7 @@ export async function emailLogin(data: {
         redirect('/login?message=Could not authenticate user')
     }
     revalidatePath('/', 'layout')
-    redirect('/create-certificate')
+    redirect('/donation-management')
     
 }
 

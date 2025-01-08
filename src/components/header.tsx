@@ -19,8 +19,8 @@ const Header = async () => {
           </a>{" "}
           {user != null && (
             <div className="flex items-center gap-4">
-              <Link href={"/create-certificate"}>Create Certificate</Link>
-              <Link href={"/certificate-list"}>Certificate List</Link>
+              {/* <Link href={"/create-certificate"}>Create Certificate</Link>
+              <Link href={"/certificate-list"}>Certificate List</Link> */}
               <Link href={"/donation-management"}>Donation Management</Link>
               <Link href={"/program-management"}>Program Management</Link>
               <Link href={"/coupon-management"}>Coupon Management</Link>
