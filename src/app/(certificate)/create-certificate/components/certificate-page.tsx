@@ -38,7 +38,6 @@ const CertificatePage = ({
   const [selectedCertificate, setSelectedCertificate] =
     useState<Certificate | null>(null);
   const [searchString, setSearchString] = useState<string>("");
-  const [certificateAssertion, setCertificateAssertion] = useState(false);
   const [selectedV1Certificate, setSelectedV1Certificate] =
     useState<CustomUploadedCertificate | null>(null);
   const [dataReady, setDataReady] = useState(false); // New flag to indicate data readiness
@@ -124,8 +123,7 @@ const CertificatePage = ({
         {!isEdit && (
           <UploadedCertificates
             uploadedCertificates={uploadedCertificates}
-            setCertificateUrl={setSelectedV1Certificate}
-            setCertificateImageDisplay={setCertificateAssertion}
+            setSelectedCertificate={setSelectedV1Certificate}
           />
         )}
         {/* Section 1: Search */}
@@ -149,16 +147,6 @@ const CertificatePage = ({
                 buttonLabel={isEdit ? "Update Certificate" : "Add Certificate"}
               />
             </div>
-            {/* {certificateAssertion && (
-            <div className="w-full flex items-center justify-center bg-white p-2 m-2 rounded-sm shadow-md">
-              <Image
-                src={selectedV1Certificate?.certificate_image_url!}
-                alt=" -Certificate Image"
-                width={500}
-                height={200}
-              />
-            </div>
-          )} */}
           </div>
         )}
       </div>

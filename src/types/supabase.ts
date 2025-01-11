@@ -22,7 +22,7 @@ export type Database = {
           number_of_hours: string | null
           skill_level: string | null
           skill_type: string | null
-          tags: string[] | null
+          tags: Json | null
         }
         Insert: {
           certificate_country?: string | null
@@ -36,7 +36,7 @@ export type Database = {
           number_of_hours?: string | null
           skill_level?: string | null
           skill_type?: string | null
-          tags?: string[] | null
+          tags?: Json | null
         }
         Update: {
           certificate_country?: string | null
@@ -50,7 +50,7 @@ export type Database = {
           number_of_hours?: string | null
           skill_level?: string | null
           skill_type?: string | null
-          tags?: string[] | null
+          tags?: Json | null
         }
         Relationships: []
       }

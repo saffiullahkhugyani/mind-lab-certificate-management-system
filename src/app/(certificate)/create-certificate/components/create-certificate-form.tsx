@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,14 +21,14 @@ import { z } from "zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "../create-certificate-module.css";
-// import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
+
 import {
   Certificate,
   CustomUploadedCertificate,
   FormattedSkillTags,
 } from "@/types/types";
 import { LoadingButton } from "@/components/ui/loading-button";
-import { SkillTags, SkillType } from "@/types/customs";
+import { SkillType } from "@/types/customs";
 import { MultiSelect, Options } from "@/components/ui/multi-select";
 import {
   addCertificate,
@@ -39,12 +38,6 @@ import {
 } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-
-// const optionSchema = z.object({
-//   label: z.string(),
-//   value: z.string(),
-//   disable: z.boolean().optional(),
-// });
 
 // schema for form validation
 const FormSchema = z.object({
@@ -94,20 +87,13 @@ const CreateCertificate = ({
 }: CreateCertificateProps) => {
   const skillLevel = ["Basic", "Intermediate", "Advanced", "Professional"];
   const [isPending, startTransition] = useTransition();
-  const [formValues, setFormValues] = useState<Certificate>();
-  const [filteredTags, setFilteredTags] = useState<Options[]>([]);
   const [disableCertificate, setDisableCertificate] = useState<boolean>(true);
+  const [tags, setTags] = useState<string[] | null>([]);
+  const [tagHours, setTagHours] = useState<{ [key: string]: number }>({});
+  const [filteredTags, setFilteredTags] = useState<Options[]>([]);
+
   const { toast } = useToast();
   const router = useRouter();
-
-  useEffect(() => {
-    setFormValues(certificate!);
-  }, [certificate]);
-
-  // use effect hook for disabling the form
-  useEffect(() => {
-    setDisableCertificate(disabled || isPending);
-  }, [disabled, isPending]);
 
   // Default values for "add certificate" mode
   const addCertificateDefaults = {
@@ -132,7 +118,7 @@ const CreateCertificate = ({
     number_of_hours: certificate?.number_of_hours || "",
     skill_level: certificate?.skill_level || "",
     skill_type: certificate?.skill_type || "",
-    tags: certificate?.tags || [],
+    tags: certificate?.tags!.map((tag) => tag.tag_name) || [],
   };
 
   // Decide which set of default values to use based on whether we are editing or adding
@@ -144,6 +130,27 @@ const CreateCertificate = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   });
+
+  // use effect hook for disabling the form
+  useEffect(() => {
+    setDisableCertificate(disabled || isPending);
+  }, [disabled, isPending]);
+
+  // setting tags for edit mode
+  useEffect(() => {
+    if (isEdit) {
+      const tagList = certificate?.tags!.map((tag) => tag.tag_name);
+      setTags(tagList!);
+    }
+
+    if (isEdit && certificate?.tags) {
+      const initialHours = certificate.tags.reduce((acc, tag) => {
+        acc[tag.tag_name] = tag.hours;
+        return acc;
+      }, {} as { [key: string]: number });
+      setTagHours(initialHours);
+    }
+  }, [isEdit, certificate]);
 
   const { reset, watch } = form;
 
@@ -163,11 +170,13 @@ const CreateCertificate = ({
     event.target.removeAttribute("lang");
   };
 
-  // watching skill type drop down to filtter tags
-  const selectedSkillType = watch("skill_type");
-
-  // initializing form reference from HTML FORM ELEMENT
-  const formRef = useRef<HTMLFormElement>(null);
+  // handle hour change for each tag(s)
+  const handleHourChange = (tag: string, hours: number) => {
+    setTagHours((prev) => ({
+      ...prev,
+      [tag]: hours, // Update the hours for the specific tag
+    }));
+  };
 
   /*
   using state hook to store form data,
@@ -199,6 +208,12 @@ const CreateCertificate = ({
     }
   }, [reset]);
 
+  // watching skill type drop down to filtter tags
+  const selectedSkillType = watch("skill_type");
+
+  // initializing form reference from HTML FORM ELEMENT
+  const formRef = useRef<HTMLFormElement>(null);
+
   // use effect hook for filtering tags
   useEffect(() => {
     // filtered tags based on the selected skill type
@@ -211,6 +226,32 @@ const CreateCertificate = ({
 
   // submitting the form
   const onSubmit: SubmitHandler<FormFields> = (data) => {
+    // 1. Calculate the total number of hours based on selected tags
+    let totalCalculatedHours = 0;
+    tags!.forEach((tag) => {
+      const hoursForTag = tagHours[tag] || 0; // Default to 0 if not specified
+      totalCalculatedHours += hoursForTag;
+    });
+
+    // 2. Get the total hours provided for the certificate (assuming you have a form field for this)
+    const providedTotalHours = form.getValues("number_of_hours"); // Assuming this is part of your form
+
+    // 3. Compare the total hours with the provided hours
+    if (totalCalculatedHours !== Number(providedTotalHours)) {
+      alert(
+        `The total hours don't match! Calculated: ${totalCalculatedHours}, Provided: ${providedTotalHours}`
+      );
+      return;
+    }
+
+    if (!isEdit && v1Certificate === null) {
+      toast({
+        description: "Please select a certificate to be asserted",
+        variant: "destructive",
+      });
+      return;
+    }
+
     startTransition(async () => {
       const certificateData = {
         id: isEdit ? certificate?.id! : null,
@@ -222,42 +263,45 @@ const CreateCertificate = ({
         number_of_hours: data.number_of_hours,
         skill_level: data.skill_level,
         skill_type: data.skill_type,
-        tags: data.tags,
+        tags: data.tags.map((tag) => ({
+          tag_name: tag,
+          hours: tagHours[tag] || 0,
+        })),
         certificate_status: true,
       };
-
       if (isEdit) {
         const response = await updateCertificate(certificateData);
-
-        if (response != null) {
+        if (response.success) {
           toast({
             description: "Certificate has been updated successfully",
             variant: "success",
           });
-
           router.back();
         }
       } else {
-        const res = await addCertificate(certificateData);
-        const v2Id = res?.at(0)?.id;
-        const resCertificateMapping = await addCertificateMapping({
+        // adding certificate
+        const response = await addCertificate(certificateData);
+
+        // fetching added cetificate id
+        const v2Id = response?.data?.id!;
+
+        // adding mapping for certificates
+        const certificateMapping = await addCertificateMapping({
           userId: v1Certificate?.profiles?.id!,
           certificateV1Id: v1Certificate?.id!,
           certificateV2Id: v2Id!,
         });
 
-        if (resCertificateMapping != null) {
+        if (certificateMapping.success) {
           const certificateAssertion = await certificateAsserted({
             certificateV1Id: v1Certificate?.id!,
           });
-
-          if (certificateAssertion != null)
+          if (certificateAssertion.success)
             toast({
               description: "Certificate has been added successfully",
               variant: "success",
             });
         }
-
         reset({
           issue_year: "",
           issue_authority: "",
@@ -470,7 +514,21 @@ const CreateCertificate = ({
                     <MultiSelect
                       {...field}
                       options={filteredTags}
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        // fetching tags
+                        field.onChange(value);
+                        setTags(value);
+
+                        // reset hours for unselected tags
+                        setTagHours((prev) =>
+                          Object.keys(prev)
+                            .filter((key) => value.includes(key))
+                            .reduce((obj, key) => {
+                              obj[key] = prev[key];
+                              return obj;
+                            }, {} as { [key: string]: number })
+                        );
+                      }}
                       defaultValue={field.value}
                       value={field.value}
                       placeholder="Select a tag"
@@ -481,6 +539,37 @@ const CreateCertificate = ({
                 </FormItem>
               )}
             />
+            <div className="flex flex-col space-y-2 m-2 mt-4 ">
+              {tags!.length > 0 && (
+                <p className="text-xl font-bold mt-2">
+                  Enter number of hours for selected tag(s)
+                </p>
+              )}
+              <div className="grid grid-cols-3">
+                {tags &&
+                  tags.map((tag) => (
+                    <div
+                      key={tag}
+                      className="grid grid-cols-2 items-center bg-slate-200 p-2 m-2 border rounded-sm shadow-md hover:cursor-pointer hover:bg-slate-300 "
+                    >
+                      <p className="font-bold text-lg">{tag}</p>
+                      <Input
+                        type="number"
+                        className="bg-white"
+                        placeholder="Number of hours"
+                        onWheel={(e) => (e.target as HTMLElement).blur()}
+                        value={tagHours[tag] || ""}
+                        onChange={(e) =>
+                          handleHourChange(
+                            tag,
+                            parseInt(e.target.value, 10) || 0
+                          )
+                        }
+                      ></Input>
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
           <div className="flex  justify-center m-2 ">
             <LoadingButton loading={isPending} className="w-auto gap-4 m-2">

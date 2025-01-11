@@ -137,7 +137,7 @@ export const MultiSelect = React.forwardRef<
       defaultValue = [],
       placeholder = "Select options",
       animation = 0,
-      maxCount = 3,
+      maxCount = 7,
       modalPopover = false,
       asChild = false,
       className,

@@ -203,9 +203,11 @@ export function DataTable({
                               </div>
                               <div>
                                 <p className="font-bold text-gray-700">Tags:</p>
-                                <p className="font-normal">
-                                  {row.original.tags?.join(", ")}
-                                </p>
+                                <div className="font-normal">
+                                  {row.original.tags?.map((tag) => (
+                                    <p>{tag.tag_name}</p>
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           </div>
