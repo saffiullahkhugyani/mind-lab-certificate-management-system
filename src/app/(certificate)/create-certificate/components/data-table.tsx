@@ -205,7 +205,7 @@ export function DataTable({
                                 <p className="font-bold text-gray-700">Tags:</p>
                                 <div className="font-normal">
                                   {row.original.tags?.map((tag) => (
-                                    <p>{tag.tag_name}</p>
+                                    <p key={tag.tag_name}>{tag.tag_name}</p>
                                   ))}
                                 </div>
                               </div>
