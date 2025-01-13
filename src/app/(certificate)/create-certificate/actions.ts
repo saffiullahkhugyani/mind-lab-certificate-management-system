@@ -191,7 +191,8 @@ export async function certificateAsserted({ certificateV1Id }: { certificateV1Id
     if (assertedCertificateError) throw new Error(assertedCertificateError.message);
 
     // return success with data if asserted 
-    console.log("Certificate Asserted: " , assertedCertificate);
+    console.log("Certificate Asserted: ", assertedCertificate);
+    revalidatePath("/create-certificate");
     return { success: true, data: assertedCertificate };
     
   } catch (error: any) {
