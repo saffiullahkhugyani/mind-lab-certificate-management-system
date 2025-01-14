@@ -1,7 +1,8 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server";
-import { Certificate } from "@/types/types";
+import { Json } from "@/types/supabase";
+import { Certificate, Tag } from "@/types/types";
 import { revalidatePath } from "next/cache"
 
 export async function switchCertificateState(certificateId: String, value: boolean) {
@@ -26,18 +27,37 @@ export async function switchCertificateState(certificateId: String, value: boole
 
 }
 
-export async function certificateList() {
-  const supabase = createClient();
-  const { data, error } = await supabase.from("certificate_master")
-    .select().order("id", { ascending: true });
+export async function getCertificateList() {
+
+  try {
+    const supabase = createClient();
     
-    if (data != null)
-  {
+    const { data: certificateMaster, error: certificateMasterError } = await supabase
+      .from("certificate_master")
+      .select()
+      .order("id", { ascending: true });
+    
+    if (certificateMasterError) throw new Error(certificateMasterError.message);
 
-    console.log("Certificate list: ",data);
-  } else {
-    console.log("Error fetching certificate list: ",error)
+    const transformTags = (tags: Json): Tag[] => {
+            // Ensure 'tags' is an array before processing
+            if (!Array.isArray(tags)) return [];
+        
+            return tags.map((tag: any) => ({
+              tag_name: tag.tag_name || null,
+              hours: typeof tag.hours === "number" ? tag.hours : null,
+            }));
+          };
+    
+        const certificatesWithTransformedTags = certificateMaster!.map((cert) => ({
+        ...cert, // Spread the rest of the properties unchanged
+        tags: transformTags(cert.tags), // Only transform the tags field
+      }));
+
+    return {success:true, data: certificatesWithTransformedTags};
+
+   } catch (error: any) {
+    return {success:false, error: error.message}
   }
-
-  return data;
+  
 }

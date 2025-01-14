@@ -17,19 +17,17 @@ import { CustomUploadedCertificate } from "@/types/types";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import React from "react";
 
-function UploadedCertificates({
-  uploadedCertificates,
-  setCertificateUrl,
-  setCertificateImageDisplay,
-}: {
+interface UploadedCertificatesProps {
   uploadedCertificates: CustomUploadedCertificate[] | null;
-  setCertificateUrl: React.Dispatch<
+  setSelectedCertificate: React.Dispatch<
     React.SetStateAction<CustomUploadedCertificate | null>
   >;
-  setCertificateImageDisplay: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+}
+function UploadedCertificates({
+  uploadedCertificates,
+  setSelectedCertificate,
+}: UploadedCertificatesProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [selectedUrl, setSelectedUrl] = React.useState("");
 
   const handleOpenImageInNewWindow = (url: string) => {
     const newWindow = window.open("", "_blank", "width=800, height=600");
@@ -67,9 +65,7 @@ function UploadedCertificates({
                   className="flex items-center justify-center aspect-square rounded-md border px-4 py-2 font-mono text-sm shadow-sm hover:bg-gray-200"
                   onClick={() => {
                     setIsOpen(false);
-                    setSelectedUrl(certificate.certificate_image_url!);
-                    setCertificateUrl(certificate);
-                    setCertificateImageDisplay(true);
+                    setSelectedCertificate(certificate);
                     handleOpenImageInNewWindow(
                       certificate.certificate_image_url!
                     );

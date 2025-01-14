@@ -1,5 +1,10 @@
+import { Json } from "./supabase";
 
 
+export type Tag = {
+  tag_name: string;
+  hours: number ;
+}
 
 export type Certificate = {
   id: string | null,
@@ -11,7 +16,7 @@ export type Certificate = {
   number_of_hours: string | null,
   skill_level: string | null,
   skill_type: string | null,
-  tags: string[] | null,
+  tags: Tag[] | null,
   certificate_status: boolean  | null,
 
 }
