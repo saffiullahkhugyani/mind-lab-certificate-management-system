@@ -68,10 +68,10 @@ export default function StudentDetails({
         <StudentPieChart />
       </div>
       <div className="flex justify-evenly p-4 ">
-        <DetailsCard title="Program Enrolled" value="15" />
-        <DetailsCard title="Projects Enrolled" value="9" />
+        <DetailsCard title="Program Interest" value="15" />
+        <DetailsCard title="Program Enrolled" value="9" />
         <DetailsCard title="Certificates Earned" value="7" />
-        <DetailsCard title="Project not completed" value="2" />
+        <DetailsCard title="Program not completed" value="2" />
         <DetailsCard title="Rating" value="4.7" />
       </div>
     </div>

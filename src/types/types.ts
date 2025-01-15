@@ -56,6 +56,7 @@ export type Donation = {
 
 export type Programs = {
   club_id?: number | null
+  description?: string | null
   period?: string | null
   program_arabic_name?: string | null
   program_english_name?: string | null
@@ -128,6 +129,7 @@ export type SponsorData = {
 export type AllocatedProgramData = {
   id: number;
   allocated_amount: number | null;
+  description: string | null;
   remaining_allocated_amount: number | null;
   program_name: string | null;
   program_id: number | null;

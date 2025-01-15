@@ -32,8 +32,8 @@ export default function StudentCard({ student, onClick }: StudentCardProps) {
       {/* Student Information */}
       <div className="flex-grow">
         <h3 className="text-lg font-bold">{student?.name}</h3>
-        <p className="text-sm text-gray-600">#Programs Enrolled: 3</p>
-        <p className="text-sm text-gray-600">#Project Done: 3</p>
+        <p className="text-sm text-gray-600">#Programs Interested: 3</p>
+        <p className="text-sm text-gray-600">#Programs Done: 3</p>
         <p className="text-sm text-gray-600">Status: Progress</p>
       </div>
 

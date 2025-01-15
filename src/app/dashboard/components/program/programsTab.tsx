@@ -50,6 +50,13 @@ const ProgramsTab: React.FC<ProgramsTabProps> = ({
   const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
 
+  const imageMap: Record<number, string> = {
+    29: "/robotics-program.png",
+    30: "/aeronautic-program.png",
+    31: "/gravity-race-program.png",
+    32: "/little-inventors-program.png",
+  };
+
   const handleSearchProgram = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value.trim().toLowerCase());
   };
@@ -91,11 +98,9 @@ const ProgramsTab: React.FC<ProgramsTabProps> = ({
   const filteredPrograms = getFilteredPrograms()?.map((program) => (
     <ProgramCard
       key={program.program_id}
-      image={"/robotics-program.png"}
+      image={imageMap[program.program_id!]}
       title={getProgramName(program)}
-      description={
-        "Our Robotics Club sparks innovation through hands-on learning."
-      }
+      description={program.description!}
       donatedAmount={getDonationAmount(program, selectedFilter === "enrolled")}
       enrolled={selectedFilter === "enrolled"}
       detailsLink={"https://www.iastem.ae"}
