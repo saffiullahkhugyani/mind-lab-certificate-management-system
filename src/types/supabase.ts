@@ -529,7 +529,7 @@ export type Database = {
         Insert: {
           club_id?: number | null
           created_at?: string
-          description: string | null
+          description?: string | null
           period?: string | null
           program_arabic_name?: string | null
           program_english_name?: string | null
@@ -541,7 +541,7 @@ export type Database = {
         Update: {
           club_id?: number | null
           created_at?: string
-          description: string | null
+          description?: string | null
           period?: string | null
           program_arabic_name?: string | null
           program_english_name?: string | null
