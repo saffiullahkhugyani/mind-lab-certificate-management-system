@@ -53,6 +53,9 @@ export default async function Dashboard() {
             sponsorData={sponsor.data?.sponsorData!}
             programAllocationData={sponsor.data?.allocatedProgramData!}
             donataionData={sponsor.data?.donataionsData!}
+            donationAllocationInvoiceData={
+              sponsor.data?.donationAllocationInvoiceData!
+            }
           />
         </TabsContent>
         <TabsContent value="program">

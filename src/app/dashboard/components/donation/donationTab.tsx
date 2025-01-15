@@ -8,12 +8,14 @@ interface DonationProps {
   sponsorData: SponsorData | null;
   programAllocationData: AllocatedProgramData[] | null;
   donataionData: Donation[] | null;
+  donationAllocationInvoiceData: AllocatedProgramData[] | null;
 }
 
 export default function DonationTab({
   sponsorData,
   programAllocationData,
   donataionData,
+  donationAllocationInvoiceData,
 }: DonationProps) {
   // Data for Donation Summary
   const donationSummaryData = [
@@ -68,7 +70,7 @@ export default function DonationTab({
       <DonationReceiptTabs
         donationData={donataionData}
         sponsorDetails={sponsorData}
-        allocatedProgramData={programAllocationData}
+        allocatedProgramData={donationAllocationInvoiceData}
       />
     </div>
   );

@@ -109,6 +109,20 @@ export default async function sponsorData() {
                 created_at: new Date(log.created_at).toISOString().split("T")[0],
             }))
         );
+
+        const donationAllocationInvoiceData = donationLog.map((log) =>  ({
+            id: log.id,
+            allocated_amount: log.allocated_amount,
+            description: log.programs.description,
+            subscription_value: log.programs.subscription_value,   
+            remaining_allocated_amount: log.remaining_allocated_amount,
+            program_id: log.programs.program_id,
+            club_id: log.programs.club_id,
+            program_name: log.programs?.program_english_name,
+            period: log.programs.period,
+            created_at: new Date(log.created_at).toISOString().split("T")[0],
+            })
+        )
         
         
         const shapedAllocatedProgramData = donationLog!.reduce<AllocatedProgramData[]>((acc, log) => {
@@ -153,7 +167,8 @@ export default async function sponsorData() {
             success: true, data: {
                 sponsorData: shapedSponsorData,
                 allocatedProgramData: shapedAllocatedProgramData,
-                donataionsData: donationData
+                donataionsData: donationData,
+                donationAllocationInvoiceData: donationAllocationInvoiceData
             }
         };
 
