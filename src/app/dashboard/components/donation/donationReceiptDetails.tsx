@@ -106,7 +106,7 @@ const DonationReceiptDetail = ({
                 </td>
               </tr>
               <tr key={donationReceipt?.bank_charges} className="border-b">
-                <td className="py-2 px-2">{"Bank Charges"}</td>
+                <td className="py-2 px-2">{"Charges"}</td>
                 <td className="py-2 px-2"></td>
                 <td className="py-2 text-center">{"1"}</td>
                 <td className="py-2 text-right px-2">

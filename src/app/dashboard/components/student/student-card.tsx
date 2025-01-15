@@ -16,6 +16,26 @@ interface StudentCardProps {
 }
 
 export default function StudentCard({ student, onClick }: StudentCardProps) {
+  const interestMap: Record<string, string> = {
+    "4dd82bb4-964c-4b33-b857-b95b17507af0": "2",
+    "a2a0d09f-f00d-43ce-9465-59bb4da847c7": "3",
+    "993382f4-f490-45ed-b9b6-49142b385e17": "1",
+    "6514d0e1-ff55-4296-b880-baa1b7b5bf76": "2",
+  };
+
+  const doneMap: Record<string, string> = {
+    "4dd82bb4-964c-4b33-b857-b95b17507af0": "1",
+    "a2a0d09f-f00d-43ce-9465-59bb4da847c7": "2",
+    "993382f4-f490-45ed-b9b6-49142b385e17": "0",
+    "6514d0e1-ff55-4296-b880-baa1b7b5bf76": "2",
+  };
+
+  const statusMap: Record<string, string> = {
+    "4dd82bb4-964c-4b33-b857-b95b17507af0": "Progress",
+    "a2a0d09f-f00d-43ce-9465-59bb4da847c7": "Progress",
+    "993382f4-f490-45ed-b9b6-49142b385e17": "Not Completed",
+    "6514d0e1-ff55-4296-b880-baa1b7b5bf76": "Completed",
+  };
   return (
     <div
       className="flex items-center bg-white shadow-md p-4 rounded-md space-x-4 m-2 hover:bg-gray-200 hover:cursor-pointer"
@@ -32,9 +52,15 @@ export default function StudentCard({ student, onClick }: StudentCardProps) {
       {/* Student Information */}
       <div className="flex-grow">
         <h3 className="text-lg font-bold">{student?.name}</h3>
-        <p className="text-sm text-gray-600">#Programs Enrolled: 3</p>
-        <p className="text-sm text-gray-600">#Project Done: 3</p>
-        <p className="text-sm text-gray-600">Status: Progress</p>
+        <p className="text-sm text-gray-600">
+          #Programs Interested: {interestMap[student?.id!] || 2}
+        </p>
+        <p className="text-sm text-gray-600">
+          #Programs Done: {doneMap[student?.id!] || 1}
+        </p>
+        <p className="text-sm text-gray-600">
+          Status: {statusMap[student?.id!] || "Progress"}
+        </p>
       </div>
 
       {/* Dropdown Button */}

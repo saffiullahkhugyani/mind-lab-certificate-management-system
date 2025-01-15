@@ -10,7 +10,8 @@ export async function studentList() {
     try { 
         const { data: studentList, error: studentListError } = await supabase
             .from("profiles")
-            .select("*");
+            .select("*")
+            .eq("role_id", 4);
         
         if (studentListError) throw new Error(studentListError.message);
 
@@ -120,8 +121,9 @@ export default async function sponsorData() {
             } else {
                 // If not, add a new entry 
                 acc.push({     
-                id: log.id,
-                allocated_amount: log.allocated_amount,
+                    id: log.id,
+                    allocated_amount: log.allocated_amount,
+                description: log.programs.description,
                 subscription_value: log.programs.subscription_value,
                 remaining_allocated_amount: log.remaining_allocated_amount,
                 program_id: programId,

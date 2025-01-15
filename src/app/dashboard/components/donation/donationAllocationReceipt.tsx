@@ -104,7 +104,7 @@ export default function DonationAllocationReceipt({
                   id={`r-${receipt.id}`}
                 />
                 <Label htmlFor={`r-${receipt.id}`}>
-                  Donation ID: {receipt.id}
+                  Invoice ID: {receipt.id}
                 </Label>
               </div>
             ))}

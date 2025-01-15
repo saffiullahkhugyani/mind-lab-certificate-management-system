@@ -17,6 +17,13 @@ export default function StudentDetails({
   student,
   onBack,
 }: StudentDetailsProps) {
+  const nationalityMap: Record<string, string> = {
+    "4dd82bb4-964c-4b33-b857-b95b17507af0": "Brazil",
+    "a2a0d09f-f00d-43ce-9465-59bb4da847c7": "Brazil",
+    "993382f4-f490-45ed-b9b6-49142b385e17": "Pakistan",
+    "6514d0e1-ff55-4296-b880-baa1b7b5bf76": "UAE",
+  };
+
   return (
     <div className=" bg-white shadow-md rounded-md">
       <div className="flex items-center justify-between mb-4 p-4">
@@ -59,7 +66,7 @@ export default function StudentDetails({
                   Nationality
                 </Label>
                 <div className="mt-1 p-2 bg-gray-300 rounded-md text-sm text-gray-800">
-                  {"UAE"}
+                  {nationalityMap[student.id] || "UAE"}
                 </div>
               </div>
             </div>
@@ -68,10 +75,10 @@ export default function StudentDetails({
         <StudentPieChart />
       </div>
       <div className="flex justify-evenly p-4 ">
-        <DetailsCard title="Program Enrolled" value="15" />
-        <DetailsCard title="Projects Enrolled" value="9" />
+        <DetailsCard title="Program Interest" value="15" />
+        <DetailsCard title="Program Enrolled" value="9" />
         <DetailsCard title="Certificates Earned" value="7" />
-        <DetailsCard title="Project not completed" value="2" />
+        <DetailsCard title="Program not completed" value="2" />
         <DetailsCard title="Rating" value="4.7" />
       </div>
     </div>

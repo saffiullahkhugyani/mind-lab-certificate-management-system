@@ -478,6 +478,7 @@ export type Database = {
           mobile: string | null
           name: string | null
           profile_image_url: string | null
+          role_id: number | null
           updated_at: string | null
         }
         Insert: {
@@ -488,6 +489,7 @@ export type Database = {
           mobile?: string | null
           name?: string | null
           profile_image_url?: string | null
+          role_id?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -498,14 +500,24 @@ export type Database = {
           mobile?: string | null
           name?: string | null
           profile_image_url?: string | null
+          role_id?: number | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       programs: {
         Row: {
           club_id: number | null
           created_at: string
+          description: string | null
           period: string | null
           program_arabic_name: string | null
           program_english_name: string | null
@@ -517,6 +529,7 @@ export type Database = {
         Insert: {
           club_id?: number | null
           created_at?: string
+          description?: string | null
           period?: string | null
           program_arabic_name?: string | null
           program_english_name?: string | null
@@ -528,6 +541,7 @@ export type Database = {
         Update: {
           club_id?: number | null
           created_at?: string
+          description?: string | null
           period?: string | null
           program_arabic_name?: string | null
           program_english_name?: string | null
@@ -595,6 +609,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      roles: {
+        Row: {
+          id: number
+          role: string | null
+        }
+        Insert: {
+          id?: number
+          role?: string | null
+        }
+        Update: {
+          id?: number
+          role?: string | null
+        }
+        Relationships: []
       }
       skill_category: {
         Row: {
