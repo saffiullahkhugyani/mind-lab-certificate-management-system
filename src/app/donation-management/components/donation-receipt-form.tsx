@@ -237,12 +237,12 @@ export default function DonationReceiptForm({
                   name="bank_charges"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bank charges</FormLabel>
+                      <FormLabel>Charges</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
-                          placeholder="Bank charges"
+                          placeholder="charges"
                           onWheel={(e) => (e.target as HTMLElement).blur()}
                           onChange={(e) =>
                             field.onChange(Number(e.target.value))
