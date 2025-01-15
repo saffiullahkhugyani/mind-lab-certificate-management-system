@@ -15,10 +15,10 @@ export async function studentList() {
         
         if (studentListError) throw new Error(studentListError.message);
 
-        return {success: true, data: studentList}
+        return { success: true, data: studentList };
 
     } catch (error: any) {
-        return {success:false, error: error.message}
+        return { success: false, error: error.message };
     }
     
 }
@@ -121,8 +121,8 @@ export default async function sponsorData() {
             } else {
                 // If not, add a new entry 
                 acc.push({     
-                    id: log.id,
-                    allocated_amount: log.allocated_amount,
+                id: log.id,
+                allocated_amount: log.allocated_amount,
                 description: log.programs.description,
                 subscription_value: log.programs.subscription_value,
                 remaining_allocated_amount: log.remaining_allocated_amount,
