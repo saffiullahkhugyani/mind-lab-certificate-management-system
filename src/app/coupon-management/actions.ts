@@ -142,31 +142,69 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       .eq("program_id", program_id!);
       
     if (updateError) throw new Error("Failed to update remaining donation.");
+
+    { /* Testing coupon donation link  */}
+    // Track remaining coupons to be allocated
+    let remainingCoupons = couponDurationInMonths;
+    const donationLinks: { donation_id: number, num_coupons: number}[] = [];
+
     
-    // Step 3.1 Update the donation_allocation_log with the deduction of amounts
-    const totalRemainingAllocatedDonations = donationAllocationLog
-      .reduce((sum, allocatedDonation) => sum + (allocatedDonation.remaining_allocated_amount ?? 0), 0);
-    
-    let remainingToDeductFormLogs = remainingDeduction;
-    for (const allocatedLog of donationAllocationLog) {
-      if (remainingToDeductFormLogs <= 0) break;
+    {/* Testin coupon donation link*/ }
+    // step 3 revising logic for deductions and coupon donation link
+    for (const log of donationAllocationLog) {
+      if (remainingCoupons <= 0) break;
+      
+      const couponsFromThisDonation = Math.min(
+        remainingCoupons,
+        Math.floor(log.remaining_allocated_amount / Number(program.subscription_value))
+      );
+      remainingCoupons -= couponsFromThisDonation;
 
-      const deduct = Math.min(remainingToDeductFormLogs, allocatedLog.remaining_allocated_amount);
-      remainingToDeductFormLogs -= deduct;
+      donationLinks.push({
+        donation_id: log.donation_id,
+        num_coupons: couponsFromThisDonation,
+      });
 
-      console.log("after amount: ", remainingToDeductFormLogs);
+      console.log(donationLinks);
 
+      
       // Step 3.2 update the donation_allocation_log table with the deducted remaining amount
-      const { data: updateAllocatedLogs, error: updateAllocatedLogError } = await supabase
+      const { data: updateAllocatedLogs, error: logUpdateError } = await supabase
         .from("donation_allocation_log")
-        .update({ remaining_allocated_amount: allocatedLog.remaining_allocated_amount - deduct })
-        .eq("program_id", allocatedLog.program_id)
-        .eq("id", allocatedLog.id);
+        .update({
+          remaining_allocated_amount:
+            log.remaining_allocated_amount -
+          (couponsFromThisDonation * Number(program.subscription_value))  })
+        .eq("program_id", log.program_id)
+        .eq("id", log.id);
       
-      if (updateAllocatedLogError) throw new Error(updateAllocatedLogError.message);
-      
-      
+      if (logUpdateError) throw new Error(logUpdateError.message);
     }
+
+    // // Step 3.1 Update the donation_allocation_log with the deduction of amounts
+    // const totalRemainingAllocatedDonations = donationAllocationLog
+    //   .reduce((sum, allocatedDonation) => sum + (allocatedDonation.remaining_allocated_amount ?? 0), 0);
+    
+    // let remainingToDeductFormLogs = remainingDeduction;
+    // for (const allocatedLog of donationAllocationLog) {
+    //   if (remainingToDeductFormLogs <= 0) break;
+
+    //   const deduct = Math.min(remainingToDeductFormLogs, allocatedLog.remaining_allocated_amount);
+    //   remainingToDeductFormLogs -= deduct;
+
+    //   console.log("after amount: ", remainingToDeductFormLogs);
+
+    //   // Step 3.2 update the donation_allocation_log table with the deducted remaining amount
+    //   const { data: updateAllocatedLogs, error: updateAllocatedLogError } = await supabase
+    //     .from("donation_allocation_log")
+    //     .update({ remaining_allocated_amount: allocatedLog.remaining_allocated_amount - deduct })
+    //     .eq("program_id", allocatedLog.program_id)
+    //     .eq("id", allocatedLog.id);
+      
+    //   if (updateAllocatedLogError) throw new Error(updateAllocatedLogError.message);
+      
+      
+    // }
       
 
       // Step 3.5: fetching start date on the basis of the start_period
@@ -187,7 +225,22 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
         .select()
         .single();
       
-      if (insertCouponError) throw new Error("Failed to insert coupon record.");
+    if (insertCouponError) throw new Error("Failed to insert coupon record.");
+    
+    {/*Link the coupon to the donation*/ }
+    for (const link of donationLinks) {
+      const { error: linkError } = await supabase
+        .from("coupon_donation_link")
+        .insert({
+          coupon_id: couponData.coupon_id,
+          donation_id: link.donation_id,
+          num_of_coupons: link.num_coupons
+        });
+      
+        console.log(linkError);
+      if (linkError)
+        throw new Error("Failed to link coupon to donation");
+    }
 
       // Step 5: Mapping user to coupons
       const mapping = student_id
