@@ -61,8 +61,9 @@ export type Programs = {
   program_english_name?: string | null
   program_id?: number
   subscription_value?: string | null
-  total_allocated_donation?: number | null
-  total_remaining_donation?: number | null
+  description?: string | null
+  total_allocated_donation?: number
+  total_remaining_donation?: number
 }
 
 export type DonationAllocation = {

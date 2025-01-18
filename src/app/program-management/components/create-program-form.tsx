@@ -36,6 +36,7 @@ export const CreateProgramFormSchema = z.object({
   subscription_value: z
     .string()
     .min(2, { message: "Subscription value is required" }),
+  description: z.string().min(10, { message: "Description is required" }),
 });
 
 //  type from schema
@@ -76,6 +77,7 @@ export default function CreateProgramForm({ clubsList }: CreateProgramProps) {
           program_arabic_name: "",
           period: "",
           subscription_value: "",
+          description: "",
         });
       }
 
@@ -183,6 +185,19 @@ export default function CreateProgramForm({ clubsList }: CreateProgramProps) {
               <FormLabel>Subscription value</FormLabel>
               <FormControl>
                 <Input placeholder="Subscription value" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
