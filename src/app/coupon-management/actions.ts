@@ -147,6 +147,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     // Track remaining coupons to be allocated
     let remainingCoupons = couponDurationInMonths;
     const donationLinks: { donation_id: number, num_coupons: number}[] = [];
+    let remainingToDeductFromLogs = remainingDeduction;
 
     
     {/* Testin coupon donation link*/ }
@@ -168,13 +169,16 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       console.log(donationLinks);
 
       
+      const deduct = Math.min(remainingToDeductFromLogs, log.remaining_allocated_amount);
+      remainingToDeductFromLogs -= deduct;
+
+      console.log("after amount: ", remainingToDeductFromLogs);
+
+      
       // Step 3.2 update the donation_allocation_log table with the deducted remaining amount
       const { data: updateAllocatedLogs, error: logUpdateError } = await supabase
         .from("donation_allocation_log")
-        .update({
-          remaining_allocated_amount:
-            log.remaining_allocated_amount -
-          (couponsFromThisDonation * Number(program.subscription_value))  })
+        .update({remaining_allocated_amount: log.remaining_allocated_amount - deduct  })
         .eq("program_id", log.program_id)
         .eq("id", log.id);
       
