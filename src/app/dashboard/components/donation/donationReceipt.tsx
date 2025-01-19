@@ -11,29 +11,28 @@ interface DonationReceiptProps {
   donationReceipt: Donation[] | null;
 }
 
-export default function DonationReceipt({
+const DonationReceipt = ({
   donationReceipt,
   sponsorDetails,
-}: DonationReceiptProps) {
+}: DonationReceiptProps) => {
   const [filteredReceipt, setFilteredReceipt] = useState<Donation[] | null>(
     donationReceipt
   );
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<Donation | null>(
-    donationReceipt?.at(0)!
+    donationReceipt?.[0] || null
   );
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.trim();
-    if (!query) {
-      setFilteredReceipt(donationReceipt);
-      return;
-    }
-    const filter = donationReceipt?.filter(
-      (receipt) => receipt.donation_id === Number(query)
+    setFilteredReceipt(
+      query
+        ? donationReceipt?.filter(
+            (receipt) => receipt.donation_id === Number(query)
+          ) || []
+        : donationReceipt
     );
-    setFilteredReceipt(filter || []);
   };
 
   const handleDateFilter = () => {
@@ -41,13 +40,14 @@ export default function DonationReceipt({
       setFilteredReceipt(donationReceipt);
       return;
     }
-    const filter = donationReceipt?.filter((receipt) => {
+    const start = startDate ? new Date(startDate).getTime() : null;
+    const end = endDate ? new Date(endDate).getTime() : null;
+
+    const filtered = donationReceipt?.filter((receipt) => {
       const donationDate = new Date(receipt.date!).getTime();
-      const start = startDate ? new Date(startDate).getTime() : null;
-      const end = endDate ? new Date(endDate).getTime() : null;
       return (!start || donationDate >= start) && (!end || donationDate <= end);
     });
-    setFilteredReceipt(filter || []);
+    setFilteredReceipt(filtered || []);
   };
 
   useEffect(() => {
@@ -95,7 +95,7 @@ export default function DonationReceipt({
         {/* Donation IDs */}
         <div className="space-y-2">
           <RadioGroup
-            defaultValue={filteredReceipt?.at(0)?.donation_id!.toString()}
+            value={selectedReceipt?.donation_id?.toString()}
             onValueChange={(value) => handleReceiptSelection(Number(value))}
           >
             {filteredReceipt?.map((receipt) => (
@@ -124,11 +124,13 @@ export default function DonationReceipt({
             donationReceipt={selectedReceipt}
           />
         ) : (
-          <p className="flex justify-self-center text-lg">
-            <strong>Please select a receipt to download </strong>
+          <p className="flex justify-center text-lg">
+            <strong>Please select a receipt to download</strong>
           </p>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default DonationReceipt;

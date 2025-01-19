@@ -1,7 +1,6 @@
 "use client";
 
 import { Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -26,9 +25,10 @@ const chartSkillLevelData = [
 ];
 
 const chartSkillTypeData = [
-  { type: "Soft", visitors: 10, fill: "var(--color-Soft)" },
-  { type: "Hard", visitors: 11, fill: "var(--color-Hard)" },
-  { type: "Programming", visitors: 9, fill: "var(--color-Programming)" },
+  { skillType: "Soft", visitors: 10, fill: "var(--color-Soft)" },
+  { skillType: "Hard", visitors: 11, fill: "var(--color-Hard)" },
+  { skillType: "Programming", visitors: 9, fill: "var(--color-Programming)" },
+  { skillType: "LifeSkill", visitors: 4, fill: "var(--color-LifeSkill)" },
 ];
 
 const skillLevelChartConfig = {
@@ -54,26 +54,30 @@ const skillLevelChartConfig = {
 } satisfies ChartConfig;
 
 const skillTypeChartConfig = {
-  type: {
-    label: "type",
+  skillType: {
+    label: "Skill Type",
   },
   Soft: {
     label: "Soft",
     color: "hsl(var(--chart-1))",
   },
   Hard: {
-    label: "hard",
+    label: "Hard",
     color: "hsl(var(--chart-2))",
   },
   Programming: {
     label: "Programming",
     color: "hsl(var(--chart-3))",
   },
+  LifeSkill: {
+    label: "Life Skill",
+    color: "hsl(var(--chart-4))",
+  },
 } satisfies ChartConfig;
 
 export function StudentPieChart() {
   return (
-    <Card className="flex items-center bg-slate-200">
+    <Card className="flex items-center bg-slate-200 h-full">
       <CardContent className="flex flex-1 pb-0">
         <div className="flex-1 justify-items-center">
           <CardTitle>Skill Level</CardTitle>
@@ -91,15 +95,15 @@ export function StudentPieChart() {
                 dataKey="visitors"
                 nameKey="level"
               />
-              {/* <ChartLegend
+              <ChartLegend
                 content={<ChartLegendContent nameKey="level" />}
                 className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-              /> */}
+              />
             </PieChart>
           </ChartContainer>
         </div>
         <div className="flex-1 justify-items-center">
-          <CardTitle>SKill Type</CardTitle>
+          <CardTitle>Skill Type</CardTitle>
           <ChartContainer
             config={skillTypeChartConfig}
             className="mx-auto aspect-square max-h-[300px]"
@@ -112,12 +116,35 @@ export function StudentPieChart() {
               <Pie
                 data={chartSkillTypeData}
                 dataKey="visitors"
-                nameKey="type"
+                nameKey="skillType"
               />
-              {/* <ChartLegend
-                content={<ChartLegendContent nameKey="type" />}
+              <ChartLegend
+                content={<ChartLegendContent nameKey="skillType" />}
                 className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-              /> */}
+              />
+            </PieChart>
+          </ChartContainer>
+        </div>
+        <div className="flex-1 justify-items-center">
+          <CardTitle>Skill Type</CardTitle>
+          <ChartContainer
+            config={skillTypeChartConfig}
+            className="mx-auto aspect-square max-h-[300px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Pie
+                data={chartSkillTypeData}
+                dataKey="visitors"
+                nameKey="skillType"
+              />
+              <ChartLegend
+                content={<ChartLegendContent nameKey="skillType" />}
+                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+              />
             </PieChart>
           </ChartContainer>
         </div>

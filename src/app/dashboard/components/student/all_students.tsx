@@ -9,13 +9,9 @@ import { StudentSupport } from "@/types/types";
 
 interface StudentProps {
   students: Profiles[] | null;
-  supportedStudents: StudentSupport[] | null;
 }
 
-export default function Students({
-  students,
-  supportedStudents,
-}: StudentProps) {
+export default function AllStudents({ students }: StudentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredStudents, setFilteredStudents] = useState<Profiles[] | null>(
     students

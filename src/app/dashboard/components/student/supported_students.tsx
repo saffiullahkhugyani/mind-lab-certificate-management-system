@@ -12,7 +12,7 @@ interface StudentProps {
   supportedStudents: StudentSupport[] | null;
 }
 
-export default function Students({
+export default function SupportedStudents({
   students,
   supportedStudents,
 }: StudentProps) {

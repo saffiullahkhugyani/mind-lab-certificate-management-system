@@ -30,7 +30,7 @@ export default function DonationTab({
     },
     {
       label: "Students supported",
-      value: "0",
+      value: sponsorData?.student_supported.toString()!,
     },
   ];
 

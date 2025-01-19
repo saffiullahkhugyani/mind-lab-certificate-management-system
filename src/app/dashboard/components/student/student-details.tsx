@@ -31,8 +31,8 @@ export default function StudentDetails({
           ← Back
         </Button>
       </div>
-      <div className="grid grid-cols-2 p-4 ">
-        <Card className="max-w-md shadow-md border bg-slate-100">
+      <div className="grid grid-cols-3 p-4 space-x-2">
+        <Card className=" col-span-1 max-w-md shadow-md border bg-slate-100">
           <CardHeader className="flex flex-col items-center p-4">
             <Avatar className="w-40 h-40 rounded-none border">
               <AvatarImage src={student?.profile_image_url!} alt="@shadcn" />
@@ -72,7 +72,9 @@ export default function StudentDetails({
             </div>
           </CardContent>
         </Card>
-        <StudentPieChart />
+        <div className="col-span-2">
+          <StudentPieChart />
+        </div>
       </div>
       <div className="flex justify-evenly p-4 ">
         <DetailsCard title="Program Interest" value="15" />

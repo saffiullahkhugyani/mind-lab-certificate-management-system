@@ -1,11 +1,11 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import Students from "../components/student/students";
 import sponsorData, { clubList, programList, studentList } from "../actions";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DonationTab from "../components/donation/donationTab";
 import ProgramsTab from "../components/program/programsTab";
+import StudentTabs from "../components/student/student_tab";
 
 export default async function Dashboard() {
   const sponsor = await sponsorData();
@@ -66,7 +66,10 @@ export default async function Dashboard() {
           />
         </TabsContent>
         <TabsContent value="student">
-          <Students students={students.data!} />
+          <StudentTabs
+            students={students.data!}
+            supportedStudents={sponsor.data?.studentSupport!}
+          />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { AllocatedProgramData } from "@/types/types";
+import { AllocatedProgramData, StudentSupport } from "@/types/types";
 import { format } from "date-fns";
 
 export async function studentList() {
@@ -14,6 +14,12 @@ export async function studentList() {
             .eq("role_id", 4);
         
         if (studentListError) throw new Error(studentListError.message);
+        
+        const { data: certificateDetails, error: certificateDetailsError } = await supabase
+            .from('certificate_v1_v2_mapping')
+            .select("user_id, certificate_master!inner(*)");
+        
+        if(certificateDetailsError) throw new Error(certificateDetailsError.message);
 
         return { success: true, data: studentList };
 
@@ -22,6 +28,7 @@ export async function studentList() {
     }
     
 }
+
 
 export async function clubList() {
     const supabase = createClient()
@@ -101,6 +108,10 @@ export default async function sponsorData() {
         if (donationLogError) throw new Error(donationLogError.message);
         if (!donationLog) throw new Error("No record found for allocated");
 
+        const studentSupport = await studentSupportData(userId!);
+        console.log(studentSupport);
+        console.log(studentSupport.length);
+
         console.log("Data for sponsor",
             donationLog!.map((log) => ({
                 allocated_amount: log.allocated_amount,
@@ -161,6 +172,7 @@ export default async function sponsorData() {
             totalRemainingDonation: totalRemainingDonation,
             allocatedDonation: totalDonationAmount - totalRemainingDonation,
             programs_funded: shapedAllocatedProgramData?.length,
+            student_supported: studentSupport?.length
         }
 
         return {
@@ -168,7 +180,8 @@ export default async function sponsorData() {
                 sponsorData: shapedSponsorData,
                 allocatedProgramData: shapedAllocatedProgramData,
                 donataionsData: donationData,
-                donationAllocationInvoiceData: donationAllocationInvoiceData
+                donationAllocationInvoiceData: donationAllocationInvoiceData,
+                studentSupport: studentSupport
             }
         };
 
@@ -177,4 +190,58 @@ export default async function sponsorData() {
         console.log("Error in sponsor data:", error.message);
         return { success: false, error: error.message };
     }
+}
+
+async function studentSupportData(sponsorUid: string) {
+  
+    const supabase = createClient();
+
+    const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
+        .from("coupon_donation_link")
+        .select('coupons(*), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
+        .eq("donation.sponsor.user_id", sponsorUid);
+    
+    if (couponDonationLinkError) throw new Error(couponDonationLinkError.message);
+
+    const { data: couponUserMapping, error: couponUserMappingError } = await supabase
+        .from("coupon_user_mapping")
+        .select("*");
+    
+    if (couponUserMappingError) throw new Error(couponUserMappingError.message);
+
+
+  const customList: StudentSupport[] = [];
+
+  couponDonationLink.forEach(donationData => {
+    const couponId = donationData.coupons?.coupon_id;
+    
+    // Find all user mappings for this coupon
+    const matchingMappings = couponUserMapping.filter(
+      mapping => mapping.coupon_id === couponId
+    );
+
+    // If there are user mappings, create an entry for each user
+    if (matchingMappings.length > 0) {
+      matchingMappings.forEach(mapping => {
+        customList.push({
+          user_id: mapping.user_id,
+          coupon_id: couponId!,
+          donation_id: donationData.donation.donation_id,
+          program_id: donationData.coupons?.program_id ?? null,
+          num_of_coupons: donationData.num_of_coupons
+        });
+      });
+    } else {
+      // If no user mappings exist, create one entry with null user_id
+      customList.push({
+        user_id: null,
+        coupon_id: couponId!,
+        donation_id: donationData.donation.donation_id,
+        program_id: donationData.coupons?.program_id ?? null,
+        num_of_coupons: donationData.num_of_coupons
+      });
+    }
+  });
+
+  return customList;
 }

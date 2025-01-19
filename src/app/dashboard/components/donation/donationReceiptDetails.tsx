@@ -44,6 +44,8 @@ const DonationReceiptDetail = ({
     pdf.save(`Donation Receipt-${donationReceipt?.donation_id}`);
   };
 
+  console.log(donationReceipt);
+
   return (
     <>
       <div className="flex justify-end p-2 space-x-2">
@@ -95,7 +97,10 @@ const DonationReceiptDetail = ({
               </tr>
             </thead>
             <tbody>
-              <tr key={donationReceipt?.donation_id} className="border-b">
+              <tr
+                key={`${donationReceipt?.donation_id}-${donationReceipt?.date}`}
+                className="border-b"
+              >
                 <td className="py-2 px-2">{"Donation amount"}</td>
                 <td className="py-2 px-2">
                   {donationReceipt?.donation_description}

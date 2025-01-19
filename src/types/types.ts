@@ -87,6 +87,7 @@ export type Profiles = {
   name?: string | null
   profile_image_url?: string | null
   updated_at?: string | null
+  role_id?: number | null
 }
 
 export type Coupons = {
@@ -124,6 +125,7 @@ export type SponsorData = {
   totalRemainingDonation: number;
   allocatedDonation: number;
   programs_funded: number;
+  student_supported: number;
 }
 
 export type AllocatedProgramData = {
@@ -138,4 +140,12 @@ export type AllocatedProgramData = {
   period: string | null;
   created_at: string | null;
 
+}
+
+export type StudentSupport = {
+  user_id: string | null;
+  coupon_id: number | null;
+  donation_id: number;
+  program_id: number | null;
+  num_of_coupons: number | null;
 }
