@@ -76,7 +76,13 @@ export default function StudentDetails({
           </CardContent>
         </Card>
         <div className="col-span-2">
-          <StudentPieChart studentCertificate={studentCertificate} />
+          {studentCertificate?.length! > 0 ? (
+            <StudentPieChart studentCertificate={studentCertificate} />
+          ) : (
+            <div className="flex items-center justify-center bg-slate-200 h-full border rounded shadow-sm text-3xl font-bold">
+              No data yet
+            </div>
+          )}
         </div>
       </div>
       <div className="flex justify-evenly p-4 ">
