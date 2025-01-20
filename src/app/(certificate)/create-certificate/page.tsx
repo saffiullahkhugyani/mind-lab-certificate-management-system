@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import CertificatePage from "./components/certificate-page";
 import { createClient } from "@/lib/supabase/server";
+import { getAssertedCertificatesList } from "./actions";
 
 async function getCertificateList() {
   // await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -24,10 +25,7 @@ export default async function page() {
   }
 
   // fetching certificates uploaded by admin
-  const { data: certificateList } = await supabase
-    .from("certificate_master")
-    .select()
-    .eq("certificate_status", true);
+  const assertedCertificateList = await getAssertedCertificatesList();
 
   // fetching skill type and tags
   const { data: skillType } = await supabase.from("skill_types").select();
@@ -47,7 +45,7 @@ export default async function page() {
 
   return (
     <CertificatePage
-      certificates={certificateList}
+      certificates={assertedCertificateList.data!}
       skillTags={formattedSkillTags}
       skillType={skillType!}
       uploadedCertificates={uploadedCertificates}

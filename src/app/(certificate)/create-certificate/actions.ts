@@ -1,7 +1,8 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server";
-import { Certificate } from "@/types/types";
+import { Json } from "@/types/supabase";
+import { Certificate, Tag } from "@/types/types";
 import { revalidatePath } from "next/cache";
 
 export async function addCertificate(formData: Certificate) {
@@ -24,6 +25,40 @@ export async function addCertificate(formData: Certificate) {
   return data;
 
 }
+// fetching certificates added by admin
+export async function getAssertedCertificatesList() {
+  try {
+    const supabase = createClient();
+    
+    const { data: assertedCertificates, error: assertedCertificateError } = await supabase
+      .from("certificate_master")
+      .select()
+      .eq("certificate_status", true);
+    
+    if (assertedCertificateError) throw new Error(assertedCertificateError.message);
+
+     const transformTags = (tags: Json): Tag[] => {
+        // Ensure 'tags' is an array before processing
+        if (!Array.isArray(tags)) return [];
+    
+        return tags.map((tag: any) => ({
+          tag_name: tag.tag_name || null,
+          hours: typeof tag.hours === "number" ? tag.hours : null,
+        }));
+      };
+
+    const certificatesWithTransformedTags = assertedCertificates!.map((cert) => ({
+    ...cert, // Spread the rest of the properties unchanged
+    tags: transformTags(cert.tags), // Only transform the tags field
+  }));
+
+    return {success:true, data: certificatesWithTransformedTags};
+
+   } catch (error: any) {
+    return {success:false, error: error.message}
+  }
+}
+
 
 export async function updateCertificate(formData: Certificate) {
   const supabase = createClient();
