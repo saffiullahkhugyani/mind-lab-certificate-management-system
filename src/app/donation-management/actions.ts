@@ -11,8 +11,6 @@ export async function sponsorList() {
     
     if (data != null)
   {
-
-    console.log("sponsor list: ",data);
   } else {
     console.log("Error fetching sponsor list: ",error)
   }
@@ -54,8 +52,6 @@ export async function programsList() {
     
     if (data != null)
   {
-
-    console.log("programs list: ",data);
   } else {
     console.log("Error fetching programs list: ",error)
   }

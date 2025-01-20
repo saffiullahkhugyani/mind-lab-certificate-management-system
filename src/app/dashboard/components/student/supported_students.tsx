@@ -5,23 +5,27 @@ import React, { useState } from "react";
 import StudentCard from "./student-card";
 import { Profiles } from "@/types/customs";
 import StudentDetails from "./student-details";
-import { StudentSupport } from "@/types/types";
+import { CertificateDetails, StudentSupport } from "@/types/types";
 
 interface StudentProps {
   students: Profiles[] | null;
   supportedStudents: StudentSupport[] | null;
+  certificateData: CertificateDetails[] | null;
 }
 
 export default function SupportedStudents({
   students,
   supportedStudents,
+  certificateData,
 }: StudentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredStudents, setFilteredStudents] = useState<Profiles[] | null>(
     students
   );
   const [selectedStudent, setSelectedStudent] = useState<Profiles | null>(null);
-
+  const [studentCertificates, setStudentCertificates] = useState<
+    CertificateDetails[] | null
+  >(null);
   // Handle search students
   const handleOnChnage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
@@ -38,6 +42,10 @@ export default function SupportedStudents({
 
   // Handle Selected Students
   const hanldeSelectedStudent = function (student: Profiles) {
+    const studentCertificate = certificateData?.filter((item) => {
+      if (item.user_id === student.id) return item;
+    });
+    setStudentCertificates(studentCertificate!);
     setSelectedStudent(student);
   };
 
@@ -80,7 +88,11 @@ export default function SupportedStudents({
           </div>
         )
       ) : (
-        <StudentDetails student={selectedStudent!} onBack={handleBackToList} />
+        <StudentDetails
+          student={selectedStudent!}
+          onBack={handleBackToList}
+          studentCertificate={studentCertificates}
+        />
       )}
     </div>
   );

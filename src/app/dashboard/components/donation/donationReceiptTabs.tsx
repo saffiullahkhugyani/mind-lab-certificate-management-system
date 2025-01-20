@@ -14,8 +14,6 @@ export default function DonationReceiptTabs({
   sponsorDetails,
   allocatedProgramData,
 }: DonationReceiptProps) {
-  console.log(donationData);
-
   return (
     <div>
       {/* Tabs for Donation Receipt and Donation Allocation */}

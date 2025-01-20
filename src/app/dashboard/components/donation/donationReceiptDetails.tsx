@@ -44,8 +44,6 @@ const DonationReceiptDetail = ({
     pdf.save(`Donation Receipt-${donationReceipt?.donation_id}`);
   };
 
-  console.log(donationReceipt);
-
   return (
     <>
       <div className="flex justify-end p-2 space-x-2">

@@ -5,17 +5,20 @@ import { Label } from "@/components/ui/label";
 import { Profiles } from "@/types/customs";
 import Image from "next/image";
 import React from "react";
-import { StudentPieChart } from "./student-pie-chart";
 import DetailsCard from "./detail-card";
+import { CertificateDetails } from "@/types/types";
+import StudentPieChart from "./student-pie-chart";
 
 interface StudentDetailsProps {
   student: Profiles;
   onBack: () => void;
+  studentCertificate: CertificateDetails[] | null;
 }
 
 export default function StudentDetails({
   student,
   onBack,
+  studentCertificate,
 }: StudentDetailsProps) {
   const nationalityMap: Record<string, string> = {
     "4dd82bb4-964c-4b33-b857-b95b17507af0": "Brazil",
@@ -73,7 +76,7 @@ export default function StudentDetails({
           </CardContent>
         </Card>
         <div className="col-span-2">
-          <StudentPieChart />
+          <StudentPieChart studentCertificate={studentCertificate} />
         </div>
       </div>
       <div className="flex justify-evenly p-4 ">

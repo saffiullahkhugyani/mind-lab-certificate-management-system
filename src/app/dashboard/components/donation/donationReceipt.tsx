@@ -59,7 +59,6 @@ const DonationReceipt = ({
       (receipt) => receipt.donation_id === donationId
     );
     setSelectedReceipt(selected || null);
-    console.log("Selected Receipt:", selected);
   };
 
   return (

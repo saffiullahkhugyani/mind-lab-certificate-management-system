@@ -67,7 +67,8 @@ export default async function Dashboard() {
         </TabsContent>
         <TabsContent value="student">
           <StudentTabs
-            students={students.data!}
+            students={students.data?.studentList!}
+            certificateData={students.data?.certificateData!}
             supportedStudents={sponsor.data?.studentSupport!}
           />
         </TabsContent>

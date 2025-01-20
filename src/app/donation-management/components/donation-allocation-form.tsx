@@ -64,18 +64,14 @@ export default function DonationAllocationForm({
 
   // Handle form submission with explicit typing
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    console.log("Form Submitted Directly:", data);
-
     // startTransition(async () => {
     //   const result = await donationAllocation(data);
-
     //   if (!result.success) {
     //     toast({
     //       description: result.error || "An unexpected error occurred",
     //       variant: "destructive",
     //     });
     //   }
-
     //   if (result.success) {
     //     setSubmissionDetails({
     //       id: result.data?.at(0)?.id!,
@@ -84,7 +80,6 @@ export default function DonationAllocationForm({
     //       amount: data.amount,
     //     });
     //     setIsSubmitted(true);
-
     //     reset({
     //       program_id: undefined,
     //       amount: 0,

@@ -1,5 +1,8 @@
 
-
+export type Tag = {
+  tag_name: string;
+  hours: number ;
+}
 
 export type Certificate = {
   id: string | null,
@@ -11,7 +14,7 @@ export type Certificate = {
   number_of_hours: string | null,
   skill_level: string | null,
   skill_type: string | null,
-  tags: string[] | null,
+  tags: Tag[] | null,
   certificate_status: boolean  | null,
 
 }
@@ -148,4 +151,20 @@ export type StudentSupport = {
   donation_id: number;
   program_id: number | null;
   num_of_coupons: number | null;
+}
+
+export type CertificateDetails = {
+  user_id: string | null,
+  id: string | null,
+  issue_year: string | null,
+  issue_authority: string | null,
+  certificate_name_arabic: string | null,
+  certificate_name_english: string | null,
+  certificate_country: string | null,
+  number_of_hours: string | null,
+  skill_level: string | null,
+  skill_type: string | null,
+  tags: Tag[] | null,
+  certificate_status: boolean  | null,
+
 }

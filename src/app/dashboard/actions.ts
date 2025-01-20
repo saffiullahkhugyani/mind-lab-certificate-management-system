@@ -1,8 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { AllocatedProgramData, StudentSupport } from "@/types/types";
-import { format } from "date-fns";
+import { AllocatedProgramData, StudentSupport, Tag } from "@/types/types";
 
 export async function studentList() {
     const supabase = createClient()
@@ -10,8 +9,7 @@ export async function studentList() {
     try { 
         const { data: studentList, error: studentListError } = await supabase
             .from("profiles")
-            .select("*")
-            .eq("role_id", 4);
+            .select("*");
         
         if (studentListError) throw new Error(studentListError.message);
         
@@ -19,9 +17,34 @@ export async function studentList() {
             .from('certificate_v1_v2_mapping')
             .select("user_id, certificate_master!inner(*)");
         
-        if(certificateDetailsError) throw new Error(certificateDetailsError.message);
+        if (certificateDetailsError) throw new Error(certificateDetailsError.message);
+        
+        const certificateData = certificateDetails.map((certificate) => {
+           
+            const { user_id, certificate_master } = certificate;
 
-        return { success: true, data: studentList };
+            /// Safely handle the `tags` field
+            const tags = Array.isArray(certificate_master.tags)
+                ? (certificate_master.tags as Tag[]).map((tag) => ({
+                    tag_name: tag!.tag_name,
+                    hours: tag!.hours,
+                }))
+            : []; // Fallback if `tags` is not an array
+
+        return {
+            user_id,
+            ...certificate_master, // Spread all other properties from `certificate_master`
+            tags, // Replace tags with the processed tags array
+  };
+           
+        })
+
+        return {
+            success: true, data: {
+                studentList: studentList,
+                certificateData: certificateData
+            }
+        };
 
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -109,17 +132,15 @@ export default async function sponsorData() {
         if (!donationLog) throw new Error("No record found for allocated");
 
         const studentSupport = await studentSupportData(userId!);
-        console.log(studentSupport);
-        console.log(studentSupport.length);
 
-        console.log("Data for sponsor",
-            donationLog!.map((log) => ({
-                allocated_amount: log.allocated_amount,
-                remaining_allocated_amount: log.remaining_allocated_amount,
-                program_name: log.programs?.program_english_name,
-                created_at: new Date(log.created_at).toISOString().split("T")[0],
-            }))
-        );
+        // console.log("Data for sponsor",
+        //     donationLog!.map((log) => ({
+        //         allocated_amount: log.allocated_amount,
+        //         remaining_allocated_amount: log.remaining_allocated_amount,
+        //         program_name: log.programs?.program_english_name,
+        //         created_at: new Date(log.created_at).toISOString().split("T")[0],
+        //     }))
+        // );
 
         const donationAllocationInvoiceData = donationLog.map((log) =>  ({
             id: log.id,

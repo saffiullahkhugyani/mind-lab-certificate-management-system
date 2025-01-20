@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import StudentCard from "./student-card";
 import { Profiles } from "@/types/customs";
 import StudentDetails from "./student-details";
-import { StudentSupport } from "@/types/types";
+import { CertificateDetails, StudentSupport } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AllStudents from "./all_students";
 import SupportedStudents from "./supported_students";
@@ -13,11 +13,13 @@ import SupportedStudents from "./supported_students";
 interface StudentProps {
   students: Profiles[] | null;
   supportedStudents: StudentSupport[] | null;
+  certificateData: CertificateDetails[] | null;
 }
 
 export default function StudentTabs({
   students,
   supportedStudents,
+  certificateData,
 }: StudentProps) {
   const [filteredStudents, setFilteredStudents] = useState<Profiles[] | null>(
     students
@@ -57,7 +59,10 @@ export default function StudentTabs({
 
         <TabsContent value="all-students">
           <div className="mt-4">
-            <AllStudents students={students} />
+            <AllStudents
+              students={students}
+              certificateData={certificateData}
+            />
           </div>
         </TabsContent>
 
@@ -65,6 +70,7 @@ export default function StudentTabs({
           <div className="mt-4">
             <SupportedStudents
               students={supported}
+              certificateData={certificateData}
               supportedStudents={supportedStudents}
             />
           </div>

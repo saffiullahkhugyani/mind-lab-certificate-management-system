@@ -58,7 +58,6 @@ export default function DonationAllocationReceipt({
       (receipt) => receipt.id === allocatedId
     );
     setSelectedReceipt(selected || null);
-    console.log("Selected Receipt:", selected);
   };
 
   return (
