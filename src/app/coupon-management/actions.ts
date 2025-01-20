@@ -233,17 +233,19 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     
     {/*Link the coupon to the donation*/ }
     for (const link of donationLinks) {
-      const { error: linkError } = await supabase
-        .from("coupon_donation_link")
-        .insert({
-          coupon_id: couponData.coupon_id,
-          donation_id: link.donation_id,
-          num_of_coupons: link.num_coupons
-        });
-      
-        console.log(linkError);
-      if (linkError)
-        throw new Error("Failed to link coupon to donation");
+      if (link.num_coupons > 0) {
+        const { error: linkError } = await supabase
+          .from("coupon_donation_link")
+          .insert({
+            coupon_id: couponData.coupon_id,
+            donation_id: link.donation_id,
+            num_of_coupons: link.num_coupons
+          });
+        
+          console.log(linkError);
+        if (linkError)
+          throw new Error("Failed to link coupon to donation");
+      }
     }
 
       // Step 5: Mapping user to coupons
