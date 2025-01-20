@@ -21,9 +21,7 @@ export default function StudentTabs({
   supportedStudents,
   certificateData,
 }: StudentProps) {
-  const [filteredStudents, setFilteredStudents] = useState<Profiles[] | null>(
-    students
-  );
+  const [notSupported, setNotSupported] = useState<Profiles[] | null>(students);
   const [supported, setStudentSupport] = useState<Profiles[] | null>(null);
 
   useEffect(() => {
@@ -41,6 +39,13 @@ export default function StudentTabs({
     const supportedStudentsList = students.filter((student) =>
       supportedUserIds.has(student.id)
     );
+
+    // Filter student those who are not supported
+    const notSupported = students.filter(
+      (student) => !supportedUserIds.has(student.id)
+    );
+
+    setNotSupported(notSupported.length > 0 ? notSupported : null);
 
     setStudentSupport(
       supportedStudentsList.length > 0 ? supportedStudentsList : null

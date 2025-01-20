@@ -9,7 +9,8 @@ export async function studentList() {
     try { 
         const { data: studentList, error: studentListError } = await supabase
             .from("profiles")
-            .select("*");
+            .select("*")
+            .in("role_id", [1,4]);
         
         if (studentListError) throw new Error(studentListError.message);
         
@@ -106,7 +107,8 @@ export default async function sponsorData() {
         const { data: donationData, error: donationError } = await supabase
             .from("donation")
             .select("*")
-            .eq("sponsor_id", sponsorData.sponsor_id);
+            .eq("sponsor_id", sponsorData.sponsor_id)
+            .order("donation_id");
         
         if (donationError) throw new Error(donationError.message);
         if (!donationData) throw new Error("No donations found.");
@@ -127,11 +129,21 @@ export default async function sponsorData() {
             .from("donation_allocation_log")
             .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
             .eq("donation.sponsor.user_id", userId!)
+            .order("id");
+            
         
         if (donationLogError) throw new Error(donationLogError.message);
         if (!donationLog) throw new Error("No record found for allocated");
 
         const studentSupport = await studentSupportData(userId!);
+
+        const uniqueStudents = new Set<string | null>();
+
+        studentSupport.forEach(support => {
+            if (support.user_id) {
+                uniqueStudents.add(support.user_id);
+            }
+        })
 
         // console.log("Data for sponsor",
         //     donationLog!.map((log) => ({
@@ -193,7 +205,7 @@ export default async function sponsorData() {
             totalRemainingDonation: totalRemainingDonation,
             allocatedDonation: totalDonationAmount - totalRemainingDonation,
             programs_funded: shapedAllocatedProgramData?.length,
-            student_supported: studentSupport?.length
+            student_supported: uniqueStudents.size,
         }
 
         return {

@@ -239,7 +239,7 @@ export default function StudentPieChart({
                 dataKey="hours"
                 nameKey="skillType"
               >
-                <LabelList
+                {/* <LabelList
                   dataKey="skillType"
                   className="fill-background"
                   stroke="none"
@@ -247,7 +247,7 @@ export default function StudentPieChart({
                   formatter={(value: keyof typeof skillTypeChartConfig) =>
                     skillTypeChartConfig[value]?.label
                   }
-                />
+                /> */}
               </Pie>
               <ChartLegend
                 content={<ChartLegendContent nameKey="skillType" />}
