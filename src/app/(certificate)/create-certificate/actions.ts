@@ -60,6 +60,24 @@ export async function getAssertedCertificatesList() {
   }
 }
 
+export async function getSkillCatrgories() {
+  try {
+    const supabase = createClient();
+
+    const { data: skillCategory, error: skillCategoryError } = await supabase
+      .from("skill_category")
+      .select("*");
+    
+    if (skillCategoryError) throw new Error(skillCategoryError.message);
+
+    return { success: true, data: skillCategory };
+
+
+   } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
 export async function getSkillTypes() {
   try {
     const supabase = createClient();
@@ -82,21 +100,16 @@ export async function getSkillTags() {
   const supabase = createClient();
 
   try {
+    
     const { data: skillTags, error: skillTagsError } = await supabase
-    .from("tags")
-    .select(`id, tag, skill_types(skill_type_name)`);
-
+      .from("skill_tags")
+      .select("*");
+    
     if (skillTagsError) throw new Error(skillTagsError.message);
-
-     // foramtting skill tags
-    const mappedSkillTags = skillTags!.map((tag) => ({
-      id: tag.id,
-      tag: tag.tag,
-      skill_types: tag.skill_types!.skill_type_name,
-    }));
+    
 
 
-    return { success: true, data: mappedSkillTags };
+    return { success: true, data: skillTags };
 
 
    } catch (error: any) {

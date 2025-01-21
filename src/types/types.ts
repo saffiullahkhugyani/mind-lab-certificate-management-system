@@ -16,6 +16,7 @@ export type Certificate = {
   number_of_hours: string | null,
   skill_level: string | null,
   skill_type: string | null,
+  skill_category: string | null,
   tags: Tag[] | null,
   certificate_status: boolean  | null,
 
@@ -31,6 +32,19 @@ export type FormattedSkillTags = {
   tag: string | null;
   skill_types: string | null;
 }
+
+export type skillCategory = {
+  id?: number
+  name?: string | null
+  skill_type_id?: number | null
+}
+
+export type SkillTags = {
+  id?: number
+  name?: string | null
+  skill_category_id?: number | null
+}
+
 
 export type CustomUploadedCertificate = {
   id: string

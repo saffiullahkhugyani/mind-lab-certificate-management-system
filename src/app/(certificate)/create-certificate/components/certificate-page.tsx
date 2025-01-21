@@ -10,6 +10,8 @@ import {
   Certificate,
   CustomUploadedCertificate,
   FormattedSkillTags,
+  skillCategory,
+  SkillTags,
 } from "@/types/types";
 import { SkillType } from "@/types/customs";
 import UploadedCertificates from "./uploaded-certificates";
@@ -20,7 +22,8 @@ import { useSearchParams } from "next/navigation";
 interface CertificatePageProps {
   certificates: Certificate[] | null;
   skillType: Array<SkillType>;
-  skillTags: Array<FormattedSkillTags>;
+  skillCategory: skillCategory[] | null;
+  skillTags: Array<SkillTags>;
   uploadedCertificates: CustomUploadedCertificate[] | null;
 }
 
@@ -30,6 +33,7 @@ const CertificatePage = ({
   skillTags,
   skillType,
   uploadedCertificates,
+  skillCategory,
 }: CertificatePageProps) => {
   const [addCertificate, setAddCertificate] = useState(true);
   const [onSearch, setOnSearch] = useState("");
@@ -141,6 +145,7 @@ const CertificatePage = ({
                 certificate={selectedCertificate!} // to add data from v2 existing certificate
                 v1Certificate={selectedV1Certificate} // for mapping version 1 certificate with version 2 certificate
                 skillTags={skillTags}
+                skillCategory={skillCategory!}
                 skillType={skillType}
                 disabled={!isEdit ? addCertificate : false}
                 isEdit={isEdit}

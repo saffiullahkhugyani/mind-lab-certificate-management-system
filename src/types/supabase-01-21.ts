@@ -46,7 +46,6 @@ export type Database = {
           issue_year: string | null
           number_of_hours: string | null
           skill_level: string | null
-          skill_category: string | null
           skill_type: string | null
           tags: Json | null
         }
@@ -62,7 +61,6 @@ export type Database = {
           number_of_hours?: string | null
           skill_level?: string | null
           skill_type?: string | null
-          skill_category?: string | null
           tags?: Json | null
         }
         Update: {
@@ -77,7 +75,6 @@ export type Database = {
           number_of_hours?: string | null
           skill_level?: string | null
           skill_type?: string | null
-          skill_category?: string | null
           tags?: Json | null
         }
         Relationships: []

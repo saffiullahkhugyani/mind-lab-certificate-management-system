@@ -26,6 +26,8 @@ import {
   Certificate,
   CustomUploadedCertificate,
   FormattedSkillTags,
+  skillCategory,
+  SkillTags,
 } from "@/types/types";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { SkillType } from "@/types/customs";
@@ -59,7 +61,10 @@ const FormSchema = z.object({
     .string()
     .min(1, { message: "Number of Hours is required" }),
   skill_level: z.string().min(2, { message: "Skill Level is required" }),
-  skill_type: z.string().min(2, { message: "Please select a skill type" }),
+  skill_type: z.string().min(1, { message: "Please select a skill type" }),
+  skill_category: z
+    .string()
+    .min(1, { message: "Please select a skill category" }),
   tags: z.array(z.string()).min(1, { message: "At least select one tag" }),
 });
 
@@ -70,7 +75,8 @@ interface CreateCertificateProps {
   certificate?: Certificate | null;
   v1Certificate?: CustomUploadedCertificate | null;
   skillType: Array<SkillType>;
-  skillTags: Array<FormattedSkillTags>;
+  skillCategory: skillCategory[];
+  skillTags: Array<SkillTags>;
   disabled: boolean;
   isEdit: boolean;
   buttonLabel: string;
@@ -80,6 +86,7 @@ const CreateCertificate = ({
   certificate,
   v1Certificate,
   skillType,
+  skillCategory,
   skillTags,
   disabled,
   isEdit,
@@ -91,6 +98,7 @@ const CreateCertificate = ({
   const [tags, setTags] = useState<string[] | null>([]);
   const [tagHours, setTagHours] = useState<{ [key: string]: number }>({});
   const [filteredTags, setFilteredTags] = useState<Options[]>([]);
+  const [categories, setCategories] = useState<skillCategory[] | null>([]);
 
   const { toast } = useToast();
   const router = useRouter();
@@ -105,6 +113,7 @@ const CreateCertificate = ({
     number_of_hours: "",
     skill_level: "",
     skill_type: "",
+    skill_category: "",
     tags: [],
   };
 
@@ -117,7 +126,19 @@ const CreateCertificate = ({
     certificate_country: certificate?.certificate_country || "",
     number_of_hours: certificate?.number_of_hours || "",
     skill_level: certificate?.skill_level || "",
-    skill_type: certificate?.skill_type || "",
+    skill_type:
+      skillType
+        .find(
+          (type) =>
+            type.skill_type_name!.trim() === certificate?.skill_type?.trim()
+        )
+        ?.id.toString() || "",
+    skill_category:
+      skillCategory
+        .find(
+          (cate) => cate.name?.trim() === certificate?.skill_category?.trim()
+        )
+        ?.id?.toString() || "",
     tags: certificate?.tags!.map((tag) => tag.tag_name) || [],
   };
 
@@ -208,8 +229,9 @@ const CreateCertificate = ({
     }
   }, [reset]);
 
-  // watching skill type drop down to filtter tags
+  // watching skill type and skill category drop down to filtter tags
   const selectedSkillType = watch("skill_type");
+  const selectedSkillCategory = watch("skill_category");
 
   // initializing form reference from HTML FORM ELEMENT
   const formRef = useRef<HTMLFormElement>(null);
@@ -217,12 +239,22 @@ const CreateCertificate = ({
   // use effect hook for filtering tags
   useEffect(() => {
     // filtered tags based on the selected skill type
+    const updatedCategories = skillCategory.filter(
+      (category) => category.skill_type_id === Number(selectedSkillType)
+    );
+
+    setCategories(updatedCategories);
+  }, [selectedSkillType, skillCategory]);
+
+  // use effect hook for filtering tags
+  useEffect(() => {
+    // filtered tags based on the selected skill type
     const updatedTags = skillTags
-      .filter((tag) => tag.skill_types === selectedSkillType)
-      .map((tag) => ({ label: tag.tag!, value: tag.tag! }));
+      .filter((tag) => tag.skill_category_id === Number(selectedSkillCategory))
+      .map((tag) => ({ label: tag.name!, value: tag.name! }));
 
     setFilteredTags(updatedTags);
-  }, [selectedSkillType, skillTags]);
+  }, [selectedSkillCategory, skillTags]);
 
   // submitting the form
   const onSubmit: SubmitHandler<FormFields> = (data) => {
@@ -262,7 +294,12 @@ const CreateCertificate = ({
         certificate_country: data.certificate_country,
         number_of_hours: data.number_of_hours,
         skill_level: data.skill_level,
-        skill_type: data.skill_type,
+        skill_type: skillType.find(
+          (type) => type.id === Number(data.skill_type)
+        )?.skill_type_name!,
+        skill_category: skillCategory.find(
+          (category) => category.id === Number(data.skill_category)
+        )?.name!,
         tags: data.tags.map((tag) => ({
           tag_name: tag,
           hours: tagHours[tag] || 0,
@@ -311,6 +348,7 @@ const CreateCertificate = ({
           number_of_hours: "",
           skill_level: "",
           skill_type: "",
+          skill_category: "",
           tags: [],
         });
         localStorage.removeItem("formData");
@@ -474,24 +512,82 @@ const CreateCertificate = ({
                 <FormItem>
                   <FormLabel>Skill Type</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+
+                      setCategories([]);
+                      setFilteredTags([]);
+                      setTags([]);
+                      setTagHours({});
+                    }}
                     value={field.value}
                     defaultValue={field.value}
                     disabled={disableCertificate}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a skill type"></SelectValue>
+                        <SelectValue placeholder="Select a skill type">
+                          {field.value
+                            ? skillType.find(
+                                (type) => type.id.toString() === field.value
+                              )?.skill_type_name
+                            : "Select a skill type"}
+                        </SelectValue>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {skillType.map((type, index) => {
                         return (
-                          <SelectItem
-                            value={type.skill_type_name!}
-                            key={type.id}
-                          >
+                          <SelectItem value={type.id.toString()!} key={type.id}>
                             {type.skill_type_name}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          {/* Section 4: Skills category */}
+          <div className="gap-2 bg-white shadow-md p-4 rounded-md m-2">
+            <FormField
+              control={form.control}
+              name="skill_category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Skill Category</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setTags([]);
+                      setTagHours({});
+                    }}
+                    value={field.value}
+                    defaultValue={field.value}
+                    disabled={disableCertificate}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a skill category">
+                          {field.value
+                            ? categories!.find(
+                                (category) =>
+                                  category.id!.toString() === field.value
+                              )?.name
+                            : "Select a skill type"}
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories!.map((category, index) => {
+                        return (
+                          <SelectItem
+                            value={category.id?.toString()!}
+                            key={category.id}
+                          >
+                            {category.name}
                           </SelectItem>
                         );
                       })}

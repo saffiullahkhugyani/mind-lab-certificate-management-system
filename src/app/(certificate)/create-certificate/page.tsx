@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   getAssertedCertificatesList,
   getCertificateList,
+  getSkillCatrgories,
   getSkillTags,
   getSkillTypes,
 } from "./actions";
@@ -17,6 +18,9 @@ export default async function page() {
   if (!userSession.session) {
     return redirect("/login");
   }
+
+  // fetching skill categories
+  const skillCategory = await getSkillCatrgories();
 
   // fetching skill type
   const skillTypes = await getSkillTypes();
@@ -36,6 +40,7 @@ export default async function page() {
       skillTags={skillTags.data!}
       skillType={skillTypes.data!}
       uploadedCertificates={uploadedCertificates.data!}
+      skillCategory={skillCategory.data!}
     />
   );
 }
