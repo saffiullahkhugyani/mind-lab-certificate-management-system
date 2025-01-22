@@ -88,16 +88,18 @@ export default function StudentCard({ student, onClick }: StudentCardProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            onClick={() =>
-              console.log(`Cancel support clicked for ${student?.name}`)
-            }
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log(`Cancel support clicked for ${student?.name}`);
+            }}
           >
             Cancel Support
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              console.log(`Assign to a program clicked for ${student?.name}`)
-            }
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log(`Assign to a program clicked for ${student?.name}`);
+            }}
           >
             Assign to a program
           </DropdownMenuItem>
