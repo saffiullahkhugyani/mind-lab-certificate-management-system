@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DonationReceiptForm from "./components/donation-receipt-form";
-import { programsList, sponsorList } from "./actions";
-import DonationAllocationForm from "./components/donation-allocation-form";
+import { sponsorList } from "./actions";
 import { readUserSession } from "@/lib/actions/action";
 import { redirect } from "next/navigation";
 
@@ -30,7 +29,7 @@ export default async function Page() {
         </TabsList>
 
         <TabsContent value="receipt">
-          <DonationReceiptForm sponsors={sponsors} />
+          <DonationReceiptForm sponsors={sponsors.data!} />
         </TabsContent>
       </Tabs>
     </div>

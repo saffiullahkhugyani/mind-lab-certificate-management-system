@@ -76,8 +76,6 @@ export function SearchableDropdown<T>({
             <CommandEmpty>No sponsors found.</CommandEmpty>
             <CommandGroup>
               {filteredItems.map((item) => {
-                console.log(searchQuery);
-                console.log(filteredItems.length);
                 const value = getValue(item);
                 const label = getLabel(item);
                 return (
