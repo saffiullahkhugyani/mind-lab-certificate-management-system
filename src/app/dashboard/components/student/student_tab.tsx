@@ -7,8 +7,7 @@ import { Profiles } from "@/types/customs";
 import StudentDetails from "./student-details";
 import { CertificateDetails, StudentSupport } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AllStudents from "./all_students";
-import SupportedStudents from "./supported_students";
+import StudentList from "./student_list";
 
 interface StudentProps {
   students: Profiles[] | null;
@@ -52,6 +51,16 @@ export default function StudentTabs({
     );
   }, [students, supportedStudents]);
 
+  const handleCancelSupport = async (studentId: string) => {
+    try {
+      console.log("this is from the tab");
+      // Your API call to cancel support
+      // After successful API call, you might want to refresh the supported students list
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div>
       <Tabs defaultValue="all-students" className="w-full">
@@ -64,19 +73,22 @@ export default function StudentTabs({
 
         <TabsContent value="all-students">
           <div className="mt-4">
-            <AllStudents
+            <StudentList
               students={students}
               certificateData={certificateData}
+              listType={"all"}
+              onCancelSupport={handleCancelSupport}
             />
           </div>
         </TabsContent>
 
         <TabsContent value="supported-students">
           <div className="mt-4">
-            <SupportedStudents
+            <StudentList
               students={supported}
               certificateData={certificateData}
-              supportedStudents={supportedStudents}
+              listType={"supported"}
+              onCancelSupport={handleCancelSupport}
             />
           </div>
         </TabsContent>

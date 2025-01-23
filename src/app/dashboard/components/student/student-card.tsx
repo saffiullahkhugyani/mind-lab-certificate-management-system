@@ -13,9 +13,14 @@ import { Profiles } from "@/types/customs";
 interface StudentCardProps {
   student: Profiles | null;
   onClick: () => {};
+  onCancelSupportClick: (studentId: string) => void;
 }
 
-export default function StudentCard({ student, onClick }: StudentCardProps) {
+export default function StudentCard({
+  student,
+  onClick,
+  onCancelSupportClick,
+}: StudentCardProps) {
   const interestMap: Record<string, string> = {
     "4dd82bb4-964c-4b33-b857-b95b17507af0": "2",
     "a2a0d09f-f00d-43ce-9465-59bb4da847c7": "3",
@@ -35,6 +40,9 @@ export default function StudentCard({ student, onClick }: StudentCardProps) {
     "a2a0d09f-f00d-43ce-9465-59bb4da847c7": "Progress",
     "993382f4-f490-45ed-b9b6-49142b385e17": "Not Completed",
     "6514d0e1-ff55-4296-b880-baa1b7b5bf76": "Completed",
+  };
+  const handleDropdownClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
   return (
     <div
@@ -64,8 +72,8 @@ export default function StudentCard({ student, onClick }: StudentCardProps) {
       </div>
 
       {/* Dropdown Button */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger onClick={handleDropdownClick} asChild>
           <Button
             variant="ghost"
             className="p-2 rounded-full hover:bg-gray-100"
@@ -86,18 +94,14 @@ export default function StudentCard({ student, onClick }: StudentCardProps) {
             </svg>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent onClick={handleDropdownClick} align="end">
           <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log(`Cancel support clicked for ${student?.name}`);
-            }}
+            onClick={async () => onCancelSupportClick(student?.id!)}
           >
             Cancel Support
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(e) => {
-              e.stopPropagation();
               console.log(`Assign to a program clicked for ${student?.name}`);
             }}
           >
