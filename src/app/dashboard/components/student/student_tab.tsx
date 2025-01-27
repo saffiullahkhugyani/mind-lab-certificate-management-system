@@ -53,9 +53,9 @@ export default function StudentTabs({
     );
   }, [students, supportedStudents]);
 
-  const handleCancelSupport = async (studentId: string, programId: number) => {
+  const handleCancelSupport = async (studentId: string) => {
     try {
-      const res = await cancelStudentSupport(studentId, programId, sponsorId);
+      const res = await cancelStudentSupport(studentId, sponsorId, programs!);
 
       if (res.success) {
         toast({

@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { AllocatedProgramData, StudentSupport, Tag } from "@/types/types";
+import { AllocatedProgramData, Programs, StudentSupport, Tag } from "@/types/types";
 
 export async function studentList() {
     const supabase = createClient()
@@ -311,8 +311,8 @@ export async function addStudentSupport(studentId: string, programId: number, sp
 
 export async function cancelStudentSupport(
   studentId: string,
-  programId: number,
-  sponsorId: number
+  sponsorId: number,
+  programs: Programs[],
 ) {
   const supabase = createClient();
 
@@ -321,7 +321,6 @@ export async function cancelStudentSupport(
     const { data: existingSupport, error: existingError } = await supabase
       .from("sponsor_student_support")
       .select("*")
-      .eq("program_id", programId)
       .eq("student_id", studentId)
       .eq("sponsor_id", sponsorId)
 
@@ -329,42 +328,85 @@ export async function cancelStudentSupport(
       throw new Error(existingError.message);
     }
 
-    // If support is already cancelled, return early
-    if (existingSupport && existingSupport.length > 0
-      && !existingSupport?.at(0)!.support_status) {
-      throw new Error("Support already cancelled.");
-    }
+    // // If support is already cancelled, return early
+    // if (existingSupport && existingSupport.length > 0
+    //   && !existingSupport?.at(0)!.support_status) {
+    //   throw new Error("Support already cancelled.");
+    // }
+
+    // Prepare records for upsert 
+    const recordsToUpsert = programs
+      .filter(program => program.program_id) // Filter out programs with undefined program_id
+      .map((program) => {
+        const existingRecord = existingSupport?.find(
+          (record) => record.program_id === program.program_id
+        );
+      
+      // skip if program id is undefined or record is already cancelled
+      if (!program.program_id || (existingRecord && !existingRecord.support_status)) {
+        return null;
+      }
+
+      return {
+        ...(existingRecord?.id ? { id: existingRecord.id } : {}),
+        sponsor_id: sponsorId,
+        student_id: studentId,
+        program_id: program.program_id,
+        support_status: false,
+      }
+      
+      
+    }) .filter((record): record is Exclude<typeof record, null> => record !== null); // Remove null records
+
 
     // Update or insert based on existing support
-    const supportData = {
-      id:  existingSupport.at(0)?.id!,
-      sponsor_id: sponsorId,
-      student_id: studentId,
-      program_id: programId,
-      support_status: false,
-    };
+    // const supportData = {
+    //   id:  existingSupport.at(0)?.id!,
+    //   sponsor_id: sponsorId,
+    //   student_id: studentId,
+    //   program_id: programId,
+    //   support_status: false,
+    // };
 
-    if (existingSupport) {
-      // Update existing support
-      const { data: updatedSupport, error: updateError } = await supabase
-        .from("sponsor_student_support")
-        .upsert(supportData)
-        .select()
-        .single();
+    // if (existingSupport) {
+    //   // Update existing support
+    //   const { data: updatedSupport, error: updateError } = await supabase
+    //     .from("sponsor_student_support")
+    //     .upsert(supportData)
+    //     .select()
+    //     .single();
 
-      if (updateError) throw new Error(updateError.message);
-      return { success: true, data: updatedSupport };
+    //   if (updateError) throw new Error(updateError.message);
+    //   return { success: true, data: updatedSupport };
+    // } else {
+    //   // Insert new support record
+    //   const { data: newSupport, error: insertError } = await supabase
+    //     .from("sponsor_student_support")
+    //     .insert(supportData)
+    //     .select()
+    //     .single();
+
+    //   if (insertError) throw new Error(insertError.message);
+    //   return { success: true, data: newSupport };
+    // }
+
+    if (recordsToUpsert && recordsToUpsert.length > 0) {
+      
+      const { data: cancelSupport, error: cancelSupportError } = await supabase
+      .from("sponsor_student_support")
+      .upsert(recordsToUpsert)
+      .select();
+      
+      console.log(cancelSupportError);
+      if (cancelSupportError) throw new Error(cancelSupportError.message);
+      
+      console.log(recordsToUpsert);
+      console.log(cancelSupport);
+      return { success: true, data: cancelSupport };
     } else {
-      // Insert new support record
-      const { data: newSupport, error: insertError } = await supabase
-        .from("sponsor_student_support")
-        .insert(supportData)
-        .select()
-        .single();
-
-      if (insertError) throw new Error(insertError.message);
-      return { success: true, data: newSupport };
+      throw new Error("support already exists.");
     }
+
   } catch (error) {
     return { 
       success: false, 
