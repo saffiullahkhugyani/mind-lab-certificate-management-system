@@ -404,7 +404,7 @@ export async function cancelStudentSupport(
       console.log(cancelSupport);
       return { success: true, data: cancelSupport };
     } else {
-      throw new Error("support already exists.");
+      throw new Error("support already cancelled.");
     }
 
   } catch (error) {
