@@ -96,8 +96,8 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
         .eq("user_id", student_id)
         .eq("coupons.program_id", program_id!);
       
-      console.log("Error for existing coupons: ", existingCouponError);
-      console.log("Data fetched: ", existingCoupon);
+      // console.log("Error for existing coupons: ", existingCouponError);
+      // console.log("Data fetched: ", existingCoupon);
 
       if (existingCoupon?.length! > 0)
         throw new Error("Coupon already exists for this user and program.");
@@ -150,15 +150,12 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
             .map((support) => support.sponsor_id)
         );
         
-        // Filter  the donation allocation log
+        // Filter to keep only active supporters
         const filteredLogs = donationAllocationLog.filter(
           (log) => !unSupportedSponsorIds.has(log.donation.sponsor_id)
         );
       
-        // assign filtered log data to donationa log
-        if (filteredLogs && filteredLogs.length > 0) {
           donationLogs = filteredLogs; 
-        }
       
         // check if sum of remainging donations are sufficient in donationLogs
         const couponDurationInMonths = parseInt(coupon_duration!);
@@ -171,7 +168,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
           throw new Error("Insufficient donations by the sponsors");
       
     }
-      // if (sponsorSupport) throw new Error("testing mode");
+      // if (cancelSponsorSupport) throw new Error("testing mode");
     }
 
     // Step 4: Check if donations are sufficient
