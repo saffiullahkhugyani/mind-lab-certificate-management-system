@@ -89,11 +89,6 @@ export default function StudentList({
     try {
       setIsProcessing(true);
       await onCancelSupport(selectedStudent.id, programId);
-      // const updatedStudents =
-      //   filteredStudents?.filter(
-      //     (student) => student.id !== selectedStudent.id
-      //   ) || null;
-      // setFilteredStudents(updatedStudents);
       setIsDialogOpen(false);
       setSelectedStudent(null);
     } catch (error) {
@@ -149,38 +144,6 @@ export default function StudentList({
         isProcessing={isProcessing}
         selectedStudentPrograms={selectedStudentPrograms!}
       />
-      {/* <ResponsiveDialog
-        isOpen={isDialogOpen}
-        setIsOpen={setIsDialogOpen}
-        title="Cancel Support"
-        description="Are you sure you want to cancel support for this student?"
-      >
-        <div className="mt-6 space-y-4">
-          <p>
-            This action will remove {selectedStudent?.name} from your supported
-            students list.
-          </p>
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSelectedStudent(null);
-                setIsDialogOpen(false);
-              }}
-              disabled={isProcessing}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmCancel}
-              disabled={isProcessing}
-            >
-              {isProcessing ? "Processing..." : "Confirm Cancel Support"}
-            </Button>
-          </div>
-        </div>
-      </ResponsiveDialog> */}
     </div>
   );
 }

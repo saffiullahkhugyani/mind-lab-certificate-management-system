@@ -130,6 +130,7 @@ export default function CancelSupportDialog({
               <LoadingButton
                 variant="destructive"
                 type="submit"
+                loading={isProcessing}
                 disabled={isProcessing || !form.formState.isValid}
               >
                 {isProcessing ? "Processing..." : "Confirm Cancel Support"}

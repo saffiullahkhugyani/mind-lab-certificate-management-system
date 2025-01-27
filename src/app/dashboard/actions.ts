@@ -324,19 +324,20 @@ export async function cancelStudentSupport(
       .eq("program_id", programId)
       .eq("student_id", studentId)
       .eq("sponsor_id", sponsorId)
-      .single();
 
     if (existingError) {
       throw new Error(existingError.message);
     }
 
     // If support is already cancelled, return early
-    if (existingSupport?.support_status === false) {
+    if (existingSupport && existingSupport.length > 0
+      && !existingSupport?.at(0)!.support_status) {
       throw new Error("Support already cancelled.");
     }
 
     // Update or insert based on existing support
     const supportData = {
+      id:  existingSupport.at(0)?.id!,
       sponsor_id: sponsorId,
       student_id: studentId,
       program_id: programId,
@@ -347,10 +348,7 @@ export async function cancelStudentSupport(
       // Update existing support
       const { data: updatedSupport, error: updateError } = await supabase
         .from("sponsor_student_support")
-        .update(supportData)
-        .eq("program_id", programId)
-        .eq("student_id", studentId)
-        .eq("sponsor_id", sponsorId)
+        .upsert(supportData)
         .select()
         .single();
 
