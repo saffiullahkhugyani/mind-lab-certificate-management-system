@@ -77,14 +77,14 @@ export async function studentsList() {
 { /* adding/generating studnets coupons */ }
 export async function addStudentCoupon(formData: Coupons, isManual = false) {
   const supabase = createClient();
-  const { program_id,
+  const {
+    program_id,
     student_id,
     student_email,
     coupon_duration,
     start_period,
-    start_date,
-    number_of_coupons,
-    club_id } = formData;
+    club_id
+  } = formData;
   
   try {
 
@@ -111,22 +111,70 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       .single();
     
     if (programError) throw new Error("Failed to fetch program details");
+    
+    // subscription value and remaining donation
+    const subscriptionValue = Number(program.subscription_value);
+    const totalRemainingDonation = program.total_remaining_donation;
 
-    // Step 1.1 Fetching donation log for the program
+    // Step 2 Fetching donation log for the program
     const { data: donationAllocationLog, error: donationAllocationLogError } = await supabase
       .from("donation_allocation_log")
-      .select("id, program_id, donation_id, allocated_amount, remaining_allocated_amount")
+      .select("id, program_id, donation!inner(donation_id, sponsor_id), allocated_amount, remaining_allocated_amount")
       .gte("remaining_allocated_amount", 0)
       .eq("program_id", program_id!)
       .order("id", {ascending: true});
     
     if (donationAllocationLogError) throw new Error("Failed to fetch donation allocation logs");
+      
+    // assinging donation logs   
+    let donationLogs = donationAllocationLog;
 
-    // subscription value and remaining donation
-    const subscriptionValue = Number(program.subscription_value);
-    const totalRemainingDonation = program.total_remaining_donation;
+    // Step 3 fetching data for cancelled sponsor support
+    if (isManual && student_id) {
+      const { data: cancelSponsorSupport, error: cancelSponsorSupportError } = await supabase
+        .from("sponsor_student_support")
+        .select()
+        .eq("student_id", student_id)
+        .eq("program_id", program_id!)
+        .eq("support_status", false);
+        
+      // throw error if there is sponsor support error
+      if (cancelSponsorSupportError) throw new Error(cancelSponsorSupportError.message);
+        
+      // if valid sponsor data perform filter
+      if (cancelSponsorSupport && cancelSponsorSupport.length > 0) {
+        
+        // create a set of sponsor IDs with support_status: false
+        const unSupportedSponsorIds = new Set(
+          cancelSponsorSupport?.filter((support) => !support.support_status)
+            .map((support) => support.sponsor_id)
+        );
+        
+        // Filter  the donation allocation log
+        const filteredLogs = donationAllocationLog.filter(
+          (log) => !unSupportedSponsorIds.has(log.donation.sponsor_id)
+        );
+      
+        // assign filtered log data to donationa log
+        if (filteredLogs && filteredLogs.length > 0) {
+          donationLogs = filteredLogs; 
+        }
+      
+        // check if sum of remainging donations are sufficient in donationLogs
+        const couponDurationInMonths = parseInt(coupon_duration!);
+        const totalRemainingDonationAmount = donationLogs.reduce
+          ((sum, log) => sum + log.remaining_allocated_amount, 0);
+    
+        // throw error if the sum of remaing donation for program in filtered log is less then 0
+        const value = totalRemainingDonationAmount - (subscriptionValue * couponDurationInMonths);
+        if (totalRemainingDonationAmount - (subscriptionValue * couponDurationInMonths) < 0)
+          throw new Error("Insufficient donations by the sponsors");
+      
+    }
+      // if (sponsorSupport) throw new Error("testing mode");
+    }
 
-    // Step 2: Check if donations are sufficient
+    // Step 4: Check if donations are sufficient
     const couponDurationInMonths = parseInt(coupon_duration!); 
     let remainingDeduction = subscriptionValue * couponDurationInMonths;
     const deduction = totalRemainingDonation! - remainingDeduction;
@@ -134,8 +182,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     if (deduction < 0)
       throw new Error("Insufficient donations for this program")
     
-
-    // Step 3: Update the donation record with deducted amount
+    // Step 5: Update the donation record with deducted amount
     const { error: updateError } = await supabase
       .from("programs")
       .update({ "total_remaining_donation": deduction })
@@ -143,16 +190,14 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       
     if (updateError) throw new Error("Failed to update remaining donation.");
 
-    { /* Testing coupon donation link  */}
     // Track remaining coupons to be allocated
     let remainingCoupons = couponDurationInMonths;
     const donationLinks: { donation_id: number, num_coupons: number}[] = [];
     let remainingToDeductFromLogs = remainingDeduction;
 
     
-    {/* Testin coupon donation link*/ }
-    // step 3 revising logic for deductions and coupon donation link
-    for (const log of donationAllocationLog) {
+    // step 6: revising logic for deductions and coupon donation link
+    for (const log of donationLogs) {
       if (remainingCoupons <= 0) break;
       
       const couponsFromThisDonation = Math.min(
@@ -162,7 +207,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       remainingCoupons -= couponsFromThisDonation;
 
       donationLinks.push({
-        donation_id: log.donation_id,
+        donation_id: log.donation.donation_id,
         num_coupons: couponsFromThisDonation,
       });
 
@@ -175,7 +220,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       console.log("after amount: ", remainingToDeductFromLogs);
 
       
-      // Step 3.2 update the donation_allocation_log table with the deducted remaining amount
+      // Step 7 update the donation_allocation_log table with the deducted remaining amount
       const { data: updateAllocatedLogs, error: logUpdateError } = await supabase
         .from("donation_allocation_log")
         .update({remaining_allocated_amount: log.remaining_allocated_amount - deduct  })
@@ -185,33 +230,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       if (logUpdateError) throw new Error(logUpdateError.message);
     }
 
-    // // Step 3.1 Update the donation_allocation_log with the deduction of amounts
-    // const totalRemainingAllocatedDonations = donationAllocationLog
-    //   .reduce((sum, allocatedDonation) => sum + (allocatedDonation.remaining_allocated_amount ?? 0), 0);
-    
-    // let remainingToDeductFormLogs = remainingDeduction;
-    // for (const allocatedLog of donationAllocationLog) {
-    //   if (remainingToDeductFormLogs <= 0) break;
-
-    //   const deduct = Math.min(remainingToDeductFormLogs, allocatedLog.remaining_allocated_amount);
-    //   remainingToDeductFormLogs -= deduct;
-
-    //   console.log("after amount: ", remainingToDeductFormLogs);
-
-    //   // Step 3.2 update the donation_allocation_log table with the deducted remaining amount
-    //   const { data: updateAllocatedLogs, error: updateAllocatedLogError } = await supabase
-    //     .from("donation_allocation_log")
-    //     .update({ remaining_allocated_amount: allocatedLog.remaining_allocated_amount - deduct })
-    //     .eq("program_id", allocatedLog.program_id)
-    //     .eq("id", allocatedLog.id);
-      
-    //   if (updateAllocatedLogError) throw new Error(updateAllocatedLogError.message);
-      
-      
-    // }
-      
-
-      // Step 3.5: fetching start date on the basis of the start_period
+      // Step 8: fetching start date on the basis of the start_period
       const startDate = calculateStartDate(start_period!);
       const finalData = {
         club_id,
@@ -222,7 +241,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
         number_of_coupons: couponDurationInMonths,
       };
 
-      // Step 4: Inserting coupon record
+      // Step 9: Inserting coupon record
       const { data: couponData , error: insertCouponError } = await supabase
         .from("coupons")
         .insert(finalData)
@@ -248,7 +267,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       }
     }
 
-      // Step 5: Mapping user to coupons
+      // Step 10: Mapping user to coupons
       const mapping = student_id
         ? { user_id: student_id, coupon_id: couponData.coupon_id }
         : { student_email, coupon_id: couponData.coupon_id };
@@ -263,7 +282,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       
       if (mappingError) throw new Error(`Failed to map user ${mappingTable}`);
 
-      // Step 6: Generate and storing coupon codes
+      // Step 11: Generate and storing coupon codes
       await generateAndStoreCouponCodes(couponData!);
       
       return { success: true, data: couponData}
@@ -546,161 +565,6 @@ export async function couponBatchProcess(clubId: number, programId: number) {
   }
 }
 
-
-// export async function couponBatchProcess(clubId: number, programId: number) {
-//   const supabase = createClient();
-//   let addedCouponsList: Coupons[] = []; // to store successfully added coupons
-//   let errorList: { email: string; message: string }[] = []; // to store errors with email
-
-//   // Step 1: Fetch data from `student_interest` table
-//   const { data: interestData, error: interestError } = await supabase
-//     .from('student_interest')
-//     .select("*")
-//     .eq("club_id", clubId)
-//     .eq("program_id", programId);
-
-//   if (interestError) {
-//     console.error("Error fetching student interest:", interestError.message);
-//     return { success: false, message: "Failed to fetch student interest data." }
-//   }
-  
-// // If no matching records for club and program, fetch students with null `program_id` in the same club
-//   let studentsWithNullProgram: StudentInterestData[] = [];
-//   if (!interestData || interestData.length === 0) {
-
-//     // fetching students with 'null' program
-//      const { data: nullProgramData, error: nullProgramError } = await supabase
-//       .from("student_interest")
-//       .select("*")
-//       .eq("club_id", clubId)
-//       .is("program_id", null);
-    
-//      if (nullProgramError) {
-//       console.error(
-//         "Error fetching students with null program:",
-//         nullProgramError.message
-//       );
-//       return { success: false, message: "Failed to fetch students with null program." };
-//     }
-
-//     if (!nullProgramData || nullProgramData.length === 0) {
-//       return { success: false, message: "No Students for the selected club" };  
-//     }
-
-//     studentsWithNullProgram = nullProgramData || [];
-//     // return { success: false, message: "No Students for the selected club and program" };
-//   }
-
-//   // Combine interest data and null-program data
-//   const studentsToProcess: StudentInterestData[] = interestData || [];
-
-//   for (const student of studentsWithNullProgram) {
-//     // Assign the program with sufficient donation
-//     const sufficientProgram = await findProgramWithSufficientDonation(clubId);
-//     if (sufficientProgram) {
-//       student.program_id = sufficientProgram.program_id;
-//       studentsToProcess.push(student); // Add student to the processing list
-
-//       // Update student in interest table with program id
-//       const { data: updateInterestData, error: updateError } = await supabase
-//         .from("student_interest")
-//         .update({ "program_id": sufficientProgram.program_id })
-//         .eq("id", student.id!)
-//         .select()
-//         .single();
-
-//         console.log("Sufficient Program: ", sufficientProgram);
-//         console.log("Update Interest Data:", updateInterestData);
-//     }
-//   }
-
-
-//   // Step 2: Pre-fetch existing coupons for efficiency
-//   const { data: userCoupons, error: userCouponError } = await supabase
-//     .from('coupon_user_mapping')
-//     .select("id, coupons (coupon_id, program_id), profiles (email)");
-
-//   const { data: interestCoupons, error: interestCouponError } = await supabase
-//     .from('coupon_interest_mapping')
-//     .select("id, student_email, coupons (coupon_id, program_id)");
-
-//   if (userCouponError || interestCouponError) {
-//     console.error("Error fetching coupons data:", userCouponError?.message || interestCouponError?.message);
-//      return { success: false, message: "Failed to fetch existing coupons data." };
- 
-//   }
-
-//   // Combine user and interest coupons for unified existence checks
-//   const allCoupons = [
-//     ...(userCoupons || []).map((mappedCoupons) => ({
-//       email: mappedCoupons.profiles?.email,
-//       programId: mappedCoupons.coupons?.program_id,
-//     })),
-//     ...(interestCoupons || []).map((mappedCoupons) => ({
-//       email: mappedCoupons.student_email,
-//       programId: mappedCoupons.coupons?.program_id,
-//     })),
-//   ];
-
-//   // Step 3: Process each user in the interest data
-//   for (const student of studentsToProcess) {
-//     const { user_email, program_id, club_id } = student;
-
-//     // Check if user already has a coupon in either table
-//     const userHasCoupon = allCoupons.some(
-//       (coupon) => coupon.email === user_email && coupon.programId === program_id
-//     );
-
-//     if (!userHasCoupon) {
-//       // Check if the user is registered
-//       const { data: registeredUser } = await supabase
-//         .from("profiles")
-//         .select("*")
-//         .eq("email", user_email!)
-//         .single(); // Get a single record if found
-
-//       // Construct the newCoupon object
-//       const newCoupon = registeredUser
-//         ? {
-//             club_id: club_id,
-//             program_id: program_id,
-//             student_id: registeredUser.id, // For registered users
-//             coupon_duration: "1 month",
-//             start_period: "Future period",
-//           }
-//         : {
-//             club_id: club_id,
-//             program_id: program_id,
-//             student_email: user_email, // For unregistered users
-//             coupon_duration: "1 month",
-//             start_period: "Future period",
-//           };
-
-//       // Pass the newCoupon to the existing addStudentCoupon function
-//       const addCouponResult = await addStudentCoupon(newCoupon);
-
-//       if (addCouponResult.success) {
-//         console.log(`Coupon added: ${addCouponResult.data}`);
-//         addedCouponsList.push(addCouponResult.data!);
-//       } else {
-//         console.error(`Error adding coupon: ${addCouponResult.data}`);
-//         errorList.push({ email: user_email!, message: addCouponResult.error });
-      
-//       }
-//     } else {
-//       console.log(`User ${user_email} already has a coupon for program ${program_id}`);
-//     }
-//   }
-
-//   // Returning results for display o the UI
-//    return {
-//     success: true,
-//     message: "Batch process completed",
-//     addedCoupons: addedCouponsList,
-//     errors: errorList,
-//   };
-// }
-
 { /* FUNCTIONS */ }
 
 // Helper function to find a program with sufficient donation
@@ -779,3 +643,21 @@ const calculateStartDate = (period: string): string => {
 
   return startDate.toLocaleDateString();
 };
+
+async function validateSponsorSupport(student_id: string, program_id: number) {
+  const supabase = createClient()
+  const { data: sponsorSupport, error: sponsorSupportError } = await supabase
+    .from("sponsor_student_support")
+    .select()
+    .eq("student_id", student_id)
+    .eq("program_id", program_id)
+    .eq("support_status", false);
+
+  if (sponsorSupportError) throw new Error(sponsorSupportError.message);
+
+  if (!sponsorSupport || sponsorSupport.length <= 0) {
+    return { success: false, error: "No unsupported sponsors found for this student." };
+  }
+
+  return {success: true, data: sponsorSupport};
+}
