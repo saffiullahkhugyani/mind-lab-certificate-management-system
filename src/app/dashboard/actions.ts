@@ -278,3 +278,99 @@ async function studentSupportData(sponsorUid: string) {
 
   return customList;
 }
+
+export async function addStudentSupport(studentId: string, programId: number, sponsorId: number) {
+    try {
+        const supabase = createClient();
+
+        const { data: exisitingSupport, error: exisitingSupportError } = await supabase
+            .from("sponsor_student_support")
+            .select("*")
+            .eq("program_id", programId)
+            .eq("student_id", studentId)
+            .eq("sponsor_id", sponsorId);
+        
+        if (exisitingSupportError) throw new Error(exisitingSupportError.message);
+        if (exisitingSupport.length > 0) throw new Error("Support already exists.")
+        
+
+        const { data: addSupport, error: addSupportError } = await supabase
+            .from("sponsor_student_support")
+            .insert({ sponsor_id: sponsorId, student_id: studentId, program_id: programId, support_status: true })
+            .select()
+            .single();
+        
+        if (addSupportError) throw new Error(addSupportError.message);
+
+        return { success: true, data: addSupport };
+    } catch (error: any) {
+        
+        return { success: false, error: error.message };
+    }
+}
+
+export async function cancelStudentSupport(
+  studentId: string,
+  programId: number,
+  sponsorId: number
+) {
+  const supabase = createClient();
+
+  try {
+    // Check existing support status
+    const { data: existingSupport, error: existingError } = await supabase
+      .from("sponsor_student_support")
+      .select("*")
+      .eq("program_id", programId)
+      .eq("student_id", studentId)
+      .eq("sponsor_id", sponsorId)
+      .single();
+
+    if (existingError) {
+      throw new Error(existingError.message);
+    }
+
+    // If support is already cancelled, return early
+    if (existingSupport?.support_status === false) {
+      throw new Error("Support already cancelled.");
+    }
+
+    // Update or insert based on existing support
+    const supportData = {
+      sponsor_id: sponsorId,
+      student_id: studentId,
+      program_id: programId,
+      support_status: false,
+    };
+
+    if (existingSupport) {
+      // Update existing support
+      const { data: updatedSupport, error: updateError } = await supabase
+        .from("sponsor_student_support")
+        .update(supportData)
+        .eq("program_id", programId)
+        .eq("student_id", studentId)
+        .eq("sponsor_id", sponsorId)
+        .select()
+        .single();
+
+      if (updateError) throw new Error(updateError.message);
+      return { success: true, data: updatedSupport };
+    } else {
+      // Insert new support record
+      const { data: newSupport, error: insertError } = await supabase
+        .from("sponsor_student_support")
+        .insert(supportData)
+        .select()
+        .single();
+
+      if (insertError) throw new Error(insertError.message);
+      return { success: true, data: newSupport };
+    }
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred' 
+    };
+  }
+}

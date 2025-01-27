@@ -70,6 +70,8 @@ export default async function Dashboard() {
             students={students.data?.studentList!}
             certificateData={students.data?.certificateData!}
             supportedStudents={sponsor.data?.studentSupport!}
+            programs={programs.data!}
+            sponsorId={sponsor.data?.sponsorData.sponsor_id!}
           />
         </TabsContent>
       </Tabs>

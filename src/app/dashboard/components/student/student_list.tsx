@@ -1,19 +1,19 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import StudentCard from "./student-card";
 import { Profiles } from "@/types/customs";
 import StudentDetails from "./student-details";
-import { CertificateDetails, StudentSupport } from "@/types/types";
-import { ResponsiveDialog } from "@/components/responsive-dialog";
-import { Button } from "@/components/ui/button";
+import { CertificateDetails, Programs, StudentSupport } from "@/types/types";
 import CancelSupportDialog from "./cancel_support_dialog";
 
 interface StudentListProps {
   students: Profiles[] | null;
   certificateData: CertificateDetails[] | null;
-  onCancelSupport: (studentId: string) => Promise<void>;
+  supportedStudents: StudentSupport[] | null;
+  programs: Programs[] | null;
+  onCancelSupport: (studentId: string, programId: number) => void;
   listType: "all" | "supported";
 }
 
@@ -22,6 +22,8 @@ export default function StudentList({
   certificateData,
   onCancelSupport,
   listType,
+  supportedStudents,
+  programs,
 }: StudentListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredStudents, setFilteredStudents] = useState<Profiles[] | null>(
@@ -33,6 +35,25 @@ export default function StudentList({
   >(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedStudentPrograms, setSelectedStudentPrograms] = useState<
+    Programs[] | null
+  >();
+
+  // console.log(supportedStudents);
+  useEffect(() => {
+    const studentSupport = supportedStudents?.filter((support) => {
+      return support.user_id === selectedStudent?.id;
+    });
+
+    const filteredPrograms = programs?.filter((program) => {
+      return studentSupport?.some((support) => {
+        return support.program_id === program.program_id;
+      });
+    });
+
+    // console.log(selectedStudentPrograms);
+    setSelectedStudentPrograms(filteredPrograms);
+  }, [selectedStudent, setSelectedStudent]);
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
@@ -56,27 +77,23 @@ export default function StudentList({
   };
 
   const handleOpenCancelDialog = (studentId: string) => {
-    console.log(studentId);
+    // console.log(studentId);
     const cancelStudent = students?.find((student) => student.id === studentId);
     setSelectedStudent(cancelStudent!);
-    console.log(cancelStudent);
+    // console.log(cancelStudent);
     setIsDialogOpen(true);
   };
 
-  const handleConfirmCancel = async () => {
-    console.log(selectedStudent);
+  const handleConfirmCancel = async (programId: number) => {
     if (!onCancelSupport || !selectedStudent) return;
-
     try {
       setIsProcessing(true);
-      await onCancelSupport(selectedStudent.id);
-
-      const updatedStudents =
-        filteredStudents?.filter(
-          (student) => student.id !== selectedStudent.id
-        ) || null;
-
-      setFilteredStudents(updatedStudents);
+      await onCancelSupport(selectedStudent.id, programId);
+      // const updatedStudents =
+      //   filteredStudents?.filter(
+      //     (student) => student.id !== selectedStudent.id
+      //   ) || null;
+      // setFilteredStudents(updatedStudents);
       setIsDialogOpen(false);
       setSelectedStudent(null);
     } catch (error) {
@@ -130,6 +147,7 @@ export default function StudentList({
         selectedStudent={selectedStudent}
         onConfirmCancel={handleConfirmCancel}
         isProcessing={isProcessing}
+        selectedStudentPrograms={selectedStudentPrograms!}
       />
       {/* <ResponsiveDialog
         isOpen={isDialogOpen}

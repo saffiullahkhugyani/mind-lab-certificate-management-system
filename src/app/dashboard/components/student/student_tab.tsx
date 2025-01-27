@@ -1,24 +1,26 @@
 "use client";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import React, { useEffect, useState } from "react";
-import StudentCard from "./student-card";
 import { Profiles } from "@/types/customs";
-import StudentDetails from "./student-details";
-import { CertificateDetails, StudentSupport } from "@/types/types";
+import { CertificateDetails, Programs, StudentSupport } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StudentList from "./student_list";
+import { addStudentSupport, cancelStudentSupport } from "../../actions";
+import { toast } from "@/components/ui/use-toast";
 
 interface StudentProps {
   students: Profiles[] | null;
   supportedStudents: StudentSupport[] | null;
   certificateData: CertificateDetails[] | null;
+  programs: Programs[] | null;
+  sponsorId: number;
 }
 
 export default function StudentTabs({
   students,
   supportedStudents,
   certificateData,
+  programs,
+  sponsorId,
 }: StudentProps) {
   const [notSupported, setNotSupported] = useState<Profiles[] | null>(students);
   const [supported, setStudentSupport] = useState<Profiles[] | null>(null);
@@ -51,13 +53,32 @@ export default function StudentTabs({
     );
   }, [students, supportedStudents]);
 
-  const handleCancelSupport = async (studentId: string) => {
+  const handleCancelSupport = async (studentId: string, programId: number) => {
+    console.log(programId);
+    console.log(studentId);
+    console.log(sponsorId);
+
     try {
-      console.log("this is from the tab");
-      // Your API call to cancel support
-      // After successful API call, you might want to refresh the supported students list
-    } catch (error) {
-      console.error("Error:", error);
+      const res = await cancelStudentSupport(studentId, programId, sponsorId);
+
+      if (res.success) {
+        toast({
+          description: `Support cancelled for the student`,
+          variant: "success",
+        });
+      }
+
+      if (res.error) {
+        toast({
+          description: res.error,
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        description: error,
+        variant: "destructive",
+      });
     }
   };
 
@@ -77,7 +98,9 @@ export default function StudentTabs({
               students={students}
               certificateData={certificateData}
               listType={"all"}
+              supportedStudents={supportedStudents}
               onCancelSupport={handleCancelSupport}
+              programs={programs}
             />
           </div>
         </TabsContent>
@@ -88,7 +111,9 @@ export default function StudentTabs({
               students={supported}
               certificateData={certificateData}
               listType={"supported"}
+              supportedStudents={supportedStudents}
               onCancelSupport={handleCancelSupport}
+              programs={programs}
             />
           </div>
         </TabsContent>

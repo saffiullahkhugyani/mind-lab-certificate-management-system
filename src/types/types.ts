@@ -168,3 +168,13 @@ export type CertificateDetails = {
   certificate_status: boolean  | null,
 
 }
+
+export type CancelStudentSupport = {
+    created_at?: string;
+    id?: number;
+    program_id?: number;
+    sponsor_id?: number;
+    student_id?: string;
+    support_status?: boolean;
+
+}

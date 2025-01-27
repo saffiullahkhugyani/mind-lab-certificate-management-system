@@ -142,7 +142,7 @@ export default function StudentPieChart({
       })
       .filter(Boolean); // Remove any null entries.
 
-    const FormatedChartCertData = top3Certificates.map((cert) => {
+    const FormatedChartCertData = certificates.map((cert) => {
       const config =
         skillTypeChartConfig[
           cert.skill_type as keyof typeof skillTypeChartConfig
