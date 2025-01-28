@@ -4,7 +4,11 @@ import { Profiles } from "@/types/customs";
 import { CertificateDetails, Programs, StudentSupport } from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StudentList from "./student_list";
-import { addStudentSupport, cancelStudentSupport } from "../../actions";
+import {
+  addStudentSupport,
+  assignStudentProgram,
+  cancelStudentSupport,
+} from "../../actions";
 import { toast } from "@/components/ui/use-toast";
 
 interface StudentProps {
@@ -78,6 +82,34 @@ export default function StudentTabs({
     }
   };
 
+  const handleAssignProgram = async (studentId: string) => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log(`from handleAssignProgram ${studentId}`);
+    await assignStudentProgram(studentId, sponsorId);
+    // try {
+    //   const res = await cancelStudentSupport(studentId, sponsorId, programs!);
+
+    //   if (res.success) {
+    //     toast({
+    //       description: `Support cancelled for the student`,
+    //       variant: "success",
+    //     });
+    //   }
+
+    //   if (res.error) {
+    //     toast({
+    //       description: res.error,
+    //       variant: "destructive",
+    //     });
+    //   }
+    // } catch (error: any) {
+    //   toast({
+    //     description: error,
+    //     variant: "destructive",
+    //   });
+    // }
+  };
+
   return (
     <div>
       <Tabs defaultValue="all-students" className="w-full">
@@ -97,6 +129,7 @@ export default function StudentTabs({
               supportedStudents={supportedStudents}
               onCancelSupport={handleCancelSupport}
               programs={programs}
+              onAssignProgram={handleAssignProgram}
             />
           </div>
         </TabsContent>
@@ -110,6 +143,7 @@ export default function StudentTabs({
               supportedStudents={supportedStudents}
               onCancelSupport={handleCancelSupport}
               programs={programs}
+              onAssignProgram={handleAssignProgram}
             />
           </div>
         </TabsContent>

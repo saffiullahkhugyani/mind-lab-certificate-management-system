@@ -414,3 +414,17 @@ export async function cancelStudentSupport(
     };
   }
 }
+
+export async function assignStudentProgram(studentId: string, sponsorId: number) {
+  const supanase = createClient();
+  const { data: programsData, error: programsDataError } = await supanase
+    .from("donation_allocation_log")
+    .select(`*, donation!inner(sponsor_id), 
+      programs!inner(program_english_name,total_allocated_donation,total_remaining_donation)`)
+    .gt("remaining_allocated_amount", 0)
+    .eq("donation.sponsor_id", sponsorId);
+  
+  console.log(programsDataError);
+  console.log(programsData);
+  console.log(programsData?.length);
+}

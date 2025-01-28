@@ -14,12 +14,14 @@ interface StudentCardProps {
   student: Profiles | null;
   onClick: () => {};
   onCancelSupportClick: (studentId: string) => void;
+  onAssignProgram: (studentId: string) => void;
 }
 
 export default function StudentCard({
   student,
   onClick,
   onCancelSupportClick,
+  onAssignProgram,
 }: StudentCardProps) {
   const interestMap: Record<string, string> = {
     "4dd82bb4-964c-4b33-b857-b95b17507af0": "2",
@@ -100,11 +102,7 @@ export default function StudentCard({
           >
             Cancel Support
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={(e) => {
-              console.log(`Assign to a program clicked for ${student?.name}`);
-            }}
-          >
+          <DropdownMenuItem onClick={async () => onAssignProgram(student?.id!)}>
             Assign to a program
           </DropdownMenuItem>
         </DropdownMenuContent>

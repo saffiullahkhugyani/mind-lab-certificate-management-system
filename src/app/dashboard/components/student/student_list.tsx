@@ -13,6 +13,7 @@ interface StudentListProps {
   supportedStudents: StudentSupport[] | null;
   programs: Programs[] | null;
   onCancelSupport: (studentId: string) => Promise<void>;
+  onAssignProgram: (studentId: string) => Promise<void>;
   listType: "all" | "supported";
 }
 
@@ -20,6 +21,7 @@ export default function StudentList({
   students,
   certificateData,
   onCancelSupport,
+  onAssignProgram,
   listType,
   supportedStudents,
   programs,
@@ -37,6 +39,9 @@ export default function StudentList({
   const [selectedStudentPrograms, setSelectedStudentPrograms] = useState<
     Programs[] | null
   >();
+  const [activeAction, setActiveAction] = useState<"cancel" | "assign" | null>(
+    null
+  );
 
   // console.log(supportedStudents);
   useEffect(() => {
@@ -99,6 +104,7 @@ export default function StudentList({
 
   const onCancelSupportClick = async (studentId: string) => {
     try {
+      setActiveAction("cancel");
       setIsProcessing(true);
       await onCancelSupport(studentId);
       // console.log(studentId);
@@ -115,6 +121,18 @@ export default function StudentList({
     }
   };
 
+  const onAssignProgramClick = async (studentId: string) => {
+    try {
+      setActiveAction("assign");
+      setIsProcessing(true);
+      await onAssignProgram(studentId);
+    } catch (error) {
+      console.error("Error canceling support:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <>
       {/* Loading Overlay */}
@@ -122,7 +140,13 @@ export default function StudentList({
         <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
           <div className="flex flex-col items-center">
             <div className="loader border-t-4 border-blue-500 w-16 h-16 rounded-full animate-spin"></div>
-            <p className="text-lg font-semibold mt-4">Canceling support...</p>
+            <p className="text-lg font-semibold mt-4">
+              {activeAction === "cancel"
+                ? "Canceling support..."
+                : activeAction === "assign"
+                ? "Assigning program to student..."
+                : ""}
+            </p>
           </div>
         </div>
       )}
@@ -149,6 +173,7 @@ export default function StudentList({
                   student={student}
                   onClick={async () => handleSelectedStudent(student)}
                   onCancelSupportClick={onCancelSupportClick}
+                  onAssignProgram={onAssignProgramClick}
                 />
               ))}
             </div>
