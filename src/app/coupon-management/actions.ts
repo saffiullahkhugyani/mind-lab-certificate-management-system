@@ -133,7 +133,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     if (isManual && student_id) {
       const { data: cancelSponsorSupport, error: cancelSponsorSupportError } = await supabase
         .from("sponsor_student_support")
-        .select()
+        .select("*, sponsor!inner(sponsor_id, name)")
         .eq("student_id", student_id)
         .eq("program_id", program_id!)
         .eq("support_status", false);
@@ -149,12 +149,12 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
           cancelSponsorSupport?.filter((support) => !support.support_status)
             .map((support) => support.sponsor_id)
         );
-        
+
         // Filter to keep only active supporters
         const filteredLogs = donationAllocationLog.filter(
           (log) => !unSupportedSponsorIds.has(log.donation.sponsor_id)
         );
-      
+    
           donationLogs = filteredLogs; 
       
         // check if sum of remainging donations are sufficient in donationLogs
@@ -164,8 +164,12 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     
         // throw error if the sum of remaing donation for program in filtered log is less then 0
         const value = totalRemainingDonationAmount - (subscriptionValue * couponDurationInMonths);
-        if (totalRemainingDonationAmount - (subscriptionValue * couponDurationInMonths) < 0)
-          throw new Error("Insufficient donations by the sponsors");
+        if (totalRemainingDonationAmount - (subscriptionValue * couponDurationInMonths) < 0) {
+          const notiLogs = cancelSponsorSupport.map((cancel) =>
+            ` support canceled by ${cancel.sponsor.name} on ${new Date(cancel.created_at).toDateString()}`);
+
+          throw new Error(notiLogs.join(' ,'));
+        }
       
     }
       // if (cancelSponsorSupport) throw new Error("testing mode");

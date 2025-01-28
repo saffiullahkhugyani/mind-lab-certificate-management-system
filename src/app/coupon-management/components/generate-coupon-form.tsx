@@ -120,7 +120,7 @@ export default function GenerateCouponForm({
         reset();
       } else {
         toast({
-          description: `Error generating coupons: ${result.error}`,
+          description: result.error,
           variant: "destructive",
         });
       }
