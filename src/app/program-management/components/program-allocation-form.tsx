@@ -66,31 +66,35 @@ export default function ProgramAllocationForm({
   const onSubmit: SubmitHandler<FormFields> = async (data) => {
     console.log("Form Submitted Directly:", data);
 
-    startTransition(async () => {
-      const result = await donationAllocation(data);
+    try {
+      startTransition(async () => {
+        const result = await donationAllocation(data);
 
-      if (!result.success) {
-        toast({
-          description: result.error || "An unexpected error occurred",
-          variant: "destructive",
-        });
-      }
+        if (!result.success) {
+          toast({
+            description: result.error || "An unexpected error occurred",
+            variant: "destructive",
+          });
+        }
 
-      if (result.success) {
-        setSubmissionDetails({
-          id: result.data?.id!,
-          programName:
-            selectedProgram?.program_english_name || "Unknown Program",
-          amount: data.amount,
-        });
-        setIsSubmitted(true);
+        if (result.success) {
+          setSubmissionDetails({
+            id: result.data?.id!,
+            programName:
+              selectedProgram?.program_english_name || "Unknown Program",
+            amount: data.amount,
+          });
+          setIsSubmitted(true);
 
-        reset({
-          program_id: undefined,
-          amount: 0,
-        });
-      }
-    });
+          reset({
+            program_id: undefined,
+            amount: 0,
+          });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleDismiss = () => {

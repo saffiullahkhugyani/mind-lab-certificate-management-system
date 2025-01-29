@@ -204,7 +204,10 @@ export async function donationAllocation(formData: DonationAllocation) {
         })
         .eq("program_id", allocationData.program_id!)
         .select();
+      
+      if (error) throw new Error(error.message);
     }
+    
 
 
     return { success: true, data: allocationData };
