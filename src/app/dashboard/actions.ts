@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { AllocatedProgramData, Coupons, Programs, StudentSupport, Tag } from "@/types/types";
+import { AllocatedProgramData, Coupons, DonationAllocationLogs, Programs, StudentSupport, Tag } from "@/types/types";
 
 export async function studentList() {
     const supabase = createClient()
@@ -421,7 +421,7 @@ export async function assignStudentProgram(studentId: string, sponsorId: number)
     const supanase = createClient();
     const { data: programsData, error: programsDataError } = await supanase
       .from("donation_allocation_log")
-      .select(`*, donation!inner(sponsor_id), 
+      .select(`*, donation!inner(donation_id, sponsor_id), 
       programs!inner(program_english_name,subscription_value,
       total_allocated_donation,total_remaining_donation, club_id)`)
       .gt("remaining_allocated_amount", 0)
@@ -431,50 +431,71 @@ export async function assignStudentProgram(studentId: string, sponsorId: number)
     if (programsDataError) throw new Error(programsDataError.message);
       
 
-    const selectedProgram = programsData.find(
-      (record) => record.remaining_allocated_amount >= Number(record.programs.subscription_value)
+    // const selectedProgram = programsData.find(
+    //   (record) => record.remaining_allocated_amount >= Number(record.programs.subscription_value)
+    // );
+
+    const sortedRecords = [...programsData].sort(
+      (a, b) => b.remaining_allocated_amount - a.remaining_allocated_amount
     );
 
-    console.log(programsData);
-    console.log(selectedProgram);
+    let selectedRecords = [];
+    let sumAmount = 0;
+    const requiredAmount = Number(sortedRecords[0]?.programs.subscription_value || 0);
+
+    for (const record of sortedRecords) {
+      sumAmount += record.remaining_allocated_amount;
+      selectedRecords.push(record);
+  
+      if (sumAmount >= requiredAmount) {
+        break;
+      }
+    }
+
+    // If we didn't reach the required amount, reset selectedRecords to empty
+    if (sumAmount < requiredAmount) {
+      selectedRecords = [];
+    }
 
     let finalResult = "testing";
-    if (selectedProgram) {
-      
+    if (selectedRecords) {
       const couponData = {
-        program_id: selectedProgram.program_id,
+        program_id: selectedRecords.at(0)?.program_id,
         student_id: studentId,
         coupon_duration: "1 month",
         start_period: "Future period",
-        club_id: selectedProgram.programs.club_id,
+        club_id: selectedRecords.at(0)?.programs.club_id,
       };
-      // const res = await addStudentCoupon(couponData, selectedProgram.programs, sponsorId, selectedProgram.id);
-
-      // if (!res.success) {
-      //   throw new Error(res.error);
-      // }
-
-      // const { data: studentName, error: studentNameError } = await supanase
-      //   .from("profiles")
-      //   .select("name")
-      //   .eq("id", studentId)
-      //   .single();
       
-      // if (studentNameError) throw new Error(studentNameError.message);
+      const res = await addStudentCoupon(couponData, selectedRecords.at(0)?.programs!, sponsorId, selectedRecords);
 
-      // const { data: programName, error: programNameError } = await supanase
-      //   .from("programs")
-      //   .select("program_english_name")
-      //   .eq("program_id", res.data?.program_id!)
-      //   .single();
+      if (!res.success) {
+        throw new Error(res.error);
+      }
+
+      const { data: studentName, error: studentNameError } = await supanase
+        .from("profiles")
+        .select("name")
+        .eq("id", studentId)
+        .single();
       
-      // if (programNameError) throw new Error(programNameError?.message);
+      if (studentNameError) throw new Error(studentNameError.message);
 
-      //  finalResult = `Coupon of ${programName.program_english_name} assigned to ${studentName.name}`;
+      const { data: programName, error: programNameError } = await supanase
+        .from("programs")
+        .select("program_english_name")
+        .eq("program_id", res.data?.program_id!)
+        .single();
+      
+      if (programNameError) throw new Error(programNameError?.message);
 
+       finalResult = `Coupon of ${programName.program_english_name} assigned to ${studentName.name}`;
+
+    } else {
+      throw new Error("No sufficient donation allocation for the programs");
       }
       
-      return { success: true, data: finalResult! };
+    return { success: true, data: finalResult! };
 
   } catch (error: any) {
     console.error(error.message);
@@ -488,7 +509,7 @@ export async function addStudentCoupon(
   couponData: Coupons,
   programDetails: Programs,
   sponsorId: Number,
-  donationAllocationLogId: Number,) {
+  donationAllocationLog: DonationAllocationLogs[],) {
   try {
     const supabase = createClient();
     const { program_id, club_id, student_id, coupon_duration, start_period } = couponData;
@@ -515,13 +536,14 @@ export async function addStudentCoupon(
 
 
     // Step 3: donation log data
-    const { data: donationAllocationLog, error: donationAllocationLogError } = await supabase
-      .from("donation_allocation_log")
-      .select(`id, program_id, donation!inner(donation_id, sponsor_id), 
-        allocated_amount, remaining_allocated_amount`)
-      .eq("id", donationAllocationLogId)
+    // const { data: donationAllocationLog, error: donationAllocationLogError } = await supabase
+    //   .from("donation_allocation_log")
+    //   .select(`id, program_id, donation!inner(donation_id, sponsor_id), 
+    //     allocated_amount, remaining_allocated_amount`)
+    //   .eq("id", donationAllocationLogId)
 
-    if (donationAllocationLogError) throw new Error("Failed to fetch donation allocation logs");
+    // if (donationAllocationLogError) throw new Error("Failed to fetch donation allocation logs");
+    
 
     // Step 4: fetching data for cancelled sponsor support
     const { data: cancelSponsorSupport, error: cancelSponsorSupportError } = await supabase
@@ -561,32 +583,95 @@ export async function addStudentCoupon(
     let remainingToDeductFromLogs = remainingDeduction;
 
     // Step 6: Deduction logic and coupon Donation link
-    for (const log of donationAllocationLog) {
-      if (remainingCoupons <= 0) break;
+    // Sort logs by remaining amount and filter for those with >= 50% of subscription value
+    const sortedLogs = [...donationAllocationLog].sort(
+      (a, b) => b.remaining_allocated_amount! - a.remaining_allocated_amount!
+    );
 
-      const couponsFromThisDonation = Math.min(
+    // Find logs that have >= 50% of subscription value
+    const halfSubscriptionValue = subscriptionValue / 2;
+    const priorityLogs = sortedLogs.filter(
+      log => log.remaining_allocated_amount! >= halfSubscriptionValue
+    );
+
+    // Process priority logs first, then remaining logs if needed
+const logsToProcess = [...priorityLogs, ...sortedLogs.filter(log => !priorityLogs.includes(log))];
+
+for (const log of logsToProcess) {
+  if (remainingCoupons <= 0) break;
+
+  // For priority logs (>=50% of subscription), assign at least 1 coupon if possible
+  if (log.remaining_allocated_amount! >= halfSubscriptionValue) {
+    const couponsFromThisDonation = Math.max(
+      1,
+      Math.min(
         remainingCoupons,
-        Math.floor(log.remaining_allocated_amount / subscriptionValue)
-      );
-      remainingCoupons -= couponsFromThisDonation;
+        Math.floor(log.remaining_allocated_amount! / subscriptionValue)
+      )
+    );
+    remainingCoupons -= couponsFromThisDonation;
 
+    donationLinks.push({
+      donation_id: log.donation?.donation_id!,
+      num_coupons: couponsFromThisDonation,
+    });
+  } else {
+    // Original logic for non-priority logs
+    const couponsFromThisDonation = Math.min(
+      remainingCoupons,
+      Math.floor(log.remaining_allocated_amount! / subscriptionValue)
+    );
+    
+    if (couponsFromThisDonation > 0) {
+      remainingCoupons -= couponsFromThisDonation;
+      
       donationLinks.push({
-        donation_id: log.donation.donation_id,
+        donation_id: log.donation?.donation_id!,
         num_coupons: couponsFromThisDonation,
       });
-      
-      const deduct = Math.min(remainingToDeductFromLogs, log.remaining_allocated_amount);
-      remainingToDeductFromLogs -= deduct;
-
-      // Step 7 update the donation_allocation_log table with the deducted remaining amount
-      const { data: updateAllocatedLogs, error: logUpdateError } = await supabase
-        .from("donation_allocation_log")
-        .update({remaining_allocated_amount: log.remaining_allocated_amount - deduct  })
-        .eq("program_id", log.program_id)
-        .eq("id", log.id);
-      
-      if (logUpdateError) throw new Error(logUpdateError.message);
     }
+  }
+
+  const deduct = Math.min(remainingToDeductFromLogs, log.remaining_allocated_amount!);
+  remainingToDeductFromLogs -= deduct;
+
+  // Update the donation_allocation_log table
+  const { data: updateAllocatedLogs, error: logUpdateError } = await supabase
+    .from("donation_allocation_log")
+    .update({ remaining_allocated_amount: log.remaining_allocated_amount! - deduct })
+    .eq("program_id", log.program_id!)
+    .eq("id", log.id!);
+
+  if (logUpdateError) throw new Error(logUpdateError.message);
+}
+
+
+    // for (const log of donationAllocationLog) {
+    //   if (remainingCoupons <= 0) break;
+
+    //   const couponsFromThisDonation = Math.min(
+    //     remainingCoupons,
+    //     Math.floor(log.remaining_allocated_amount! / subscriptionValue)
+    //   );
+    //   remainingCoupons -= couponsFromThisDonation;
+
+    //   donationLinks.push({
+    //     donation_id: log.donation?.donation_id!,
+    //     num_coupons: couponsFromThisDonation,
+    //   });
+      
+    //   const deduct = Math.min(remainingToDeductFromLogs, log.remaining_allocated_amount!);
+    //   remainingToDeductFromLogs -= deduct;
+
+    //   // Step 7 update the donation_allocation_log table with the deducted remaining amount
+    //   const { data: updateAllocatedLogs, error: logUpdateError } = await supabase
+    //     .from("donation_allocation_log")
+    //     .update({remaining_allocated_amount: log.remaining_allocated_amount! - deduct  })
+    //     .eq("program_id", log.program_id!)
+    //     .eq("id", log.id!);
+      
+    //   if (logUpdateError) throw new Error(logUpdateError.message);
+    // }
 
     // Step 8: fetching start date on the basis of the start_period
       const startDate = calculateStartDate(start_period!);
@@ -614,7 +699,7 @@ export async function addStudentCoupon(
         const { error: linkError } = await supabase
           .from("coupon_donation_link")
           .insert({
-            coupon_id: insertCoupon.coupon_id,
+            coupon_id: insertCoupon.coupon_id!,
             donation_id: link.donation_id,
             num_of_coupons: link.num_coupons
           });

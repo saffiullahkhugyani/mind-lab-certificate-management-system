@@ -170,11 +170,25 @@ export type CertificateDetails = {
 }
 
 export type CancelStudentSupport = {
-    created_at?: string;
-    id?: number;
-    program_id?: number;
-    sponsor_id?: number;
-    student_id?: string;
-    support_status?: boolean;
+  created_at?: string;
+  id?: number;
+  program_id?: number;
+  sponsor_id?: number;
+  student_id?: string;
+  support_status?: boolean;
+}
 
+export type DonationAllocationLogs = {
+  id?: number;
+  allocated_amount?: number;
+  created_at?: string;
+  donation_id?: number;
+  program_id?: number;
+  remaining_allocated_amount?: number;
+  donation?: { donation_id?: number, sponsor_id?: number }
+  programs?: {
+    club_id?: number | null, program_english_name?: string | null,
+    total_remaining_donation?: number | null,
+    total_allocated_donation?: number | null,
+  }
 }
