@@ -458,7 +458,7 @@ export async function assignStudentProgram(studentId: string, sponsorId: number)
     }
 
     let finalResult = "testing";
-    if (selectedRecords) {
+    if (selectedRecords && selectedRecords.length > 0) {
       const couponData = {
         program_id: selectedRecords.at(0)?.program_id,
         student_id: studentId,
@@ -492,7 +492,7 @@ export async function assignStudentProgram(studentId: string, sponsorId: number)
        finalResult = `Coupon of ${programName.program_english_name} assigned to ${studentName.name}`;
 
     } else {
-      throw new Error("No sufficient donation allocation for the programs");
+      throw new Error("No sufficient donation for the programs");
       }
       
     return { success: true, data: finalResult! };
@@ -598,7 +598,7 @@ export async function addStudentCoupon(
 const logsToProcess = [...priorityLogs, ...sortedLogs.filter(log => !priorityLogs.includes(log))];
 
 for (const log of logsToProcess) {
-  if (remainingCoupons <= 0) break;
+  // if (remainingCoupons <= 0) break;
 
   // For priority logs (>=50% of subscription), assign at least 1 coupon if possible
   if (log.remaining_allocated_amount! >= halfSubscriptionValue) {
@@ -609,7 +609,7 @@ for (const log of logsToProcess) {
         Math.floor(log.remaining_allocated_amount! / subscriptionValue)
       )
     );
-    remainingCoupons -= couponsFromThisDonation;
+    // remainingCoupons -= couponsFromThisDonation;
 
     donationLinks.push({
       donation_id: log.donation?.donation_id!,
@@ -643,9 +643,8 @@ for (const log of logsToProcess) {
     .eq("id", log.id!);
 
   if (logUpdateError) throw new Error(logUpdateError.message);
-}
-
-
+    }
+    
     // for (const log of donationAllocationLog) {
     //   if (remainingCoupons <= 0) break;
 
