@@ -83,31 +83,30 @@ export default function StudentTabs({
   };
 
   const handleAssignProgram = async (studentId: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log(`from handleAssignProgram ${studentId}`);
-    await assignStudentProgram(studentId, sponsorId);
-    // try {
-    //   const res = await cancelStudentSupport(studentId, sponsorId, programs!);
+    try {
+      const res = await assignStudentProgram(studentId, sponsorId);
+      console.log(res);
 
-    //   if (res.success) {
-    //     toast({
-    //       description: `Support cancelled for the student`,
-    //       variant: "success",
-    //     });
-    //   }
+      if (res.success) {
+        toast({
+          description: res.data,
+          variant: "success",
+        });
+      }
 
-    //   if (res.error) {
-    //     toast({
-    //       description: res.error,
-    //       variant: "destructive",
-    //     });
-    //   }
-    // } catch (error: any) {
-    //   toast({
-    //     description: error,
-    //     variant: "destructive",
-    //   });
-    // }
+      if (res.error) {
+        toast({
+          description: res.error,
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        description: error,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
