@@ -91,6 +91,7 @@ export type Profiles = {
   profile_image_url?: string | null
   updated_at?: string | null
   role_id?: number | null
+  nationality?: string | null
 }
 
 export type Coupons = {

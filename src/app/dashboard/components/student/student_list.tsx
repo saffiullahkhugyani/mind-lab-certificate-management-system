@@ -151,7 +151,7 @@ export default function StudentList({
         </div>
       )}
 
-      <div className="bg-gray-50 shadow-md p-4 rounded-md space-x-2">
+      <div className="">
         {!selectedStudent && (
           <div className="flex items-center justify-between w-full p-2">
             <Label className="text-lg font-bold">Students</Label>

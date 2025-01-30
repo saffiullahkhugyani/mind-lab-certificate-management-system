@@ -10,6 +10,7 @@ import {
   cancelStudentSupport,
 } from "../../actions";
 import { toast } from "@/components/ui/use-toast";
+import { Label } from "@/components/ui/label";
 
 interface StudentProps {
   students: Profiles[] | null;
@@ -110,11 +111,17 @@ export default function StudentTabs({
   };
 
   return (
-    <div>
+    <div className="bg-white shadow-md p-4 rounded-md space-x-2 space-y-4">
       <Tabs defaultValue="all-students" className="w-full">
-        <TabsList className="flex justify-start">
-          <TabsTrigger value="all-students">All Students</TabsTrigger>
-          <TabsTrigger value="supported-students">
+        <TabsList
+          className="flex justify-start"
+          variant={"underline"}
+          width={"fit"}
+        >
+          <TabsTrigger value="all-students" variant={"underline"}>
+            All Students
+          </TabsTrigger>
+          <TabsTrigger value="supported-students" variant={"underline"}>
             Supported Students
           </TabsTrigger>
         </TabsList>

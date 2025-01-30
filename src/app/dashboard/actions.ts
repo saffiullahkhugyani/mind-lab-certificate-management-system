@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { AllocatedProgramData, Coupons, DonationAllocationLogs, Programs, StudentSupport, Tag } from "@/types/types";
+import { revalidatePath } from "next/cache";
 
 export async function studentList() {
     const supabase = createClient()
@@ -717,7 +718,8 @@ for (const log of logsToProcess) {
 
     // Step 11: Generate and store coupon codes
     await generateAndStoreCouponCodes(insertCoupon);
-
+    
+    revalidatePath('/dashboard', 'page');
     return { success: true , data: insertCoupon };
 
 
