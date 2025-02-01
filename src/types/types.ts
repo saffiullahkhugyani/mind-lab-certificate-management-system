@@ -143,6 +143,8 @@ export type AllocatedProgramData = {
   subscription_value: string | null;
   period: string | null;
   created_at: string | null;
+  allocationDataCount?: number | null;
+
 
 }
 
@@ -152,6 +154,8 @@ export type StudentSupport = {
   donation_id: number;
   program_id: number | null;
   num_of_coupons: number | null;
+  totalCoupons?: number | null;
+  numOfEnrolledPrograms?: number | null;
 }
 
 export type CertificateDetails = {

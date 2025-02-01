@@ -170,59 +170,63 @@ export default async function sponsorData() {
         )
         
         
-        const shapedAllocatedProgramData = donationLog!.reduce<AllocatedProgramData[]>((acc, log) => {
-            const programId = log.programs.program_id;
-            const existing = acc.find(item => item.program_id === programId);
-            if (existing) {
-                // If program_id exists, update the allocated_amount
-                existing.allocated_amount! += log.allocated_amount;
-                existing.remaining_allocated_amount! += log.remaining_allocated_amount;
-            } else {
-                // If not, add a new entry 
-                acc.push({     
-                id: log.id,
-                allocated_amount: log.allocated_amount,
-                description: log.programs.description,
-                subscription_value: log.programs.subscription_value,
-                remaining_allocated_amount: log.remaining_allocated_amount,
-                program_id: programId,
-                club_id: log.programs.club_id,
-                program_name: log.programs?.program_english_name,
-                period: log.programs.period,
-                created_at: new Date(log.created_at).toISOString().split("T")[0],
-                });
-            }            
-            return acc;    
-        }, []);
-        
-        
-        const shapedSponsorData = {
-            sponsor_id: sponsorData.sponsor_id,
-            name: sponsorData.name,
-            email: sponsorData.email,
-            number: sponsorData.phone_number,
-            image: sponsorData.profiles?.profile_image_url,
-            totalDonationAmount: totalDonationAmount,
-            totalRemainingDonation: totalRemainingDonation,
-            allocatedDonation: totalDonationAmount - totalRemainingDonation,
-            programs_funded: shapedAllocatedProgramData?.length,
-            student_supported: uniqueStudents.size,
+      const shapedAllocatedProgramData = donationLog!.reduce<AllocatedProgramData[]>((acc, log) => {
+        const programId = log.programs.program_id;
+        const existing = acc.find(item => item.program_id === programId);
+        if (existing) {
+              
+          // If program_id exists, update the allocated_amount
+          existing.allocated_amount! += log.allocated_amount;
+          existing.remaining_allocated_amount! += log.remaining_allocated_amount;
+          existing.allocationDataCount! += 1;
+              
+        } else {
+          // If not, add a new entry 
+          acc.push({
+            id: log.id,
+            allocated_amount: log.allocated_amount,
+            description: log.programs.description,
+            subscription_value: log.programs.subscription_value,
+            remaining_allocated_amount: log.remaining_allocated_amount,
+            program_id: programId,
+            club_id: log.programs.club_id,
+            program_name: log.programs?.program_english_name,
+            period: log.programs.period,
+            created_at: new Date(log.created_at).toISOString().split("T")[0],
+            allocationDataCount: 1,
+          });
         }
+        return acc;
+      }, []);
+        
+        
+      const shapedSponsorData = {
+        sponsor_id: sponsorData.sponsor_id,
+        name: sponsorData.name,
+        email: sponsorData.email,
+        number: sponsorData.phone_number,
+        image: sponsorData.profiles?.profile_image_url,
+        totalDonationAmount: totalDonationAmount,
+        totalRemainingDonation: totalRemainingDonation,
+        allocatedDonation: totalDonationAmount - totalRemainingDonation,
+        programs_funded: shapedAllocatedProgramData?.length,
+        student_supported: uniqueStudents.size,
+      };
 
-        return {
-            success: true, data: {
-                sponsorData: shapedSponsorData,
-                allocatedProgramData: shapedAllocatedProgramData,
-                donataionsData: donationData,
-                donationAllocationInvoiceData: donationAllocationInvoiceData,
-                studentSupport: studentSupport
-            }
-        };
+      return {
+        success: true, data: {
+          sponsorData: shapedSponsorData,
+          allocatedProgramData: shapedAllocatedProgramData,
+          donataionsData: donationData,
+          donationAllocationInvoiceData: donationAllocationInvoiceData,
+          studentSupport: studentSupport
+        }
+      };
 
 
      } catch(error:any) {
-        console.log("Error in sponsor data:", error.message);
-        return { success: false, error: error.message };
+      console.log("Error in sponsor data:", error.message);
+      return { success: false, error: error.message };
     }
 }
 
@@ -265,6 +269,7 @@ async function studentSupportData(sponsorUid: string) {
           num_of_coupons: donationData.num_of_coupons
         });
       });
+      
     } else {
       // If no user mappings exist, create one entry with null user_id
       customList.push({

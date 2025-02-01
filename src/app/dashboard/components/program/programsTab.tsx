@@ -95,19 +95,30 @@ const ProgramsTab: React.FC<ProgramsTabProps> = ({
     setExpandedCardId(expandedCardId === programId ? null : programId);
   };
 
-  const filteredPrograms = getFilteredPrograms()?.map((program) => (
-    <ProgramCard
-      key={program.program_id}
-      image={imageMap[program.program_id!]}
-      title={getProgramName(program)}
-      description={program.description!}
-      donatedAmount={getDonationAmount(program, selectedFilter === "enrolled")}
-      enrolled={selectedFilter === "enrolled"}
-      detailsLink={"https://www.iastem.ae"}
-      isExpanded={expandedCardId === program.program_id}
-      onClick={() => handleCardClick(program.program_id!)}
-    />
-  ));
+  const filteredPrograms = getFilteredPrograms()?.map((program) => {
+    // Find the corresponding allocated program (if exists) to get the count
+    const allocatedProgram = allocatedProgramData?.find(
+      (allocated) => allocated.program_id === program.program_id
+    );
+
+    return (
+      <ProgramCard
+        key={program.program_id}
+        image={imageMap[program.program_id!]}
+        title={getProgramName(program)}
+        description={program.description!}
+        donatedAmount={getDonationAmount(
+          program,
+          selectedFilter === "enrolled"
+        )}
+        enrolled={selectedFilter === "enrolled"}
+        detailsLink={"https://www.iastem.ae"}
+        isExpanded={expandedCardId === program.program_id}
+        onClick={() => handleCardClick(program.program_id!)}
+        numOfAllocations={allocatedProgram?.allocationDataCount!}
+      />
+    );
+  });
 
   return (
     <div className="grid space-y-2">

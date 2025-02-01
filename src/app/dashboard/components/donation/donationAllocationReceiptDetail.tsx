@@ -117,18 +117,18 @@ const DonationAllocationReceiptDetail = ({
           <p className="text-gray-600 mb-2">
             All donations are tax-deductible, currency is UAE.
           </p>
-          <div className="text-right">
-            <p>
+          <div className="text-right mt-6 ">
+            {/* <p>
               <strong>Subtotal:</strong>$
               {allocatedProgramData?.allocated_amount}
             </p>
             <p className="text-xl font-bold mt-2">
               <strong>Total Amount:</strong>$
               {allocatedProgramData?.allocated_amount}
-            </p>
+            </p> */}
             <p className="mt-2">
               <strong>Payment Method:</strong>
-              {"card"}
+              {" card"}
             </p>
           </div>
         </div>

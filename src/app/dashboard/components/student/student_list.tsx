@@ -167,15 +167,36 @@ export default function StudentList({
         {!selectedStudent ? (
           filteredStudents?.length! > 0 ? (
             <div className="grid grid-cols-3">
-              {filteredStudents!.map((student) => (
-                <StudentCard
-                  key={student.id}
-                  student={student}
-                  onClick={async () => handleSelectedStudent(student)}
-                  onCancelSupportClick={onCancelSupportClick}
-                  onAssignProgram={onAssignProgramClick}
-                />
-              ))}
+              {filteredStudents!.map((student) => {
+                // Get all support records for this student
+                const studentSupport = supportedStudents?.filter(
+                  (support) => support.user_id === student.id
+                );
+
+                // Calculate total number of coupons
+                const totalCoupons =
+                  studentSupport?.reduce(
+                    (sum, support) => sum + support.num_of_coupons!,
+                    0
+                  ) || 0;
+
+                // Count unique enrolled programs
+                const enrolledPrograms = new Set(
+                  studentSupport?.map((support) => support.program_id)
+                ).size;
+
+                return (
+                  <StudentCard
+                    key={student.id}
+                    student={student}
+                    onClick={async () => handleSelectedStudent(student)}
+                    onCancelSupportClick={onCancelSupportClick}
+                    onAssignProgram={onAssignProgramClick}
+                    totalNumOfCoupons={totalCoupons}
+                    totalNumOfEnrolledPrograms={enrolledPrograms}
+                  />
+                );
+              })}
             </div>
           ) : (
             <div className="flex justify-center p-5 font-bold text-xl">

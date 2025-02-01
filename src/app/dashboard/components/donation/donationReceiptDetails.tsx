@@ -105,17 +105,17 @@ const DonationReceiptDetail = ({
                 </td>
                 <td className="py-2 text-center">{"1"}</td>
                 <td className="py-2 text-right px-2">
-                  ${donationReceipt?.amount!}
+                  ${donationReceipt?.amount! - donationReceipt?.bank_charges!}
                 </td>
               </tr>
-              <tr key={donationReceipt?.bank_charges} className="border-b">
+              {/* <tr key={donationReceipt?.bank_charges} className="border-b">
                 <td className="py-2 px-2">{"Charges"}</td>
                 <td className="py-2 px-2"></td>
                 <td className="py-2 text-center">{"1"}</td>
                 <td className="py-2 text-right px-2">
                   ${donationReceipt?.bank_charges!}
                 </td>
-              </tr>
+              </tr> */}
             </tbody>
           </table>
 
@@ -123,18 +123,18 @@ const DonationReceiptDetail = ({
           <p className="text-gray-600 mb-2">
             All donations are tax-deductible, currency is UAE.
           </p>
-          <div className="text-right">
-            <p>
+          <div className="text-right mt-6">
+            {/* <p>
               <strong>Subtotal:</strong>$
               {donationReceipt?.amount! + donationReceipt?.bank_charges!}
             </p>
             <p className="text-xl font-bold mt-2">
               <strong>Total Amount:</strong>$
               {donationReceipt?.amount! + donationReceipt?.bank_charges!}
-            </p>
+            </p> */}
             <p className="mt-2">
               <strong>Payment Method:</strong>
-              {donationReceipt?.source_of_amount}
+              {` ${donationReceipt?.source_of_amount}`}
             </p>
           </div>
         </div>

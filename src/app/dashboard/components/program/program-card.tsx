@@ -12,6 +12,7 @@ interface ProgramCardProps {
   detailsLink: string;
   isExpanded: boolean;
   onClick: () => void;
+  numOfAllocations: number;
 }
 
 const ProgramCard: React.FC<ProgramCardProps> = ({
@@ -23,6 +24,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   detailsLink,
   isExpanded,
   onClick,
+  numOfAllocations,
 }) => {
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -55,7 +57,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
             <h2 className="text-lg font-bold text-gray-800">{title}</h2>
             <p className="text-sm text-gray-600 mb-4">{description}</p>
             <p className="text-sm text-gray-700 font-medium mb-4">
-              Donated amount: {donatedAmount}
+              Accumulated donation amount: {donatedAmount}
             </p>
             <div className="flex-grow" />
             <Button
@@ -94,8 +96,11 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
           />
           <h2 className="text-lg font-bold text-gray-800">{title}</h2>
           <p className="text-sm text-gray-600 mb-4">{description}</p>
+          <p className="text-sm text-gray-700 font-medium ">
+            Accumulated donated amount: {donatedAmount}
+          </p>
           <p className="text-sm text-gray-700 font-medium mb-4">
-            Donated amount: {donatedAmount}
+            Number of allocations: {numOfAllocations}
           </p>
           <div className="flex-grow" />
           <Button
