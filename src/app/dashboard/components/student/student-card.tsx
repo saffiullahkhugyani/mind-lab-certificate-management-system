@@ -74,10 +74,10 @@ export default function StudentCard({
           <span className="font-medium">Number of coupons issued:</span>{" "}
           {totalNumOfCoupons}
         </p>
-        {/* <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600">
           <span className="font-medium">Status:</span>{" "}
           {statusMap[student?.id!] || "Progress"}
-        </p> */}
+        </p>
       </div>
 
       {/* Dropdown Button */}

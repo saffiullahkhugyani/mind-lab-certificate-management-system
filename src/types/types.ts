@@ -144,6 +144,7 @@ export type AllocatedProgramData = {
   period: string | null;
   created_at: string | null;
   allocationDataCount?: number | null;
+  lastCouponExpiryDate?: string | null;
 
 
 }

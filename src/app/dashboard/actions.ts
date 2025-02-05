@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { AllocatedProgramData, Coupons, DonationAllocationLogs, Programs, StudentSupport, Tag } from "@/types/types";
 import { revalidatePath } from "next/cache";
+import { parseISO, addMonths, format } from "date-fns";
+
 
 export async function studentList() {
     const supabase = createClient()
@@ -130,7 +132,7 @@ export default async function sponsorData() {
             .from("donation_allocation_log")
             .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
             .eq("donation.sponsor.user_id", userId!)
-            .order("id");
+            .order("id", {ascending: true});
             
         
         if (donationLogError) throw new Error(donationLogError.message);
@@ -169,6 +171,16 @@ export default async function sponsorData() {
             })
         )
         
+      // First, map over the donation logs to handle async operations
+      // const mappedData = await Promise.all(
+      //   donationLog!.map(async (log) => {
+      //     const lastCouponExpiryDate = await lastCouponExpiry(userId!, log.programs.program_id!);
+      //     return {
+      //       ...log,
+      //       lastCouponExpiryDate
+      //     };
+      //   })
+      // );
         
       const shapedAllocatedProgramData = donationLog!.reduce<AllocatedProgramData[]>((acc, log) => {
         const programId = log.programs.program_id;
@@ -179,8 +191,10 @@ export default async function sponsorData() {
           existing.allocated_amount! += log.allocated_amount;
           existing.remaining_allocated_amount! += log.remaining_allocated_amount;
           existing.allocationDataCount! += 1;
+          // existing.lastCouponExpiryDate = log.lastCouponExpiryDate;
               
         } else {
+
           // If not, add a new entry 
           acc.push({
             id: log.id,
@@ -194,12 +208,24 @@ export default async function sponsorData() {
             period: log.programs.period,
             created_at: new Date(log.created_at).toISOString().split("T")[0],
             allocationDataCount: 1,
+            // lastCouponExpiryDate: log.lastCouponExpiryDate,
           });
         }
         return acc;
       }, []);
         
-        
+      console.log(shapedAllocatedProgramData);
+
+      const shapedAllocatedProgramDataWithLastCouponExpiry = await Promise.all(
+        shapedAllocatedProgramData!.map(async (log) => {
+          const lastCouponExpiryDate = await lastCouponExpiry(userId!, log.program_id!);
+          return {
+            ...log,
+            lastCouponExpiryDate
+          };
+        })
+      );
+
       const shapedSponsorData = {
         sponsor_id: sponsorData.sponsor_id,
         name: sponsorData.name,
@@ -213,10 +239,12 @@ export default async function sponsorData() {
         student_supported: uniqueStudents.size,
       };
 
+      // await lastCouponExpiry(userId!, 29);
+
       return {
         success: true, data: {
           sponsorData: shapedSponsorData,
-          allocatedProgramData: shapedAllocatedProgramData,
+          allocatedProgramData: shapedAllocatedProgramDataWithLastCouponExpiry,
           donataionsData: donationData,
           donationAllocationInvoiceData: donationAllocationInvoiceData,
           studentSupport: studentSupport
@@ -230,29 +258,73 @@ export default async function sponsorData() {
     }
 }
 
-async function studentSupportData(sponsorUid: string) {
+async function lastCouponExpiry(sponsorUid: string, programId: number) {
   
-    const supabase = createClient();
+  const supabase = createClient();
 
-    const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
-        .from("coupon_donation_link")
-        .select('coupons(*), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
-        .eq("donation.sponsor.user_id", sponsorUid);
+  const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
+    .from("coupon_donation_link")
+    .select('coupons!inner(*), donation!inner(sponsor!inner(*)), num_of_coupons')
+    .eq("donation.sponsor.user_id", sponsorUid)
+    .eq("coupons.program_id", programId)
+    .order("id", { ascending: true });
     
-    if (couponDonationLinkError) throw new Error(couponDonationLinkError.message);
+  if (couponDonationLinkError)
+    return null;
 
-    const { data: couponUserMapping, error: couponUserMappingError } = await supabase
-        .from("coupon_user_mapping")
-        .select("*");
-    
-    if (couponUserMappingError) throw new Error(couponUserMappingError.message);
+  if (!couponDonationLink || couponDonationLink.length === 0)
+    return null;
+    // throw new Error("No coupon donation link found.");
+
+  // Step 1: Extract only the necessary coupons details
+  const filteredCoupons = couponDonationLink.map((item) => ({
+    coupon_id: item.coupons!.coupon_id,
+    start_date: item.coupons!.start_date,
+    number_of_coupons: item.coupons!.number_of_coupons,
+  }));
+
+  // Step 2: Find the last coupon (highest coupon_id)
+  const lastCoupon = filteredCoupons.reduce((prev, curr) =>
+    prev.coupon_id > curr.coupon_id ? prev : curr
+  );
+
+
+  // Step 3: Calculate the expiry date
+  const startDate = parseISO(lastCoupon.start_date!);
+  const expiryDate = addMonths(startDate, lastCoupon.number_of_coupons!);
+  
+  // console.log("Filtered Coupon:", couponDonationLink);
+  // console.log("Start Date: ", format(startDate, "MMM dd, yyyy").toUpperCase());
+
+  // console.log("End Date: ", format(expiryDate, "MMM dd, yyyy").toUpperCase());
+
+  return format(expiryDate, "MMM dd, yyyy");
+}
+
+
+async function studentSupportData(sponsorUid: string) {
+
+  const supabase = createClient();
+
+  const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
+      .from("coupon_donation_link")
+      .select('coupons(*), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
+      .eq("donation.sponsor.user_id", sponsorUid);
+  
+  if (couponDonationLinkError) throw new Error(couponDonationLinkError.message);
+
+  const { data: couponUserMapping, error: couponUserMappingError } = await supabase
+      .from("coupon_user_mapping")
+      .select("*");
+  
+  if (couponUserMappingError) throw new Error(couponUserMappingError.message);
 
 
   const customList: StudentSupport[] = [];
 
   couponDonationLink.forEach(donationData => {
     const couponId = donationData.coupons?.coupon_id;
-    
+  
     // Find all user mappings for this coupon
     const matchingMappings = couponUserMapping.filter(
       mapping => mapping.coupon_id === couponId
@@ -269,7 +341,7 @@ async function studentSupportData(sponsorUid: string) {
           num_of_coupons: donationData.num_of_coupons
         });
       });
-      
+    
     } else {
       // If no user mappings exist, create one entry with null user_id
       customList.push({

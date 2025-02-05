@@ -40,15 +40,17 @@ const getDonationAmount = (
   return "0";
 };
 
-const ProgramsTab: React.FC<ProgramsTabProps> = ({
+export default function ProgramsTab({
   allocatedProgramData,
   clubList,
   programList,
-}) => {
+}: ProgramsTabProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedFilter, setSelectedFilter] = useState<string>("enrolled");
   const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
+
+  console.log("allocatedProgramData", allocatedProgramData);
 
   const imageMap: Record<number, string> = {
     29: "/robotics-program.png",
@@ -111,11 +113,17 @@ const ProgramsTab: React.FC<ProgramsTabProps> = ({
           program,
           selectedFilter === "enrolled"
         )}
+        remaingAmount={
+          allocatedProgram?.remaining_allocated_amount?.toString()!
+        }
+        programSubsrciptionValue={allocatedProgram?.subscription_value!}
+        programEnrolledDate={allocatedProgram?.created_at!}
         enrolled={selectedFilter === "enrolled"}
         detailsLink={"https://www.iastem.ae"}
         isExpanded={expandedCardId === program.program_id}
         onClick={() => handleCardClick(program.program_id!)}
         numOfAllocations={allocatedProgram?.allocationDataCount!}
+        couponLastExpiryDate={allocatedProgram?.lastCouponExpiryDate!}
       />
     );
   });
@@ -183,6 +191,4 @@ const ProgramsTab: React.FC<ProgramsTabProps> = ({
       </div>
     </div>
   );
-};
-
-export default ProgramsTab;
+}
