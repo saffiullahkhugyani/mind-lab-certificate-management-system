@@ -129,7 +129,7 @@ const ExpandedView: React.FC<any> = ({
       {detailsLinkComponent}
     </div>
     <div className="grid grid-rows-4 col-span-3">
-      <div className="flex row-span-1 m-1">
+      <div className="flex justify-center row-span-1 m-1">
         <DetailsCard
           title="Program donation amount"
           donatedAmount={donatedAmount}
@@ -153,16 +153,6 @@ const ExpandedView: React.FC<any> = ({
           programEnrolledDate={programEnrolledDate}
           couponLastExpiryDate={couponLastExpiryDate}
         />
-        {/* <DetailsCard
-          title="Important Dates"
-          value={`Program enrolled: ${new Date(
-            programEnrolledDate
-          ).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}`}
-        /> */}
       </div>
       <div className="flex row-span-3 justify-center items-center m-1 bg-slate-100">
         <ProgramTimelineChart />
