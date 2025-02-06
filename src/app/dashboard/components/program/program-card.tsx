@@ -41,12 +41,8 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   const enrollmentButton = (
     <Button
       onClick={handleButtonClick}
-      variant="ghost"
-      className={`py-1 px-3 text-sm font-bold rounded-md w-full ${
-        enrolled
-          ? "bg-black text-white"
-          : "bg-gray-200 text-gray-700 border border-gray-300"
-      }`}
+      variant="default"
+      className={`py-1 px-3 text-sm font-bold rounded-md w-full `}
     >
       {enrolled ? "Enrolled" : "Enroll"}
     </Button>
