@@ -57,13 +57,16 @@ export default function Dashboard({
   return (
     <div className=" mx-auto p-8">
       {/* Background Banner */}
-      <div className="bg-gray-300 h-24 rounded-sm"></div>
+      <div className="bg-gray-300 h-24 rounded-md"></div>
 
       {/* Profile Section */}
       <div className="relative -mt-12 flex flex-col items-center">
         {/* Sponsor Image */}
         <Avatar className="w-32 h-32 border-white border-2 rounded-none">
-          <AvatarImage src={sponsor?.image!} alt="@SP" />
+          <AvatarImage
+            src={sponsor?.image ? sponsor?.image : "/no-user-image.jpeg"}
+            alt="@SP"
+          />
           <AvatarFallback className="font-bold text-5xl">
             {sponsor?.name!.charAt(0).toUpperCase()}
           </AvatarFallback>
