@@ -35,6 +35,8 @@ import { Clubs, SkillType } from "@/types/customs";
 import { MultiSelect, Options } from "@/components/ui/multi-select";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { set } from "date-fns";
+import { addProgramCertificate } from "../actions";
 
 // schema for form validation
 const FormSchema = z.object({
@@ -90,6 +92,9 @@ const GenerateCertificate = ({
   const [tagHours, setTagHours] = useState<{ [key: string]: number }>({});
   const [filteredTags, setFilteredTags] = useState<Options[]>([]);
   const [categories, setCategories] = useState<skillCategory[] | null>([]);
+  const [filteredPrograms, setFilteredPrograms] = useState<Programs[] | null>(
+    []
+  );
 
   const { toast } = useToast();
   const router = useRouter();
@@ -214,42 +219,42 @@ const GenerateCertificate = ({
   const formRef = useRef<HTMLFormElement>(null);
 
   // use effect hook for filtering tags
-  // useEffect(() => {
-  //   // filtered tags based on the selected skill type
-  //   const updatedCategories = skillCategory.filter(
-  //     (category) => category.skill_type_id === Number(selectedSkillType)
-  //   );
+  useEffect(() => {
+    // filtered tags based on the selected skill type
+    const updatedCategories = skillCategory.filter(
+      (category) => category.skill_type_id === Number(selectedSkillType)
+    );
 
-  //   setCategories(updatedCategories);
-  // }, [selectedSkillType, skillCategory]);
+    setCategories(updatedCategories);
+  }, [selectedSkillType, skillCategory]);
 
   // use effect hook for filtering tags
-  // useEffect(() => {
-  //   // filtered tags based on the selected skill type
-  //   const updatedTags = skillTags
-  //     .filter((tag) => tag.skill_category_id === Number(selectedSkillCategory))
-  //     .map((tag) => ({ label: tag.name!, value: tag.name! }));
+  useEffect(() => {
+    // filtered tags based on the selected skill type
+    const updatedTags = skillTags
+      .filter((tag) => tag.skill_category_id === Number(selectedSkillCategory))
+      .map((tag) => ({ label: tag.name!, value: tag.name! }));
 
-  //   setFilteredTags(updatedTags);
-  // }, [selectedSkillCategory, skillTags]);
+    setFilteredTags(updatedTags);
+  }, [selectedSkillCategory, skillTags]);
 
   // submitting the form
   const onSubmit: SubmitHandler<FormFields> = (data) => {
-    // // 1. Calculate the total number of hours based on selected tags
-    // let totalCalculatedHours = 0;
-    // tags!.forEach((tag) => {
-    //   const hoursForTag = tagHours[tag] || 0; // Default to 0 if not specified
-    //   totalCalculatedHours += hoursForTag;
-    // });
-    // // 2. Get the total hours provided for the certificate (assuming you have a form field for this)
-    // const providedTotalHours = form.getValues("number_of_hours"); // Assuming this is part of your form
-    // // 3. Compare the total hours with the provided hours
-    // if (totalCalculatedHours !== Number(providedTotalHours)) {
-    //   alert(
-    //     `The total hours don't match! Calculated: ${totalCalculatedHours}, Provided: ${providedTotalHours}`
-    //   );
-    //   return;
-    // }
+    // 1. Calculate the total number of hours based on selected tags
+    let totalCalculatedHours = 0;
+    tags!.forEach((tag) => {
+      const hoursForTag = tagHours[tag] || 0; // Default to 0 if not specified
+      totalCalculatedHours += hoursForTag;
+    });
+    // 2. Get the total hours provided for the certificate (assuming you have a form field for this)
+    const providedTotalHours = form.getValues("number_of_hours"); // Assuming this is part of your form
+    // 3. Compare the total hours with the provided hours
+    if (totalCalculatedHours !== Number(providedTotalHours)) {
+      alert(
+        `The total hours don't match! Calculated: ${totalCalculatedHours}, Provided: ${providedTotalHours}`
+      );
+      return;
+    }
     // if (!isEdit && v1Certificate === null) {
     //   toast({
     //     description: "Please select a certificate to be asserted",
@@ -257,73 +262,91 @@ const GenerateCertificate = ({
     //   });
     //   return;
     // }
-    // startTransition(async () => {
-    //   const certificateData = {
-    //     id: isEdit ? certificate?.id! : null,
-    //     issue_year: data.issue_year,
-    //     issue_authority: data.issue_authority,
-    //     certificate_name_arabic: data.certificate_name_arabic,
-    //     certificate_name_english: data.certificate_name_english,
-    //     certificate_country: data.certificate_country,
-    //     number_of_hours: data.number_of_hours,
-    //     skill_level: data.skill_level,
-    //     skill_type: skillType.find(
-    //       (type) => type.id === Number(data.skill_type)
-    //     )?.skill_type_name!,
-    //     skill_category: skillCategory.find(
-    //       (category) => category.id === Number(data.skill_category)
-    //     )?.name!,
-    //     tags: data.tags.map((tag) => ({
-    //       tag_name: tag,
-    //       hours: tagHours[tag] || 0,
-    //     })),
-    //     certificate_status: true,
-    //   };
-    //   if (isEdit) {
-    //     const response = await updateCertificate(certificateData);
-    //     if (response.success) {
-    //       toast({
-    //         description: "Certificate has been updated successfully",
-    //         variant: "success",
-    //       });
-    //       router.back();
-    //     }
-    //   } else {
-    //     // adding certificate
-    //     const response = await addCertificate(certificateData);
-    //     // fetching added cetificate id
-    //     const v2Id = response?.data?.id!;
-    //     // adding mapping for certificates
-    //     const certificateMapping = await addCertificateMapping({
-    //       userId: v1Certificate?.profiles?.id!,
-    //       certificateV1Id: v1Certificate?.id!,
-    //       certificateV2Id: v2Id!,
-    //     });
-    //     if (certificateMapping.success) {
-    //       const certificateAssertion = await certificateAsserted({
-    //         certificateV1Id: v1Certificate?.id!,
-    //       });
-    //       if (certificateAssertion.success)
-    //         toast({
-    //           description: "Certificate has been added successfully",
-    //           variant: "success",
-    //         });
-    //     }
-    //     reset({
-    //       issue_year: "",
-    //       issue_authority: "",
-    //       certificate_name_arabic: "",
-    //       certificate_name_english: "",
-    //       certificate_country: "",
-    //       number_of_hours: "",
-    //       skill_level: "",
-    //       skill_type: "",
-    //       skill_category: "",
-    //       tags: [],
-    //     });
-    //     localStorage.removeItem("formData");
-    //   }
-    // });
+    startTransition(async () => {
+      const certificateData = {
+        id: null,
+        club_id: data.club_id,
+        program_id: data.program_id,
+        issue_year: data.issue_year,
+        issue_authority: data.issue_authority,
+        certificate_name_arabic: data.certificate_name_arabic,
+        certificate_name_english: data.certificate_name_english,
+        certificate_country: data.certificate_country,
+        number_of_hours: data.number_of_hours,
+        skill_level: data.skill_level,
+        skill_type: skillType.find(
+          (type) => type.id === Number(data.skill_type)
+        )?.skill_type_name!,
+        skill_category: skillCategory.find(
+          (category) => category.id === Number(data.skill_category)
+        )?.name!,
+        tags: data.tags.map((tag) => ({
+          tag_name: tag,
+          hours: tagHours[tag] || 0,
+        })),
+        certificate_status: true,
+      };
+
+      const response = await addProgramCertificate(certificateData);
+
+      if (response.success) {
+        toast({
+          description: "Program certificate has been added successfully",
+          variant: "success",
+        });
+      }
+
+      if (response.error) {
+        toast({
+          description: response.error,
+          variant: "destructive",
+        });
+      }
+      // if (isEdit) {
+      //   const response = await updateCertificate(certificateData);
+      //   if (response.success) {
+      //     toast({
+      //       description: "Certificate has been updated successfully",
+      //       variant: "success",
+      //     });
+      //     router.back();
+      //   }
+      // } else {
+      //   // adding certificate
+      //   const response = await addCertificate(certificateData);
+      //   // fetching added cetificate id
+      //   const v2Id = response?.data?.id!;
+      //   // adding mapping for certificates
+      //   const certificateMapping = await addCertificateMapping({
+      //     userId: v1Certificate?.profiles?.id!,
+      //     certificateV1Id: v1Certificate?.id!,
+      //     certificateV2Id: v2Id!,
+      //   });
+      //   if (certificateMapping.success) {
+      //     const certificateAssertion = await certificateAsserted({
+      //       certificateV1Id: v1Certificate?.id!,
+      //     });
+      //     if (certificateAssertion.success)
+      //       toast({
+      //         description: "Certificate has been added successfully",
+      //         variant: "success",
+      //       });
+      //   }
+      //   reset({
+      //     issue_year: "",
+      //     issue_authority: "",
+      //     certificate_name_arabic: "",
+      //     certificate_name_english: "",
+      //     certificate_country: "",
+      //     number_of_hours: "",
+      //     skill_level: "",
+      //     skill_type: "",
+      //     skill_category: "",
+      //     tags: [],
+      //   });
+      //   localStorage.removeItem("formData");
+      // }
+    });
   };
   return (
     <Form {...form}>
@@ -350,9 +373,14 @@ const GenerateCertificate = ({
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value);
+
+                      // reset program list
+                      const programs = programList!.filter(
+                        (program) => program.club_id === Number(value)
+                      );
+
+                      setFilteredPrograms(programs);
                     }}
-                    value={field.value.toString()}
-                    defaultValue={field.value.toString()}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -361,12 +389,12 @@ const GenerateCertificate = ({
                             ? clubList.find(
                                 (club) => club.club_id === field.value
                               )?.club_name
-                            : "Select a skill type"}
+                            : "Select a club"}
                         </SelectValue>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {clubList.map((club, index) => {
+                      {clubList.map((club) => {
                         return (
                           <SelectItem
                             value={club.club_id.toString()!}
@@ -393,8 +421,6 @@ const GenerateCertificate = ({
                     onValueChange={(value) => {
                       field.onChange(value);
                     }}
-                    value={field.value.toString()}
-                    defaultValue={field.value.toString()}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -408,7 +434,7 @@ const GenerateCertificate = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {programList!.map((program, index) => {
+                      {filteredPrograms!.map((program) => {
                         return (
                           <SelectItem
                             value={program.program_id?.toString()!}
@@ -571,6 +597,8 @@ const GenerateCertificate = ({
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value);
+
+                      console.log(skillCategory);
 
                       setCategories([]);
                       setFilteredTags([]);

@@ -22,6 +22,25 @@ export type Certificate = {
 
 }
 
+export type ProgramCertificate = {
+  id: string | null,
+  issue_year: string | null,
+  issue_authority: string | null,
+  certificate_name_arabic: string | null,
+  certificate_name_english: string | null,
+  certificate_country: string | null,
+  number_of_hours: string | null,
+  skill_level: string | null,
+  skill_type: string | null,
+  skill_category: string | null,
+  tags: Tag[] | null,
+  certificate_status: boolean | null,
+  club_id: number | null,
+  program_id: number | null,
+
+
+}
+
 export type SkillType = {
   id: string;
   skill_type_name: string;

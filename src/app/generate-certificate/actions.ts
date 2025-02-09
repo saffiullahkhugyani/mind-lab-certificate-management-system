@@ -1,4 +1,8 @@
+"use server"
+
 import { createClient } from "@/lib/supabase/server";
+import {  ProgramCertificate } from "@/types/types";
+import { revalidatePath } from "next/cache";
 
 export async function getSkillCatrgories() {
   try {
@@ -97,6 +101,29 @@ export async function getProgramsList() {
 
 
    } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function addProgramCertificate(formData: ProgramCertificate) {
+console.log("formData: ", formData);
+  try {
+    const supabase = createClient();
+    const { id, ...rest } = formData;
+    const certificateData = id === null ? rest : formData;
+  
+    const { data: addProgramCertificate, error: addProgramCertificateError } = await supabase
+      .from("program_certificate").insert(certificateData).select().single();
+    
+    if (addProgramCertificateError) throw new Error(addProgramCertificateError.message);
+
+    console.log("data interted to certificate master: ", addProgramCertificate);
+    revalidatePath("/generate-certificate");
+    return { success: true, data: addProgramCertificate };
+
+  
+  } catch (error: any) {
+    console.log("Error inserting data into certificate master: ", error)
     return { success: false, error: error.message };
   }
 }

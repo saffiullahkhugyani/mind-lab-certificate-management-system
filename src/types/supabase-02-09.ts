@@ -45,8 +45,8 @@ export type Database = {
           issue_authority: string | null
           issue_year: string | null
           number_of_hours: string | null
-          skill_level: string | null
           skill_category: string | null
+          skill_level: string | null
           skill_type: string | null
           tags: Json | null
         }
@@ -60,9 +60,9 @@ export type Database = {
           issue_authority?: string | null
           issue_year?: string | null
           number_of_hours?: string | null
+          skill_category?: string | null
           skill_level?: string | null
           skill_type?: string | null
-          skill_category?: string | null
           tags?: Json | null
         }
         Update: {
@@ -75,9 +75,9 @@ export type Database = {
           issue_authority?: string | null
           issue_year?: string | null
           number_of_hours?: string | null
+          skill_category?: string | null
           skill_level?: string | null
           skill_type?: string | null
-          skill_category?: string | null
           tags?: Json | null
         }
         Relationships: []
@@ -544,6 +544,7 @@ export type Database = {
           id: string
           mobile: string | null
           name: string | null
+          nationality: string | null
           profile_image_url: string | null
           role_id: number | null
           updated_at: string | null
@@ -555,6 +556,7 @@ export type Database = {
           id: string
           mobile?: string | null
           name?: string | null
+          nationality?: string | null
           profile_image_url?: string | null
           role_id?: number | null
           updated_at?: string | null
@@ -566,6 +568,7 @@ export type Database = {
           id?: string
           mobile?: string | null
           name?: string | null
+          nationality?: string | null
           profile_image_url?: string | null
           role_id?: number | null
           updated_at?: string | null
@@ -581,74 +584,74 @@ export type Database = {
         ]
       }
       program_certificate: {
-              Row: {
-                certificate_country: string | null
-                certificate_name_arabic: string | null
-                certificate_name_english: string | null
-                certificate_status: boolean | null
-                club_id: number | null
-                id: string
-                inserted_at: string
-                issue_authority: string | null
-                issue_year: string | null
-                number_of_hours: string | null
-                program_id: number | null
-                skill_category: string | null
-                skill_level: string | null
-                skill_type: string | null
-                tags: Json | null
-              }
-              Insert: {
-                certificate_country?: string | null
-                certificate_name_arabic?: string | null
-                certificate_name_english?: string | null
-                certificate_status?: boolean | null
-                club_id?: number | null
-                id?: string
-                inserted_at?: string
-                issue_authority?: string | null
-                issue_year?: string | null
-                number_of_hours?: string | null
-                program_id?: number | null
-                skill_category?: string | null
-                skill_level?: string | null
-                skill_type?: string | null
-                tags?: Json | null
-              }
-              Update: {
-                certificate_country?: string | null
-                certificate_name_arabic?: string | null
-                certificate_name_english?: string | null
-                certificate_status?: boolean | null
-                club_id?: number | null
-                id?: string
-                inserted_at?: string
-                issue_authority?: string | null
-                issue_year?: string | null
-                number_of_hours?: string | null
-                program_id?: number | null
-                skill_category?: string | null
-                skill_level?: string | null
-                skill_type?: string | null
-                tags?: Json | null
-              }
-              Relationships: [
-                {
-                  foreignKeyName: "program_certificate_club_id_fkey"
-                  columns: ["club_id"]
-                  isOneToOne: false
-                  referencedRelation: "clubs"
-                  referencedColumns: ["club_id"]
-                },
-                {
-                  foreignKeyName: "program_certificate_program_id_fkey"
-                  columns: ["program_id"]
-                  isOneToOne: false
-                  referencedRelation: "programs"
-                  referencedColumns: ["program_id"]
-                },
-              ]
-            }
+        Row: {
+          certificate_country: string | null
+          certificate_name_arabic: string | null
+          certificate_name_english: string | null
+          certificate_status: boolean | null
+          club_id: number | null
+          id: string
+          inserted_at: string
+          issue_authority: string | null
+          issue_year: string | null
+          number_of_hours: string | null
+          program_id: number | null
+          skill_category: string | null
+          skill_level: string | null
+          skill_type: string | null
+          tags: Json | null
+        }
+        Insert: {
+          certificate_country?: string | null
+          certificate_name_arabic?: string | null
+          certificate_name_english?: string | null
+          certificate_status?: boolean | null
+          club_id?: number | null
+          id?: string
+          inserted_at?: string
+          issue_authority?: string | null
+          issue_year?: string | null
+          number_of_hours?: string | null
+          program_id?: number | null
+          skill_category?: string | null
+          skill_level?: string | null
+          skill_type?: string | null
+          tags?: Json | null
+        }
+        Update: {
+          certificate_country?: string | null
+          certificate_name_arabic?: string | null
+          certificate_name_english?: string | null
+          certificate_status?: boolean | null
+          club_id?: number | null
+          id?: string
+          inserted_at?: string
+          issue_authority?: string | null
+          issue_year?: string | null
+          number_of_hours?: string | null
+          program_id?: number | null
+          skill_category?: string | null
+          skill_level?: string | null
+          skill_type?: string | null
+          tags?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_certificate_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["club_id"]
+          },
+          {
+            foreignKeyName: "program_certificate_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["program_id"]
+          },
+        ]
+      }
       programs: {
         Row: {
           club_id: number | null
@@ -918,6 +921,55 @@ export type Database = {
           },
         ]
       }
+      sponsor_student_support: {
+        Row: {
+          created_at: string
+          id: number
+          program_id: number
+          sponsor_id: number
+          student_id: string
+          support_status: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          program_id: number
+          sponsor_id: number
+          student_id?: string
+          support_status: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          program_id?: number
+          sponsor_id?: number
+          student_id?: string
+          support_status?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsor_student_support_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["program_id"]
+          },
+          {
+            foreignKeyName: "sponsor_student_support_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsor"
+            referencedColumns: ["sponsor_id"]
+          },
+          {
+            foreignKeyName: "sponsor_student_support_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_interest: {
         Row: {
           club_id: number | null
@@ -1023,32 +1075,34 @@ export type Database = {
         Row: {
           certificate_asserted: string | null
           certificate_image_url: string | null
+          certificate_name: string | null
           id: string
-          skill_id: number
+          skill_category: string | null
+          skill_tag: string | null
+          skill_type: string | null
           user_id: string
         }
         Insert: {
           certificate_asserted?: string | null
           certificate_image_url?: string | null
+          certificate_name?: string | null
           id: string
-          skill_id: number
+          skill_category?: string | null
+          skill_tag?: string | null
+          skill_type?: string | null
           user_id: string
         }
         Update: {
           certificate_asserted?: string | null
           certificate_image_url?: string | null
+          certificate_name?: string | null
           id?: string
-          skill_id?: number
+          skill_category?: string | null
+          skill_tag?: string | null
+          skill_type?: string | null
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "upload_certificate_skill_id_fkey"
-            columns: ["skill_id"]
-            isOneToOne: false
-            referencedRelation: "skills"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "upload_certificate_user_id_fkey"
             columns: ["user_id"]
