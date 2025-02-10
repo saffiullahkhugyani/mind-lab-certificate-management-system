@@ -142,24 +142,42 @@ export default function StudentPieChart({
       })
       .filter(Boolean); // Remove any null entries.
 
-    const FormatedChartCertData = certificates.map((cert) => {
-      const config =
-        skillTypeChartConfig[
-          cert.skill_type as keyof typeof skillTypeChartConfig
-        ];
+    const selectedCertificates = Object.values(
+      certificates
+        .filter((cert) => cert.skill_type && cert.number_of_hours) // Ensure valid data
+        .sort((a, b) => Number(b.number_of_hours) - Number(a.number_of_hours)) // Sort by hours (descending)
+        .reduce((acc, cert) => {
+          if (!acc[cert.skill_type!]) {
+            acc[cert.skill_type!] = cert; // Pick the first (highest hours) in each category
+          }
+          return acc;
+        }, {} as Record<string, CertificateDetails>) // Group by skill_type
+    );
 
-      if (!config) {
-        console.warn(`No config found for skillType: ${cert.skill_type}`);
-        return null;
-      }
+    // Format the selected certificates for the chart
+    const FormatedChartCertData = selectedCertificates
+      .map((cert) => {
+        const config =
+          skillTypeChartConfig[
+            cert.skill_type as keyof typeof skillTypeChartConfig
+          ];
 
-      return {
-        skillType: cert.skill_type,
-        hours: Number(cert.number_of_hours),
-        fill: "color" in config ? config.color : "default-color", // Fallback to a default color if `color` is not present.
-      };
-    });
+        if (!config) {
+          console.warn(`No config found for skillType: ${cert.skill_type}`);
+          return null;
+        }
 
+        return {
+          skillType: cert.skill_type,
+          hours: Number(cert.number_of_hours),
+          fill: "color" in config ? config.color : "default-color", // Fallback if color is missing
+        };
+      })
+      .filter(Boolean); // Remove any null values
+
+    console.log(FormatedChartCertData);
+
+    console.log(FormatedChartSkillLevelData);
     console.log(FormatedChartSkillTypeData);
     console.log(FormatedChartCertData);
 

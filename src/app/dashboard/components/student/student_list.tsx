@@ -72,6 +72,9 @@ export default function StudentList({
     const studentCertificate = certificateData?.filter((item) => {
       if (item.user_id === student.id) return item;
     });
+
+    console.log(studentCertificate);
+
     setStudentCertificates(studentCertificate!);
     setSelectedStudent(student);
   };
