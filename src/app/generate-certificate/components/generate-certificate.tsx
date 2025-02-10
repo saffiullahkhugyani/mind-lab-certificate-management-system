@@ -40,8 +40,8 @@ import { addProgramCertificate } from "../actions";
 
 // schema for form validation
 const FormSchema = z.object({
-  club_id: z.number().int().min(1, { message: "Club is required" }),
-  program_id: z.number().int().min(1, { message: "Program is required" }),
+  club_id: z.coerce.number().min(1, { message: "Club is required" }),
+  program_id: z.coerce.number().min(1, { message: "Program is required" }),
   issue_year: z.string().min(1, { message: "Issue year is required" }),
   issue_authority: z
     .string()

@@ -37,8 +37,12 @@ export type ProgramCertificate = {
   certificate_status: boolean | null,
   club_id: number | null,
   program_id: number | null,
+}
 
-
+export type ProgramCertificateMapping = {
+  student_id: string | null,
+  program_certificate_id: string | null,
+  rating: string | null,
 }
 
 export type SkillType = {

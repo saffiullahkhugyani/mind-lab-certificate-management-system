@@ -648,7 +648,47 @@ export type Database = {
                   referencedColumns: ["program_id"]
                 },
               ]
-            }
+      }
+      
+      program_certificate_student_mapping: {
+        Row: {
+          created_at: string
+          id: number
+          program_certificate_id: string | null
+          rating: string | null
+          student_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          program_certificate_id?: string | null
+          rating?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          program_certificate_id?: string | null
+          rating?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_certificate_student_mapping_program_certificate_id_fkey"
+            columns: ["program_certificate_id"]
+            isOneToOne: false
+            referencedRelation: "program_certificate"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_certificate_student_mapping_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       programs: {
         Row: {
           club_id: number | null
