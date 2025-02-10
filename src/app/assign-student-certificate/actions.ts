@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Profiles } from "@/types/customs";
 import { Json } from "@/types/supabase";
 import { ProgramCertificateMapping, Tag } from "@/types/types";
+import { revalidatePath } from "next/cache";
 
 export async function getStudents() {
   try {
@@ -80,6 +81,7 @@ export async function assignStudentCertificate(data: ProgramCertificateMapping) 
     
     if (programCertificateMappingError) throw new Error(programCertificateMappingError.message);
       
+      revalidatePath("/assign-program-certificate");
       return { success: true, data: programCertificateMapping };
   
   } catch (error: any) {
