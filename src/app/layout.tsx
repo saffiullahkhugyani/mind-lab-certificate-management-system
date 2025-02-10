@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 import "./globals.css";
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,6 +27,7 @@ export default async function RootLayout({
         <main className="flex min-h-screen flex-col  items-center bg-gray-200">
           {children}
         </main>
+        {user && <Footer />}
         <Toaster />
       </body>
     </html>
