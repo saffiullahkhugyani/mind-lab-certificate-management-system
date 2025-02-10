@@ -23,6 +23,9 @@ const Header = async () => {
               <Link href={"/create-certificate"}>Create Certificate</Link>
               <Link href={"/certificate-list"}>Certificate List</Link>
               <Link href={"/generate-certificate"}>Generate Certificate</Link>
+              <Link href={"/assign-student-certificate"}>
+                Generate Certificate
+              </Link>
               {/* <Link href={"/donation-management"}>Donation Management</Link>
               <Link href={"/program-management"}>Program Management</Link>
               <Link href={"/coupon-management"}>Coupon Management</Link> */}
