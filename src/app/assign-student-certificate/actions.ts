@@ -91,3 +91,42 @@ export async function assignStudentCertificate(data: ProgramCertificateMapping) 
 }
 
 
+export async function getAssignedProgramCertificate() {
+  try {
+    const supabase = createClient();
+
+      const { data: assignedCertificateMapping, error: ssignedCertificateMappingError } = await supabase
+        .from("program_certificate_student_mapping")
+        .select("*, profiles!inner(*), program_certificate!inner(*)");
+    
+    if (ssignedCertificateMappingError) throw new Error(ssignedCertificateMappingError.message);
+    console.log("here");
+    if (assignedCertificateMapping && assignedCertificateMapping.length > 0) {
+      const transformedData = assignedCertificateMapping.map((item) => {
+        return {
+          student_name: item.profiles.name,
+          certificate_name: item.program_certificate.certificate_name_english,
+          certificate_id: item.program_certificate.id,
+          student_id: item.profiles.id,
+          tags: Array.isArray(item.program_certificate.tags)
+            ? (item.program_certificate.tags as Tag[]).map((tag: Tag) => ({
+                tag_name: tag.tag_name,
+                hours: tag.hours,
+              }))
+            : [],
+          id: item.id
+          
+        };
+      });
+      console.log("Transformed Data: ", transformedData);
+      
+      return { success: true, data: transformedData };
+    
+    }
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+
+
