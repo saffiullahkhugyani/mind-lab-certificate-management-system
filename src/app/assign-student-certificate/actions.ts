@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Profiles } from "@/types/customs";
 import { Json } from "@/types/supabase";
 import { ProgramCertificateMapping, Tag } from "@/types/types";
+import { format } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 export async function getStudents() {
@@ -97,24 +98,28 @@ export async function getAssignedProgramCertificate() {
 
       const { data: assignedCertificateMapping, error: ssignedCertificateMappingError } = await supabase
         .from("program_certificate_student_mapping")
-        .select("*, profiles!inner(*), program_certificate!inner(*)");
+        .select("*, profiles!inner(*), program_certificate!inner(*, programs!inner(*))");
     
     if (ssignedCertificateMappingError) throw new Error(ssignedCertificateMappingError.message);
-    console.log("here");
+    
     if (assignedCertificateMapping && assignedCertificateMapping.length > 0) {
       const transformedData = assignedCertificateMapping.map((item) => {
         return {
-          student_name: item.profiles.name,
-          certificate_name: item.program_certificate.certificate_name_english,
-          certificate_id: item.program_certificate.id,
           student_id: item.profiles.id,
+          student_name: item.profiles.name,
+          program_certificate_id: item.program_certificate.id,
+          certificate_name: item.program_certificate.certificate_name_english,
+          program_name: item.program_certificate.programs.program_english_name,
+          number_of_hours: item.program_certificate.number_of_hours,
           tags: Array.isArray(item.program_certificate.tags)
             ? (item.program_certificate.tags as Tag[]).map((tag: Tag) => ({
                 tag_name: tag.tag_name,
                 hours: tag.hours,
               }))
             : [],
-          id: item.id
+          id: item.id,
+          rating: item.rating,
+          date: format(new Date(item.created_at), "MMM dd yyyy"),
           
         };
       });
@@ -124,6 +129,7 @@ export async function getAssignedProgramCertificate() {
     
     }
   } catch (error: any) {
+    console.log("error:", error.message);
     return { success: false, error: error.message };
   }
 }

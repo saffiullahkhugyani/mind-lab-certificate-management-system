@@ -6,6 +6,7 @@ import {
 } from "./actions";
 import AssignStudentCertificateForm from "./components/assign-student-certificate-form";
 import Certificate from "./components/certificate";
+import CertificateList from "./components/certificates-list";
 
 export default async function Page() {
   const studentList = await getStudents();
@@ -22,8 +23,11 @@ export default async function Page() {
         />
       </div>
 
-      <div className="w-[600px]">
-        <Certificate />
+      <div className="container">
+        <CertificateList
+          assignedCertificate={assignProgramCertificate?.data!}
+        />
+        {/* <Certificate /> */}
       </div>
     </>
   );

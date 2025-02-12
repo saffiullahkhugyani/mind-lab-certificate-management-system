@@ -154,3 +154,16 @@ export type StudentInterestData = {
   date_submitted?: string | null
   created_at?: string
 }
+
+export type AssignedProgramCertificate = {
+  id?: number
+  student_id?: string | null
+  program_certificate_id?: string | null
+  student_name?: string | null
+  certificate_name?: string | null
+  rating?: string | null
+  number_of_hours?: string | null
+  program_name?: string | null
+  tags?: Tag[] | null
+  date?: string
+}
