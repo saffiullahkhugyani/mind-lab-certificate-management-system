@@ -6,9 +6,9 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
-  const publicUrls = ['/reset-password']
+  const publicUrls = ['/reset-password', /^\/student-details\/[^/]+$/];
 
-  if (publicUrls.includes(request.nextUrl.pathname)) {
+  if (publicUrls.some((url) => (typeof url === 'string' ? url === request.nextUrl.pathname : url.test(request.nextUrl.pathname)))) {
     return supabaseResponse;
   }
 
