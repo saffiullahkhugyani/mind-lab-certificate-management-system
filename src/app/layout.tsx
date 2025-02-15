@@ -20,14 +20,32 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   return (
-    <html lang="en" className={GeistSans.variable}>
-      <body className="sticky top-0 bg-background text-foreground">
-        {user && <Header />}
-        <main className="flex min-h-screen flex-col  items-center bg-gray-200">
-          {children}
-        </main>
-        {user && <Footer />}
+    <html lang="en" className={`${GeistSans.variable} h-full`}>
+      <body className="flex min-h-full flex-col bg-background text-foreground">
+        <div className="flex flex-col min-h-screen">
+          {/* Header - sticky on desktop, fixed on mobile */}
+          {user && (
+            <div className="sticky top-0 z-50 w-full">
+              <Header />
+            </div>
+          )}
+
+          {/* Main content area */}
+          <main className="flex-grow w-full bg-gray-200 px-2 sm:px-4 md:px-6">
+            <div className="max-w-screen-2xl mx-auto w-full">{children}</div>
+          </main>
+
+          {/* Footer */}
+          {user && (
+            <div className="mt-auto w-full">
+              <Footer />
+            </div>
+          )}
+        </div>
+
+        {/* Toast notifications */}
         <Toaster />
       </body>
     </html>
