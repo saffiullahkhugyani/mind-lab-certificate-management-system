@@ -97,9 +97,11 @@ import { Printer, Share } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useReactToPrint } from "react-to-print";
-
+import ReactDOM from "react-dom";
+import { QRCodeSVG } from "qrcode.react";
 interface CertificateProps {
   certificate_name: string;
+  student_id: string;
   student_name: string;
   program: string;
   number_of_hours: string;
@@ -109,6 +111,7 @@ interface CertificateProps {
 
 const Certificate: React.FC<CertificateProps> = ({
   student_name,
+  student_id,
   certificate_name,
   program,
   number_of_hours,
@@ -146,6 +149,18 @@ const Certificate: React.FC<CertificateProps> = ({
     pdf.save(`${student_name}-Certificate-of-${program}`);
   };
 
+  // const StudentId = "1f698458-55f0-49cd-ad3a-ecc64bf146c2";
+  {
+    /*Development link*/
+  }
+  const profileLink = `http://localhost:3000/student-details/${student_id}`;
+
+  {
+    /*Production link*/
+  }
+  // const profileLink = `https://admin-cms-app.netlify.app/studen-details/${student_id}`;
+  console.log(profileLink);
+
   return (
     <>
       <div className="flex justify-end p-2 space-x-2">
@@ -175,8 +190,8 @@ const Certificate: React.FC<CertificateProps> = ({
           <div className="grid grid-rows-3 col-span-2 h-full">
             {/* Header with QR Code and Logo */}
             <div className="flex row-span-1 justify-between p-2">
-              <div className="bg-slate-300 flex-1 flex items-center justify-center">
-                QR Code Placeholder
+              <div className="flex-1 flex items-center pl-2">
+                {<QRCodeSVG value={profileLink} />}
               </div>
               <div className="flex-1 flex justify-end">
                 <Image

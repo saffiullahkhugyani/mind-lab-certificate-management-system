@@ -3,7 +3,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { AssignedProgramCertificate, Donation } from "@/types/types";
+import { AssignedProgramCertificate } from "@/types/types";
 import Certificate from "./certificate";
 
 interface CertificateListProps {
@@ -121,6 +121,7 @@ const CertificateList = ({ assignedCertificate }: CertificateListProps) => {
         {selected ? (
           <Certificate
             certificate_name={selected.certificate_name!}
+            student_id={selected.student_id!}
             student_name={selected.student_name!}
             program={selected.program_name!}
             number_of_hours={selected.number_of_hours!}
@@ -129,7 +130,7 @@ const CertificateList = ({ assignedCertificate }: CertificateListProps) => {
           />
         ) : (
           <p className="flex justify-center text-lg">
-            <strong>Please select a receipt to download</strong>
+            <strong>Please select a certificate to download</strong>
           </p>
         )}
       </div>

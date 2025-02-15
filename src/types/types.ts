@@ -128,6 +128,7 @@ export type Profiles = {
   name?: string | null
   profile_image_url?: string | null
   updated_at?: string | null
+  nationality?: string | null
 }
 
 export type Coupons = {
@@ -166,4 +167,20 @@ export type AssignedProgramCertificate = {
   program_name?: string | null
   tags?: Tag[] | null
   date?: string
+}
+
+export type CertificateDetails = {
+  user_id: string | null,
+  id: string | null,
+  issue_year: string | null,
+  issue_authority: string | null,
+  certificate_name_arabic: string | null,
+  certificate_name_english: string | null,
+  certificate_country: string | null,
+  number_of_hours: string | null,
+  skill_level: string | null,
+  skill_type: string | null,
+  tags: Tag[] | null,
+  certificate_status: boolean  | null,
+
 }

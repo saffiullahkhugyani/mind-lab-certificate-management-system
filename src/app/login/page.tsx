@@ -8,6 +8,7 @@ export default async function Login() {
   const { data: userSession } = await readUserSession();
 
   if (userSession.session) {
+    // return redirect("/student-details");
     return redirect("/create-certificate");
   }
 
