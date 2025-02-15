@@ -153,12 +153,12 @@ const Certificate: React.FC<CertificateProps> = ({
   {
     /*Development link*/
   }
-  const profileLink = `http://localhost:3000/student-details/${student_id}`;
+  // const profileLink = `http://localhost:3000/student-details/${student_id}`;
 
   {
     /*Production link*/
   }
-  // const profileLink = `https://admin-cms-app.netlify.app/student-details/${student_id}`;
+  const profileLink = `https://admin-cms-app.netlify.app/student-details/${student_id}`;
   console.log(profileLink);
 
   return (
