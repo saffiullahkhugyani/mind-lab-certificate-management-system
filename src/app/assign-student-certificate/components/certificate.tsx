@@ -158,7 +158,7 @@ const Certificate: React.FC<CertificateProps> = ({
   {
     /*Production link*/
   }
-  const profileLink = `https://admin-cms-app.netlify.app/studen-details/${student_id}`;
+  const profileLink = `https://admin-cms-app.netlify.app/student-details/${student_id}`;
   console.log(profileLink);
 
   return (
