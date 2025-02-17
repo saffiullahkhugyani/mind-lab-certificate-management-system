@@ -40,7 +40,10 @@ const FormSchema = z.object({
   student_age_group: z.string().optional(),
   student_id: z.string().min(1, { message: "Please select a student" }),
   certificate_id: z.string().min(1, { message: "Please select a certificate" }),
-  rating: z.string().optional(),
+  rating: z
+    .number()
+    .max(5, { message: "Rating cannot be more than 5" })
+    .optional(),
 });
 
 type FormField = z.infer<typeof FormSchema>;
@@ -66,11 +69,11 @@ export default function AssignStudentCertificateForm({
       const addProgramCertificateData = {
         student_id: data.student_id,
         program_certificate_id: data.certificate_id,
-        rating: data.rating ?? "",
+        rating: data.rating ?? 0,
       };
 
       const response = await assignStudentCertificate(
-        addProgramCertificateData
+        addProgramCertificateData!
       );
 
       console.log("response: ", response);
@@ -161,7 +164,29 @@ export default function AssignStudentCertificateForm({
                 <FormItem>
                   <FormLabel>Rating</FormLabel>
                   <FormControl>
-                    <Input placeholder="rating" {...field} />
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      max="5"
+                      placeholder="Enter rating (1-5)"
+                      value={field.value || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        // If input is empty, set rating as undefined (optional)
+                        if (value === "") {
+                          field.onChange(undefined);
+                          return;
+                        }
+
+                        // Parse the number and ensure it's valid
+                        const parsedValue = parseFloat(value);
+                        if (!isNaN(parsedValue)) {
+                          field.onChange(parsedValue);
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

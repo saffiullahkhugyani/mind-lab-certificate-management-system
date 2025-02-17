@@ -97,8 +97,8 @@ import { Printer, Share } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useReactToPrint } from "react-to-print";
-import ReactDOM from "react-dom";
 import { QRCodeSVG } from "qrcode.react";
+
 interface CertificateProps {
   certificate_name: string;
   student_id: string;
