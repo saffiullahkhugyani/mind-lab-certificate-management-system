@@ -16,7 +16,7 @@ interface StudentDetailsProps {
   clubInterest: number | null;
   programInterest: number | null;
   certificateEarned: number | null;
-  rating: string | null;
+  rating: number | null;
   enrolledProgramCount: number | null;
   programNotCompletedCount: number | null;
 }
@@ -115,7 +115,7 @@ export default function StudentDetails({
           title="Program not completed"
           value={programNotCompletedCount?.toString()!}
         />
-        <DetailsCard title="Rating" value={rating! ?? "N/A"} />
+        <DetailsCard title="Rating" value={rating?.toString()! ?? "0"} />
       </div>
     </div>
   );

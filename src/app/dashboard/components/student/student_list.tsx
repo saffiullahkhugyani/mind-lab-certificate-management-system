@@ -31,7 +31,7 @@ interface SelectedStudentData {
   programInterestCount: number;
   clubInterestCount: number;
   certificatesEarnedCount: number;
-  rating: string;
+  rating: number;
   enrolledProgramsCount: number;
   programsNotCompleted: number;
 }
@@ -115,17 +115,24 @@ export default function StudentList({
       certificateEarned?.filter((cert) => cert.student_id === student.id)
         .length ?? 0;
 
-    // Get the latest certificate or a specific one
-    const studentCertificateEarned = certificateEarned
-      ?.filter((cert) => cert.student_id === student.id)
-      ?.sort(
-        (a, b) =>
-          new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
-      ) // Sort by latest date
-      ?.at(0); // Pick the most recent certificate
+    // Get all earned certificates for the student that have a valid rating
+    const studentCertificatesEarned =
+      certificateEarned?.filter(
+        (cert) =>
+          cert.student_id === student.id &&
+          cert.rating !== null &&
+          cert.rating !== undefined
+      ) ?? [];
 
     // Extract rating from the selected certificate
-    const studentRating = studentCertificateEarned?.rating ?? null;
+    // Compute the average rating
+    const studentRating =
+      studentCertificatesEarned!.length > 0
+        ? studentCertificatesEarned!.reduce(
+            (sum, cert) => sum + (cert.rating ?? 0),
+            0
+          ) / studentCertificatesEarned!.length
+        : null; // Return null if no rating exists
 
     // Get enrolled programs count (same logic from StudentCard)
     const studentSupport = supportedStudents?.filter(

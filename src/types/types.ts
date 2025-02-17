@@ -224,7 +224,7 @@ export type ProgramCertificateStudentMapping = {
   created_at?: string;
   id?: number;
   program_certificate_id?: string | null;
-  rating?: string | null;
+  rating?: number | null;
   student_id?: string | null;
   program_certificate?: ProgramCertificate | null;
 }
