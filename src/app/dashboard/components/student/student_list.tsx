@@ -12,6 +12,7 @@ import {
   StudentInterestData,
   StudentSupport,
 } from "@/types/types";
+import { addMonths } from "date-fns";
 
 interface StudentListProps {
   students: Profiles[] | null;
@@ -145,8 +146,8 @@ export default function StudentList({
 
         // Calculate program end date
         const startDate = new Date(couponStartDate);
-        const programEndDate = new Date(startDate);
-        programEndDate.setDate(programEndDate.getDate() + num_of_coupons - 1);
+        const programEndDate = addMonths(startDate, num_of_coupons);
+        // programEndDate.setDate(programEndDate.getDate() + num_of_coupons);
 
         // Check if program period has ended
         const isProgramFinished = today > programEndDate;
@@ -156,6 +157,15 @@ export default function StudentList({
           (cert) =>
             cert.student_id === student.id &&
             cert.program_certificate?.program_id === program_id
+        );
+
+        console.log(
+          isProgramFinished,
+          " = ",
+          startDate,
+          today,
+          " ",
+          programEndDate
         );
 
         // Program is not completed if period has ended but no certificate exists
