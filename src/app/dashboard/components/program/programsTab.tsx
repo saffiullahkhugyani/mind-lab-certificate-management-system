@@ -117,7 +117,7 @@ export default function ProgramsTab({
           allocatedProgram?.remaining_allocated_amount?.toString()!
         }
         programSubsrciptionValue={allocatedProgram?.subscription_value!}
-        programEnrolledDate={allocatedProgram?.created_at!}
+        programEnrolledDate={allocatedProgram?.startDate!}
         enrolled={selectedFilter === "enrolled"}
         detailsLink={"https://www.iastem.ae"}
         isExpanded={expandedCardId === program.program_id}

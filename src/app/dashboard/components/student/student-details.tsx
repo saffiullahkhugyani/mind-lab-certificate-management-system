@@ -13,12 +13,24 @@ interface StudentDetailsProps {
   student: Profiles;
   onBack: () => void;
   studentCertificate: CertificateDetails[] | null;
+  clubInterest: number | null;
+  programInterest: number | null;
+  certificateEarned: number | null;
+  rating: string | null;
+  enrolledProgramCount: number | null;
+  programNotCompletedCount: number | null;
 }
 
 export default function StudentDetails({
   student,
   onBack,
   studentCertificate,
+  programInterest,
+  clubInterest,
+  certificateEarned,
+  rating,
+  enrolledProgramCount,
+  programNotCompletedCount,
 }: StudentDetailsProps) {
   const nationalityMap: Record<string, string> = {
     "4dd82bb4-964c-4b33-b857-b95b17507af0": "Brazil",
@@ -86,11 +98,24 @@ export default function StudentDetails({
         </div>
       </div>
       <div className="flex justify-evenly p-4 ">
-        <DetailsCard title="Program Interest" value="15" />
-        <DetailsCard title="Program Enrolled" value="9" />
-        <DetailsCard title="Certificates Earned" value="7" />
-        <DetailsCard title="Program not completed" value="2" />
-        <DetailsCard title="Rating" value="4.7" />
+        <DetailsCard
+          title="Program Interest"
+          value={programInterest?.toString()!}
+        />
+        <DetailsCard title="Club Interest" value={clubInterest?.toString()!} />
+        <DetailsCard
+          title="Program Enrolled"
+          value={enrolledProgramCount?.toString()!}
+        />
+        <DetailsCard
+          title="Certificates Earned"
+          value={certificateEarned?.toString()!}
+        />
+        <DetailsCard
+          title="Program not completed"
+          value={programNotCompletedCount?.toString()!}
+        />
+        <DetailsCard title="Rating" value={rating! ?? "N/A"} />
       </div>
     </div>
   );

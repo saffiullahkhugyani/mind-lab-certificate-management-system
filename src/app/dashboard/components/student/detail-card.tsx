@@ -7,7 +7,7 @@ interface DetailsCardProps {
 
 export default function DetailsCard({ title, value }: DetailsCardProps) {
   return (
-    <div className=" flex flex-col items-center justify-items-center p-4 bg-gray-100 shadow-md rounded-sm font-bold text-xl">
+    <div className=" flex flex-col items-center justify-items-center p-2 bg-gray-100 shadow-md rounded-sm font-bold text-xl">
       <p>{title}</p>
       <p>{value}</p>
     </div>

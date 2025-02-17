@@ -1,7 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Profiles } from "@/types/customs";
-import { CertificateDetails, Programs, StudentSupport } from "@/types/types";
+import {
+  CertificateDetails,
+  ProgramCertificateStudentMapping,
+  Programs,
+  StudentInterestData,
+  StudentSupport,
+} from "@/types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StudentList from "./student_list";
 import {
@@ -18,6 +24,8 @@ interface StudentProps {
   certificateData: CertificateDetails[] | null;
   programs: Programs[] | null;
   sponsorId: number;
+  studentInterest: StudentInterestData[] | null;
+  certificateEarned: ProgramCertificateStudentMapping[] | null;
 }
 
 export default function StudentTabs({
@@ -26,6 +34,8 @@ export default function StudentTabs({
   certificateData,
   programs,
   sponsorId,
+  studentInterest,
+  certificateEarned,
 }: StudentProps) {
   const [notSupported, setNotSupported] = useState<Profiles[] | null>(students);
   const [supported, setStudentSupport] = useState<Profiles[] | null>(null);
@@ -136,6 +146,8 @@ export default function StudentTabs({
               onCancelSupport={handleCancelSupport}
               programs={programs}
               onAssignProgram={handleAssignProgram}
+              certificateEarned={certificateEarned}
+              studentInterest={studentInterest}
             />
           </div>
         </TabsContent>
@@ -150,6 +162,8 @@ export default function StudentTabs({
               onCancelSupport={handleCancelSupport}
               programs={programs}
               onAssignProgram={handleAssignProgram}
+              studentInterest={studentInterest}
+              certificateEarned={certificateEarned}
             />
           </div>
         </TabsContent>

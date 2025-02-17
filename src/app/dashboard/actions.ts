@@ -23,31 +23,54 @@ export async function studentList() {
         
         if (certificateDetailsError) throw new Error(certificateDetailsError.message);
         
-        const certificateData = certificateDetails.map((certificate) => {
+      const certificateData = certificateDetails.map((certificate) => {
            
-            const { user_id, certificate_master } = certificate;
+        const { user_id, certificate_master } = certificate;
 
-            /// Safely handle the `tags` field
-            const tags = Array.isArray(certificate_master.tags)
-                ? (certificate_master.tags as Tag[]).map((tag) => ({
-                    tag_name: tag!.tag_name,
-                    hours: tag!.hours,
-                }))
-            : []; // Fallback if `tags` is not an array
+        /// Safely handle the `tags` field
+        const tags = Array.isArray(certificate_master.tags)
+          ? (certificate_master.tags as Tag[]).map((tag) => ({
+            tag_name: tag!.tag_name,
+            hours: tag!.hours,
+          }))
+          : []; // Fallback if `tags` is not an array
 
         return {
-            user_id,
-            ...certificate_master, // Spread all other properties from `certificate_master`
-            tags, // Replace tags with the processed tags array
-  };
+          user_id,
+          ...certificate_master, // Spread all other properties from `certificate_master`
+          tags, // Replace tags with the processed tags array
+        };
            
-        })
+      });
+
+      {/* Student screen information details fetching */}
+      const { data: studentInterest, error: studentInterestError } = await supabase
+        .from("student_interest")
+        .select();
+      
+      if (studentInterestError) throw new Error(studentInterestError.message);
+
+      // Extract emails from studentList
+        const studentEmails = new Set(studentList.map(student => student.email));
+
+        // Filter studentInterest where user_email exists in studentList
+        const filteredStudentInterest = studentInterest.filter(interest =>
+            interest.user_email && studentEmails.has(interest.user_email)
+        );
+
+      const { data: certificateEarned, error: certificateEarnedError } = await supabase
+        .from("program_certificate_student_mapping")
+        .select("*, program_certificate!inner(*)");
+      
+      if (certificateEarnedError) throw new Error(certificateEarnedError.message);
 
         return {
-            success: true, data: {
-                studentList: studentList,
-                certificateData: certificateData
-            }
+          success: true, data: {
+            studentList: studentList,
+            certificateData: certificateData,
+            studentInterest: filteredStudentInterest,
+            certificateEarned: certificateEarned,
+          }
         };
 
     } catch (error: any) {
@@ -221,7 +244,7 @@ export default async function sponsorData() {
           const lastCouponExpiryDate = await lastCouponExpiry(userId!, log.program_id!);
           return {
             ...log,
-            lastCouponExpiryDate
+            ...lastCouponExpiryDate,
           };
         })
       );
@@ -298,7 +321,10 @@ async function lastCouponExpiry(sponsorUid: string, programId: number) {
 
   // console.log("End Date: ", format(expiryDate, "MMM dd, yyyy").toUpperCase());
 
-  return format(expiryDate, "MMM dd, yyyy");
+  return {
+    startDate: format(startDate, "MMM dd, yyyy"),
+    lastCouponExpiryDate: format(expiryDate, "MMM dd, yyyy")
+  };
 }
 
 
@@ -324,6 +350,7 @@ async function studentSupportData(sponsorUid: string) {
 
   couponDonationLink.forEach(donationData => {
     const couponId = donationData.coupons?.coupon_id;
+    const couponStartDate = donationData.coupons?.start_date;
   
     // Find all user mappings for this coupon
     const matchingMappings = couponUserMapping.filter(
@@ -338,7 +365,8 @@ async function studentSupportData(sponsorUid: string) {
           coupon_id: couponId!,
           donation_id: donationData.donation.donation_id,
           program_id: donationData.coupons?.program_id ?? null,
-          num_of_coupons: donationData.num_of_coupons
+          num_of_coupons: donationData.num_of_coupons,
+          couponStartDate: couponStartDate!,
         });
       });
     

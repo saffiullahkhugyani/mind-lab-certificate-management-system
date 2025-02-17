@@ -1,3 +1,4 @@
+import { Json } from "./supabase";
 
 export type Tag = {
   tag_name: string;
@@ -145,6 +146,7 @@ export type AllocatedProgramData = {
   created_at: string | null;
   allocationDataCount?: number | null;
   lastCouponExpiryDate?: string | null;
+  startDate?: string | null;
 
 
 }
@@ -157,6 +159,7 @@ export type StudentSupport = {
   num_of_coupons: number | null;
   totalCoupons?: number | null;
   numOfEnrolledPrograms?: number | null;
+  couponStartDate?: string | null;
 }
 
 export type CertificateDetails = {
@@ -197,4 +200,31 @@ export type DonationAllocationLogs = {
     total_remaining_donation?: number | null,
     total_allocated_donation?: number | null,
   }
+}
+
+export type ProgramCertificate = {
+certificate_country?: string | null
+    certificate_name_arabic?: string | null
+    certificate_name_english?: string | null
+    certificate_status?: boolean | null
+    club_id?: number | null
+    id?: string
+    inserted_at?: string
+    issue_authority?: string | null
+    issue_year?: string | null
+    number_of_hours?: string | null
+    program_id?: number | null
+    skill_category?: string | null
+    skill_level?: string | null
+    skill_type?: string | null
+    tags?: Json | null
+}
+
+export type ProgramCertificateStudentMapping = {
+  created_at?: string;
+  id?: number;
+  program_certificate_id?: string | null;
+  rating?: string | null;
+  student_id?: string | null;
+  program_certificate?: ProgramCertificate | null;
 }
