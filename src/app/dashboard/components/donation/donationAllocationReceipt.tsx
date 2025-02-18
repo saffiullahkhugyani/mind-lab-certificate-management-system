@@ -75,7 +75,7 @@ export default function DonationAllocationReceipt({
         />
 
         {/* Date Filter */}
-        <div className="flex mb-4 gap-2">
+        <div className="grid grid-cols-2 mb-4 gap-2">
           <Input
             type="date"
             placeholder="Start Date"
@@ -97,7 +97,14 @@ export default function DonationAllocationReceipt({
             onValueChange={(value) => handleReceiptSelection(Number(value))}
           >
             {filteredReceipt?.map((receipt) => (
-              <div key={receipt.id} className="flex items-center space-x-2 m-2">
+              <div
+                key={receipt.id}
+                className={`flex items-center space-x-2 p-2 ${
+                  selectedReceipt?.id === receipt.id
+                    ? "bg-[#00784787] text-white rounded-sm" // Selected Item Styling
+                    : "bg-white" // Default Styling
+                }`}
+              >
                 <RadioGroupItem
                   value={receipt.id?.toString()!}
                   id={`r-${receipt.id}`}

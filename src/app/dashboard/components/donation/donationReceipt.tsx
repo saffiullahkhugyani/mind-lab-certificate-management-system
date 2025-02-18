@@ -76,7 +76,7 @@ const DonationReceipt = ({
         />
 
         {/* Date Filter */}
-        <div className="flex mb-4 gap-2">
+        <div className="grid grid-cols-2 mb-4 gap-2">
           <Input
             type="date"
             placeholder="Start Date"
