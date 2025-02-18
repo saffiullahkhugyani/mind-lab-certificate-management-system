@@ -162,7 +162,7 @@ export type AssignedProgramCertificate = {
   program_certificate_id?: string | null
   student_name?: string | null
   certificate_name?: string | null
-  rating?: string | null
+  rating?: number | null
   number_of_hours?: string | null
   program_name?: string | null
   tags?: Tag[] | null
