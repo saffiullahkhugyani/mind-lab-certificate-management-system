@@ -1,14 +1,19 @@
 // SummaryCard.jsx
 interface SummaryCardProps {
-  label: String;
-  value: String;
+  label: string;
+  value: string;
+  className?: string; // Optional prop for custom classes
 }
 
-export default function SummaryCard({ label, value }: SummaryCardProps) {
+export default function SummaryCard({
+  label,
+  value,
+  className,
+}: SummaryCardProps) {
   return (
-    <div className="bg-gray-100 shadow-md rounded-sm p-4 text-center">
-      <p className="text-gray-500 text-sm">{label}</p>
-      <p className="text-2xl font-semibold">{value}</p>
+    <div className={`shadow-md rounded-sm p-4 text-center ${className}`}>
+      <p className="font-bold text-md">{label}</p>
+      <p className="text-3xl font-bold">{value}</p>
     </div>
   );
 }

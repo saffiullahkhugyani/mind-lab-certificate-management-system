@@ -13,7 +13,7 @@ export default function ProgramCard({
   date,
 }: ProgramCardProps) {
   return (
-    <div className="bg-gray-100 shadow-md rounded-lg p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 mr-2">
+    <div className="border border-[#007847] bg-[#00784714] shadow-md rounded-md p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 mr-2">
       <div>
         <h3 className="text-lg font-semibold">{programName}</h3>
         <p className="text-sm text-gray-500">Donation of: {donation}</p>

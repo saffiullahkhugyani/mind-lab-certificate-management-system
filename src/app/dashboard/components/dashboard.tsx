@@ -70,26 +70,40 @@ export default function Dashboard({
         {/* Sponsor Image */}
         <Avatar className="w-32 h-32 border-white border-2 rounded-none">
           <AvatarImage
-            src={sponsor?.image ? sponsor?.image : "/no-user-image.jpeg"}
+            src={sponsor?.image || "/no-user-image.jpeg"}
             alt="@SP"
+            className="w-full h-full object-cover rounded-none aspect-square"
           />
-          <AvatarFallback className="font-bold text-5xl">
-            {sponsor?.name!.charAt(0).toUpperCase()}
+          <AvatarFallback className="flex items-center justify-center w-full h-full bg-gray-200 text-gray-700 font-bold text-5xl">
+            {sponsor?.name?.charAt(0).toUpperCase() || "?"}
           </AvatarFallback>
         </Avatar>
 
         <div className="text-center mt-4">
-          <h2 className="text-xl font-semibold">{sponsor?.name}</h2>
-          <p className="text-gray-500">{sponsor?.email}</p>
+          <h2 className="text-xl font-semibold">
+            {sponsor?.name || "Unknown Sponsor"}
+          </h2>
+          <p className="text-gray-500">
+            {sponsor?.email || "No email available"}
+          </p>
         </div>
       </div>
+
       {/* Tab Navigation */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
         <TabsList className="flex justify-center space-x-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="donations">Donations</TabsTrigger>
-          <TabsTrigger value="program">Program</TabsTrigger>
-          <TabsTrigger value="student">Student</TabsTrigger>
+          <TabsTrigger value="overview" variant={"customOne"}>
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="donations" variant={"customOne"}>
+            Donations
+          </TabsTrigger>
+          <TabsTrigger value="program" variant={"customOne"}>
+            Program
+          </TabsTrigger>
+          <TabsTrigger value="student" variant={"customOne"}>
+            Student
+          </TabsTrigger>
         </TabsList>
 
         {/* Tab Content */}

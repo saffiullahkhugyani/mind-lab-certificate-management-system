@@ -100,7 +100,11 @@ const DonationReceipt = ({
             {filteredReceipt?.map((receipt) => (
               <div
                 key={receipt.donation_id}
-                className="flex items-center space-x-2 m-2"
+                className={`flex items-center space-x-2 p-2 ${
+                  selectedReceipt?.donation_id === receipt.donation_id
+                    ? "bg-[#00784787] text-white rounded-sm" // Selected Item Styling
+                    : "bg-white" // Default Styling
+                }`}
               >
                 <RadioGroupItem
                   value={receipt.donation_id?.toString()!}

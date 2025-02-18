@@ -41,7 +41,16 @@ export default function DonationTab({
         <h2 className="text-xl font-semibold mb-4">Donation Summary</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {donationSummaryData.map((item, index) => (
-            <SummaryCard key={index} label={item.label} value={item.value} />
+            <SummaryCard
+              key={index}
+              label={item.label}
+              value={item.value}
+              className={
+                index < 2
+                  ? "border border-red-300 bg-[#9e1b3214]"
+                  : "border border-[#007847] bg-[#00784714]"
+              }
+            />
           ))}
         </div>
       </div>

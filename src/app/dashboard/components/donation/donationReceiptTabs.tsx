@@ -15,13 +15,25 @@ export default function DonationReceiptTabs({
   allocatedProgramData,
 }: DonationReceiptProps) {
   return (
-    <div>
+    <div className="bg-white">
       {/* Tabs for Donation Receipt and Donation Allocation */}
       <Tabs defaultValue="receipt" className="w-full">
         {/* Tabs Navigation */}
-        <TabsList className="flex">
-          <TabsTrigger value="receipt">Donation Receipt</TabsTrigger>
-          <TabsTrigger value="allocation">Donation Allocation</TabsTrigger>
+        <TabsList className="flex border-primary" variant={"underline"}>
+          <TabsTrigger
+            value="receipt"
+            variant={"underline"}
+            className=" text-lg data-[state=active]:bg-[#007847] text-black font-bold data-[state=active]:text-white"
+          >
+            Donation Receipt
+          </TabsTrigger>
+          <TabsTrigger
+            value="allocation"
+            variant={"underline"}
+            className=" text-lg data-[state=active]:bg-[#007847] text-black font-bold data-[state=active]:text-white"
+          >
+            Donation Allocation
+          </TabsTrigger>
         </TabsList>
 
         {/* Tabs Content */}

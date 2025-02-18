@@ -50,13 +50,13 @@ const DonationAllocationReceiptDetail = ({
     <>
       <div className="flex justify-end p-2 space-x-2">
         <Button variant={"outline"} onClick={() => invoicePrint()}>
-          <Printer />
+          <Printer color="#286e34" />
         </Button>
         <Button variant={"outline"} onClick={handleDownloadPdf}>
           <Share />
         </Button>
       </div>
-      <div className=" mx-auto bg-white border rounded-lg shadow-lg p-3">
+      <div className=" mx-auto bg-[#f9f9f9] border border-[#007847] rounded-lg shadow-lg p-3">
         <div ref={contentRef} className="p-3">
           {/* Header */}
           <h1 className="text-2xl font-bold mb-4">Donation Allocation</h1>
@@ -89,7 +89,7 @@ const DonationAllocationReceiptDetail = ({
           {/* Items Table */}
           <table className="w-full border-t border-b mb-6">
             <thead>
-              <tr className="bg-gray-200">
+              <tr className="bg-[#00784740]">
                 <th className="py-2 text-left px-2">Program Name</th>
                 <th className="py-2 text-left px-2">Program Period</th>
                 <th className="py-2 text-center">Number of Coupons</th>
