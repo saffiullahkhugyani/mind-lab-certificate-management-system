@@ -9,11 +9,23 @@ import StudentDetailCard from "./student-datacard";
 interface StudentDetailProps {
   student: Profiles | null;
   certificateData: CertificateDetails[] | null;
+  programInterestCount: number;
+  clubInterestCount: number;
+  certificateEarnedCount: number;
+  programEnrolledCount: number;
+  programNotCompletedCount: number;
+  rating: number;
 }
 
 export default function StudentDetails({
   student,
   certificateData,
+  programInterestCount,
+  clubInterestCount,
+  programEnrolledCount,
+  certificateEarnedCount,
+  programNotCompletedCount,
+  rating,
 }: StudentDetailProps) {
   return (
     <div className="bg-white shadow-md rounded-md mx-2 my-2 sm:m-4">
@@ -79,30 +91,33 @@ export default function StudentDetails({
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 p-2 sm:p-4">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 p-2 sm:p-4">
         <StudentDetailCard
           title="Program Interest"
-          value="15"
+          value={programInterestCount!}
           // className="text-sm sm:text-base"
         />
+
+        <StudentDetailCard title="CLub Interest" value={clubInterestCount!} />
+
         <StudentDetailCard
           title="Program Enrolled"
-          value="9"
+          value={programEnrolledCount!}
           // className="text-sm sm:text-base"
         />
         <StudentDetailCard
           title="Certificates Earned"
-          value="7"
+          value={certificateEarnedCount!}
           // className="text-sm sm:text-base"
         />
         <StudentDetailCard
           title="Program not completed"
-          value="2"
+          value={programNotCompletedCount}
           // className="text-sm sm:text-base"
         />
         <StudentDetailCard
           title="Rating"
-          value="4.7"
+          value={rating!}
           // className="text-sm sm:text-base"
         />
       </div>

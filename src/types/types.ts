@@ -156,6 +156,17 @@ export type StudentInterestData = {
   created_at?: string
 }
 
+export type StudentSupport = {
+  user_id: string | null;
+  coupon_id: number | null;
+  donation_id: number;
+  program_id: number | null;
+  num_of_coupons: number | null;
+  totalCoupons?: number | null;
+  numOfEnrolledPrograms?: number | null;
+  couponStartDate?: string | null;
+}
+
 export type AssignedProgramCertificate = {
   id?: number
   student_id?: string | null

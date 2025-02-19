@@ -9,6 +9,12 @@ export default async function Page({ params }: { params: { id: string } }) {
     <StudentDetails
       student={studentData.data?.studentList.at(0)!}
       certificateData={studentData.data?.certificateData!}
+      programInterestCount={studentData.data?.programInterestCount!}
+      clubInterestCount={studentData.data?.clubInterestCount!}
+      programEnrolledCount={studentData.data?.programEnrolledCount!}
+      certificateEarnedCount={studentData.data?.certificateEarnedCount!}
+      programNotCompletedCount={studentData.data?.programNotCompleted!}
+      rating={studentData.data?.studentRating!}
     />
   );
 }
