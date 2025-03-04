@@ -23,11 +23,12 @@ export async function emailLogin(data: { email: string; password: string }) {
         // Optionally revalidate the home page cache if needed
         // revalidatePath('/', 'layout');
 
-        redirect("/create-certificate");
     } catch (error) {
         console.error("Unexpected error during login:", error);
         redirect("/login?message=An unexpected error occurred");
     }
+
+    redirect("/create-certificate");
 }
 
 /**
