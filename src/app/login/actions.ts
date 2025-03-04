@@ -28,7 +28,8 @@ export async function emailLogin(data: { email: string; password: string }) {
         redirect("/login?message=An unexpected error occurred");
     }
 
-    redirect("/create-certificate");
+    // redirect to donation management
+    redirect("/donation-management");
 }
 
 /**
