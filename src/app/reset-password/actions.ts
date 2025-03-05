@@ -25,7 +25,6 @@ export async function updatePassword(data: {
         });
 
         if (sessionError) {
-            console.log(sessionError);
             throw new Error(`${sessionError}`);
         }
 

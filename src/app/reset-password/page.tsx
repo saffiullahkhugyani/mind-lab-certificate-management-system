@@ -101,6 +101,7 @@ export default function LoginForm() {
           variant: "success",
         });
       } else {
+        console.error(res?.error);
         toast({
           description: res?.error || "An error occurred",
           variant: "destructive",
