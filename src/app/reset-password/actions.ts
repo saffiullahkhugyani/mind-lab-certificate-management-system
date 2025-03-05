@@ -25,7 +25,7 @@ export async function updatePassword(data: {
         });
 
         if (sessionError) {
-            throw new Error(`${sessionError}`);
+            throw new Error("Failed to set the session");
         }
 
         // // optional validate user accessToken
