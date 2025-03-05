@@ -87,7 +87,7 @@ export default function DonationReceiptForm({
         donation_description: data.donation_description,
         bank_charges: data.bank_charges,
         date: data.donation_date,
-        amount: data.amount,
+        amount: data.amount - data.bank_charges,
       };
 
       // inserting donation
