@@ -324,7 +324,7 @@ const CreateCertificate = ({
 
         // adding mapping for certificates
         const certificateMapping = await addCertificateMapping({
-          userId: v1Certificate?.profiles?.id!,
+          studentId: v1Certificate?.students?.id!,
           certificateV1Id: v1Certificate?.id!,
           certificateV2Id: v2Id!,
         });

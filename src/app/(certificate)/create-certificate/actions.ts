@@ -163,9 +163,9 @@ export async function updateCertificate(formData: Certificate) {
 
 }
 
-export async function addCertificateMapping({ userId, certificateV1Id, certificateV2Id }:
-  { userId: string, certificateV1Id: string, certificateV2Id: string }) {
-  console.log("User Id: ", userId);
+export async function addCertificateMapping({ studentId, certificateV1Id, certificateV2Id }:
+  { studentId: string, certificateV1Id: number, certificateV2Id: string }) {
+  console.log("User Id: ", studentId);
   console.log("V1 Id: ", certificateV1Id);
   console.log("V2 Id:", certificateV2Id);
   try {
@@ -173,7 +173,7 @@ export async function addCertificateMapping({ userId, certificateV1Id, certifica
     const supabase = createClient();
     const { data: addCertificateMapping, error: certificateMappingError } = await supabase
       .from("certificate_v1_v2_mapping")
-      .insert({ user_id: userId, v1_certificate_id: certificateV1Id, v2_certificate_id: certificateV2Id }).select();
+      .insert({ student_id: studentId, v1_certificate_id: certificateV1Id, v2_certificate_id: certificateV2Id }).select();
 
     if (certificateMappingError) throw new Error(certificateMappingError.message);
 
@@ -190,7 +190,7 @@ export async function addCertificateMapping({ userId, certificateV1Id, certifica
 
 }
 
-export async function certificateAsserted({ certificateV1Id }: { certificateV1Id: string }) {
+export async function certificateAsserted({ certificateV1Id }: { certificateV1Id: number }) {
 
   try {
     const supabase = createClient();

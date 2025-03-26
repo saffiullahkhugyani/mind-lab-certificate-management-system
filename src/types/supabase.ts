@@ -85,28 +85,28 @@ export type Database = {
       certificate_v1_v2_mapping: {
         Row: {
           id: number
-          user_id: string | null
-          v1_certificate_id: string | null
+          student_id: string | null
+          v1_certificate_id: number | null
           v2_certificate_id: string | null
         }
         Insert: {
           id?: number
-          user_id?: string | null
-          v1_certificate_id?: string | null
+          student_id?: string | null
+          v1_certificate_id?: number | null
           v2_certificate_id?: string | null
         }
         Update: {
           id?: number
-          user_id?: string | null
-          v1_certificate_id?: string | null
+          student_id?: string | null
+          v1_certificate_id?: number | null
           v2_certificate_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "certificate_v1_v2_mapping_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "certificate_v1_v2_mapping_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
           {
