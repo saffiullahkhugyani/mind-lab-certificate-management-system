@@ -2,12 +2,12 @@ import React from "react";
 import StudentPieChart from "./student-pie-chart";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { CertificateDetails, Profiles } from "@/types/types";
+import { CertificateDetails, Profiles, Students } from "@/types/types";
 import { Label } from "@/components/ui/label";
 import StudentDetailCard from "./student-datacard";
 
 interface StudentDetailProps {
-  student: Profiles | null;
+  student: Students | null;
   certificateData: CertificateDetails[] | null;
   programInterestCount: number;
   clubInterestCount: number;
@@ -36,7 +36,7 @@ export default function StudentDetails({
           <CardHeader className="flex flex-col items-center p-3 sm:p-4">
             <Avatar className="w-20 h-20 sm:w-32 md:w-40 sm:h-32 md:h-40 rounded-none border">
               <AvatarImage
-                src={student?.profile_image_url!}
+                src={student?.image_url!}
                 alt={student?.name || "Profile"}
               />
               <AvatarFallback className="font-bold text-2xl sm:text-4xl md:text-5xl rounded-none bg-gray-300">
@@ -61,7 +61,7 @@ export default function StudentDetails({
                   Age Group
                 </Label>
                 <div className="p-1.5 sm:p-2 bg-gray-300 rounded-md text-xs sm:text-sm text-gray-800">
-                  {student?.age || "N/A"}
+                  {student?.age_group || "N/A"}
                 </div>
               </div>
               <div className="space-y-1">

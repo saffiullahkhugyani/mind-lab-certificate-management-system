@@ -9,7 +9,7 @@ async function getCertificateList() {
   const supabase = createClient();
   const { data: uploadedCertificates } = await supabase
     .from("upload_certificate")
-    .select(`id, certificate_image_url ,profiles(*)`);
+    .select(`id, certificate_image_url ,students(*)`);
 
   return uploadedCertificates;
 }

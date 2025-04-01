@@ -23,7 +23,7 @@ export default async function UploadedCertificates({
 
   const { data } = await supabase
     .from("upload_certificate")
-    .select(`id, certificate_image_url ,profiles(*)`)
+    .select(`id, certificate_image_url ,students(*)`)
     .eq("id", certificateId)
     .single();
 
@@ -40,7 +40,7 @@ export default async function UploadedCertificates({
           <div className="flex flex-col">
             <h2 className="font-bold text-md">Certificate ID: {data?.id}</h2>
             <span className="text-neutral-500 text-sm">
-              Student Name: {data?.profiles?.name}
+              Student Name: {data?.students?.name}
             </span>
           </div>
         </Card>

@@ -18,7 +18,7 @@ export default function CertificateCardItem(props: CustomUploadedCertificate) {
             <div className="flex flex-col">
               <h2 className="font-bold text-md">Certificate ID: {props.id}</h2>
               <span className="text-neutral-500 text-sm font-bold">
-                Student Name: {props.profiles!.name}
+                Student Name: {props.students!.name}
               </span>
             </div>
           </div>

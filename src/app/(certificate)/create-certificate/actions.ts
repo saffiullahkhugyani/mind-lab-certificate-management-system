@@ -18,6 +18,8 @@ export async function getCertificateList() {
 
     if (uploadedCertificatesError) throw new Error(uploadedCertificatesError.message);
 
+    console.log("Uploaded certificates:", uploadedCertificates);
+
     return { success: true, data: uploadedCertificates };
 
   } catch (error: any) {

@@ -4,25 +4,25 @@ import { addMonths } from "date-fns";
 
 export async function getStudentData(studentId: string) {
     const supabase = createClient()
-    
-    try { 
+
+    try {
         const { data: studentDetail, error: studentDetailError } = await supabase
             .from("profiles")
             .select("*")
             .eq("id", studentId);
-        
+
         if (studentDetailError) throw new Error(studentDetailError.message);
-        
+
         const { data: certificateDetails, error: certificateDetailsError } = await supabase
             .from('certificate_v1_v2_mapping')
-            .select("user_id, certificate_master!inner(*)")
-            .eq("user_id", studentId);
-        
+            .select("student_id, certificate_master!inner(*)")
+            .eq("student_id", studentId);
+
         if (certificateDetailsError) throw new Error(certificateDetailsError.message);
-        
+
         const certificateData = certificateDetails.map((certificate) => {
-           
-            const { user_id, certificate_master } = certificate;
+
+            const { student_id, certificate_master } = certificate;
 
             /// Safely handle the `tags` field
             const tags = Array.isArray(certificate_master.tags)
@@ -33,29 +33,29 @@ export async function getStudentData(studentId: string) {
                 : []; // Fallback if `tags` is not an array
 
             return {
-                user_id,
+                student_id,
                 ...certificate_master, // Spread all other properties from `certificate_master`
                 tags, // Replace tags with the processed tags array
             };
-           
+
         });
 
 
-         {/* Student screen information details fetching */}
+        {/* Student screen information details fetching */ }
         const { data: studentInterest, error: studentInterestError } = await supabase
             .from("student_interest")
             .select()
             .in("user_email", studentDetail.map(s => s.email));
-      
+
         if (studentInterestError) throw new Error(studentInterestError.message);
 
         // Count program interests (non-null program entries)
-    const programInterestCount =
-      studentInterest?.filter(
-        (interest) =>
-          interest.user_email === studentDetail.at(0)!.email && interest.program_id !== null
-      ).length ?? 0;
-        
+        const programInterestCount =
+            studentInterest?.filter(
+                (interest) =>
+                    interest.user_email === studentDetail.at(0)!.email && interest.program_id !== null
+            ).length ?? 0;
+
         // Count club interest
         const clubInterestCount =
             studentInterest?.filter(
@@ -63,19 +63,19 @@ export async function getStudentData(studentId: string) {
                     interest.user_email === studentDetail.at(0)!.email && interest.club_id !== null
             ).length ?? 0;
 
-    //   // Extract emails from studentList
-    //     const studentEmails = new Set(studentDetail.map(student => student.email));
+        //   // Extract emails from studentList
+        //     const studentEmails = new Set(studentDetail.map(student => student.email));
 
-    //     // Filter studentInterest where user_email exists in studentList
-    //     const filteredStudentInterest = studentInterest.filter(interest =>
-    //         interest.user_email && studentEmails.has(interest.user_email)
-    //     );
+        //     // Filter studentInterest where user_email exists in studentList
+        //     const filteredStudentInterest = studentInterest.filter(interest =>
+        //         interest.user_email && studentEmails.has(interest.user_email)
+        //     );
 
         const { data: certificateEarned, error: certificateEarnedError } = await supabase
             .from("program_certificate_student_mapping")
             .select("*, program_certificate!inner(*)")
             .eq("student_id", studentId);
-      
+
         if (certificateEarnedError) throw new Error(certificateEarnedError.message);
 
         // Get all earned certificates for the student that have a valid rating
@@ -86,8 +86,8 @@ export async function getStudentData(studentId: string) {
                     cert.rating !== null &&
                     cert.rating !== undefined
             ) ?? [];
-        
-        
+
+
         // console.log(certificateEarned);
         // console.log(studentCertificatesEarned);
 
@@ -98,16 +98,16 @@ export async function getStudentData(studentId: string) {
                     0
                 ) / studentCertificatesEarned!.length
                 : 0;
-        
+
         const { data: cdl, error: cdlError } = await supabase
             .from("coupon_donation_link")
             .select(`num_of_coupons, coupons!inner(coupon_id, program_id, start_date, 
                 coupon_user_mapping!inner(user_id, profiles!inner(id,name, email))),
                  donation!inner(donation_id, sponsor!inner(name))`)
             .eq("coupons.coupon_user_mapping.user_id", studentId);
-            
+
         if (cdlError) throw new Error(cdlError.message);
-        
+
         const supportList: StudentSupport[] = [];
         cdl!.forEach(mapping => {
             supportList.push({
@@ -152,11 +152,11 @@ export async function getStudentData(studentId: string) {
                 //     programEndDate
                 // );
 
-                
+
                 // Program is not completed if period has ended but no certificate exists
                 return isProgramFinished && !hasCertificate;
             }).length ?? 0;
-        
+
         // console.log(supportList);
 
         // console.log("Number of program Interest:", studentInterest.length)
@@ -184,5 +184,5 @@ export async function getStudentData(studentId: string) {
         console.log(error.message);
         return { success: false, error: error.message };
     }
-    
+
 }

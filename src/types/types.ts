@@ -181,7 +181,7 @@ export type AssignedProgramCertificate = {
 }
 
 export type CertificateDetails = {
-  user_id: string | null,
+  student_id: string | null,
   id: string | null,
   issue_year: string | null,
   issue_authority: string | null,
