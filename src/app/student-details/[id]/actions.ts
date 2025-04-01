@@ -7,7 +7,7 @@ export async function getStudentData(studentId: string) {
 
     try {
         const { data: studentDetail, error: studentDetailError } = await supabase
-            .from("profiles")
+            .from("students")
             .select("*")
             .eq("id", studentId);
 

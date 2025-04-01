@@ -649,7 +649,6 @@ export type Database = {
           },
         ]
       }
-
       program_certificate_student_mapping: {
         Row: {
           created_at: string
@@ -684,7 +683,7 @@ export type Database = {
             foreignKeyName: "program_certificate_student_mapping_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]

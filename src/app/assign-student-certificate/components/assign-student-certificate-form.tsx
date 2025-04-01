@@ -18,8 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Profiles } from "@/types/customs";
-import { ProgramCertificate } from "@/types/types";
+import { ProgramCertificate, Students } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useRef, useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -29,7 +28,7 @@ import { assignStudentCertificate } from "../actions";
 import { toast } from "@/components/ui/use-toast";
 
 interface AssignStudentCertificateFormProps {
-  students: Profiles[];
+  students: Students[];
   programCertificates: ProgramCertificate[];
 }
 
@@ -52,7 +51,7 @@ export default function AssignStudentCertificateForm({
   students,
   programCertificates,
 }: AssignStudentCertificateFormProps) {
-  const [selectedStudent, setSelectedStudent] = useState<Profiles | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<Students | null>(null);
   const [selectedCertificate, setSelectedCertificate] =
     useState<ProgramCertificate | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -94,7 +93,7 @@ export default function AssignStudentCertificateForm({
     });
   };
 
-  const handleStudentSelect = (student: Profiles) => {
+  const handleStudentSelect = (student: Students) => {
     form.setValue("student_id", student.id ? student.id : "");
     form.setValue("student_name", student.name ? student.name : "");
     form.setValue("student_email", student.email ? student.email : "");
@@ -113,7 +112,7 @@ export default function AssignStudentCertificateForm({
           className="grid grid-cols-[1fr_auto_1fr] gap-4"
         >
           <div className="col-span-1 space-y-3">
-            <SearchableDropdown<Profiles>
+            <SearchableDropdown<Students>
               items={students!}
               placeholder="Search student..."
               onSelect={(student) => handleStudentSelect(student)}
