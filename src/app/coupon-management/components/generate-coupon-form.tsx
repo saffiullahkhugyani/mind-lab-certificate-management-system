@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Clubs, Profiles, Programs } from "@/types/types";
+import { Clubs, Programs, Students } from "@/types/types";
 import { SearchableDropdown } from "./student-search";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { Input } from "@/components/ui/input";
@@ -44,7 +44,7 @@ type FormFields = z.infer<typeof generateCouponFormSchema>;
 interface GenerateCouponProps {
   clubs: Clubs[] | null;
   programs: Programs[] | null;
-  studentProfiles: Profiles[] | null;
+  studentProfiles: Students[] | null;
 }
 
 export default function GenerateCouponForm({
@@ -127,7 +127,7 @@ export default function GenerateCouponForm({
     });
   };
 
-  const handleStudentSelect = (student: Profiles) => {
+  const handleStudentSelect = (student: Students) => {
     form.setValue("student_id", student.id ? student.id : "");
     form.setValue("student_name", student.name ? student.name : "");
     form.setValue("student_email", student.email ? student.email : "");
@@ -138,7 +138,7 @@ export default function GenerateCouponForm({
       {/* Search */}
       <div className="gap-2 mb-4">
         <h3 className="font-bold text-lg">Search Student</h3>
-        <SearchableDropdown<Profiles>
+        <SearchableDropdown<Students>
           items={studentProfiles!}
           placeholder="Search student..."
           onSelect={(student) => handleStudentSelect(student)}

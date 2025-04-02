@@ -12,7 +12,7 @@ export type Certificate = {
   skill_level: string | null,
   skill_type: string | null,
   tags: string[] | null,
-  certificate_status: boolean  | null,
+  certificate_status: boolean | null,
 
 }
 
@@ -87,6 +87,19 @@ export type Profiles = {
   name?: string | null
   profile_image_url?: string | null
   updated_at?: string | null
+}
+
+export type Students = {
+  age_group?: string | null
+  created_at?: string
+  email?: string | null
+  gender?: string | null
+  id: string
+  image_url?: string | null
+  mobile?: string | null
+  name?: string | null
+  nationality?: string | null
+  profile_id?: string | null
 }
 
 export type Coupons = {
