@@ -193,15 +193,19 @@ export default function StudentPieChart({
   console.log(studentCertificate);
 
   return (
-    <Card className="flex items-center bg-slate-200 h-full">
-      <CardContent className="flex flex-1 pb-0">
-        <div className="flex-1 justify-items-center">
-          <CardTitle>Skill Level</CardTitle>
+    <Card className=" bg-slate-200">
+      <CardContent className="flex flex-col md:flex-row gap-6 p-4">
+        {/* Skill Level Chart */}
+        <div className="flex-1 min-w-0">
+          <div className="text-center mb-4">
+            <CardTitle className="text-lg">Skill Level</CardTitle>
+          </div>
           <ChartContainer
             config={skillLevelChartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
+            className="mx-auto"
+            style={{ width: 250, height: 250 }}
           >
-            <PieChart>
+            <PieChart width={250} height={250}>
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
@@ -213,18 +217,22 @@ export default function StudentPieChart({
               />
               <ChartLegend
                 content={<ChartLegendContent nameKey="level" />}
-                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                className="mt-4 flex flex-wrap justify-center gap-2 [&>*]:basis-[45%] [&>*]:justify-center"
               />
             </PieChart>
           </ChartContainer>
         </div>
-        <div className="flex-1 justify-items-center">
-          <CardTitle>Skill Type</CardTitle>
+        {/* Skill Type Chart */}
+        <div className="flex-1 min-w-0">
+          <div className="text-center mb-4">
+            <CardTitle className="text-lg">Skill Type</CardTitle>
+          </div>
           <ChartContainer
             config={skillTypeChartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
+            className="mx-auto"
+            style={{ width: 250, height: 250 }}
           >
-            <PieChart>
+            <PieChart width={250} height={250}>
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
@@ -236,18 +244,22 @@ export default function StudentPieChart({
               />
               <ChartLegend
                 content={<ChartLegendContent nameKey="skillType" />}
-                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                className="mt-4 flex flex-wrap justify-center gap-2 [&>*]:basis-[45%] [&>*]:justify-center"
               />
             </PieChart>
           </ChartContainer>
         </div>
-        <div className="flex-1 justify-items-center">
-          <CardTitle>Accumulated skills by type</CardTitle>
+        {/* Accumulated Skills Chart */}
+        <div className="flex-1 min-w-0">
+          <div className="text-center mb-4">
+            <CardTitle className="text-lg">Accumulated Skills</CardTitle>
+          </div>
           <ChartContainer
             config={skillTypeChartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
+            className="mx-auto"
+            style={{ width: 250, height: 250 }}
           >
-            <PieChart>
+            <PieChart width={250} height={250}>
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
@@ -269,7 +281,7 @@ export default function StudentPieChart({
               </Pie>
               <ChartLegend
                 content={<ChartLegendContent nameKey="skillType" />}
-                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                className="mt-4 flex flex-wrap justify-center gap-2 [&>*]:basis-[45%] [&>*]:justify-center"
                 key={"skillType"}
               />
             </PieChart>
