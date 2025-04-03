@@ -157,7 +157,7 @@ export type StudentInterestData = {
 }
 
 export type StudentSupport = {
-  user_id: string | null;
+  student_id: string | null;
   coupon_id: number | null;
   donation_id: number;
   program_id: number | null;

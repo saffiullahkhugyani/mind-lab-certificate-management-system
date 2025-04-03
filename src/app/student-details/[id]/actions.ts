@@ -102,16 +102,16 @@ export async function getStudentData(studentId: string) {
         const { data: cdl, error: cdlError } = await supabase
             .from("coupon_donation_link")
             .select(`num_of_coupons, coupons!inner(coupon_id, program_id, start_date, 
-                coupon_user_mapping!inner(user_id, profiles!inner(id,name, email))),
+                coupon_student_mapping!inner(student_id, students!inner(id,name, email))),
                  donation!inner(donation_id, sponsor!inner(name))`)
-            .eq("coupons.coupon_user_mapping.user_id", studentId);
+            .eq("coupons.coupon_student_mapping.student_id", studentId);
 
         if (cdlError) throw new Error(cdlError.message);
 
         const supportList: StudentSupport[] = [];
         cdl!.forEach(mapping => {
             supportList.push({
-                user_id: mapping.coupons.coupon_user_mapping.at(0)?.user_id!,
+                student_id: mapping.coupons.coupon_student_mapping.at(0)?.student_id!,
                 coupon_id: mapping.coupons.coupon_id!,
                 donation_id: mapping.donation.donation_id,
                 program_id: mapping.coupons?.program_id ?? null,

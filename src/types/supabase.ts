@@ -211,7 +211,7 @@ export type Database = {
           },
         ]
       }
-      coupon_interest_mapping: {
+      coupon_student_interest_mapping: {
         Row: {
           coupon_id: number | null
           created_at: string
@@ -240,24 +240,24 @@ export type Database = {
           },
         ]
       }
-      coupon_user_mapping: {
+      coupon_student_mapping: {
         Row: {
           coupon_id: number | null
           created_at: string
           id: number
-          user_id: string | null
+          student_id: string | null
         }
         Insert: {
           coupon_id?: number | null
           created_at?: string
           id?: number
-          user_id?: string | null
+          student_id?: string | null
         }
         Update: {
           coupon_id?: number | null
           created_at?: string
           id?: number
-          user_id?: string | null
+          student_id?: string | null
         }
         Relationships: [
           {
@@ -268,10 +268,10 @@ export type Database = {
             referencedColumns: ["coupon_id"]
           },
           {
-            foreignKeyName: "coupon_user_mapping_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "coupon_user_mapping_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
