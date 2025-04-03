@@ -98,7 +98,7 @@ export default function StudentDetails({
           // className="text-sm sm:text-base"
         />
 
-        <StudentDetailCard title="CLub Interest" value={clubInterestCount!} />
+        <StudentDetailCard title="Club Interest" value={clubInterestCount!} />
 
         <StudentDetailCard
           title="Program Enrolled"
