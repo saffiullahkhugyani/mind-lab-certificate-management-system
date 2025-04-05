@@ -15,6 +15,7 @@ import {
   ProgramCertificateStudentMapping,
   Programs,
   SponsorData,
+  Student,
   StudentInterestData,
   StudentSupport,
 } from "@/types/types";
@@ -28,7 +29,7 @@ interface DashboardProps {
   donationAllocationInvoiceData: AllocatedProgramData[] | null;
   clubs: Clubs[] | null;
   programs: Programs[] | null;
-  students: Profiles[] | null;
+  students: Student[] | null;
   certificateData: CertificateDetails[] | null;
   studentSupport: StudentSupport[] | null;
   studentInterest: StudentInterestData[] | null;

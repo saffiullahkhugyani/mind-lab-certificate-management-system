@@ -9,13 +9,14 @@ import {
   CertificateDetails,
   ProgramCertificateStudentMapping,
   Programs,
+  Student,
   StudentInterestData,
   StudentSupport,
 } from "@/types/types";
 import { addMonths } from "date-fns";
 
 interface StudentListProps {
-  students: Profiles[] | null;
+  students: Student[] | null;
   certificateData: CertificateDetails[] | null;
   supportedStudents: StudentSupport[] | null;
   programs: Programs[] | null;
@@ -27,7 +28,7 @@ interface StudentListProps {
 }
 
 interface SelectedStudentData {
-  student: Profiles;
+  student: Student;
   programInterestCount: number;
   clubInterestCount: number;
   certificatesEarnedCount: number;
@@ -48,7 +49,7 @@ export default function StudentList({
   certificateEarned,
 }: StudentListProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredStudents, setFilteredStudents] = useState<Profiles[] | null>(
+  const [filteredStudents, setFilteredStudents] = useState<Student[] | null>(
     students
   );
   const [selectedStudent, setSelectedStudent] =
@@ -68,7 +69,7 @@ export default function StudentList({
   // console.log(supportedStudents);
   useEffect(() => {
     const studentSupport = supportedStudents?.filter((support) => {
-      return support.user_id === selectedStudent?.student.id;
+      return support.student_id === selectedStudent?.student.id;
     });
 
     const filteredPrograms = programs?.filter((program) => {
@@ -90,10 +91,10 @@ export default function StudentList({
     setFilteredStudents(filter!);
   };
 
-  const handleSelectedStudent = function (student: Profiles) {
+  const handleSelectedStudent = function (student: Student) {
     // get student certificates
     const studentCertificate = certificateData?.filter((item) => {
-      if (item.user_id === student.id) return item;
+      if (item.student_id === student.id) return item;
     });
 
     // Count program interests (non-null program entries)
@@ -136,7 +137,7 @@ export default function StudentList({
 
     // Get enrolled programs count (same logic from StudentCard)
     const studentSupport = supportedStudents?.filter(
-      (support) => support.user_id === student.id
+      (support) => support.student_id === student.id
     );
 
     const enrolledProgramsCount = new Set(
@@ -285,7 +286,7 @@ export default function StudentList({
               {filteredStudents!.map((student) => {
                 // Get all support records for this student
                 const studentSupport = supportedStudents?.filter(
-                  (support) => support.user_id === student.id
+                  (support) => support.student_id === student.id
                 );
 
                 // Calculate total number of coupons

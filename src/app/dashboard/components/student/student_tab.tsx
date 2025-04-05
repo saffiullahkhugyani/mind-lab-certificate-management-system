@@ -5,6 +5,7 @@ import {
   CertificateDetails,
   ProgramCertificateStudentMapping,
   Programs,
+  Student,
   StudentInterestData,
   StudentSupport,
 } from "@/types/types";
@@ -19,7 +20,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 
 interface StudentProps {
-  students: Profiles[] | null;
+  students: Student[] | null;
   supportedStudents: StudentSupport[] | null;
   certificateData: CertificateDetails[] | null;
   programs: Programs[] | null;
@@ -37,8 +38,8 @@ export default function StudentTabs({
   studentInterest,
   certificateEarned,
 }: StudentProps) {
-  const [notSupported, setNotSupported] = useState<Profiles[] | null>(students);
-  const [supported, setStudentSupport] = useState<Profiles[] | null>(null);
+  const [notSupported, setNotSupported] = useState<Student[] | null>(students);
+  const [supported, setStudentSupport] = useState<Student[] | null>(null);
 
   useEffect(() => {
     if (!students || !supportedStudents) {
@@ -48,7 +49,7 @@ export default function StudentTabs({
 
     // Create a Set of supported user IDs for efficient lookup
     const supportedUserIds = new Set(
-      supportedStudents.map((item) => item.user_id)
+      supportedStudents.map((item) => item.student_id)
     );
 
     // Filter students who are supported

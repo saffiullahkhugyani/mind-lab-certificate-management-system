@@ -9,9 +9,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Profiles } from "@/types/customs";
+import { Student } from "@/types/types";
 
 interface StudentCardProps {
-  student: Profiles | null;
+  student: Student | null;
   onClick: () => {};
   onCancelSupportClick: (studentId: string) => void;
   onAssignProgram: (studentId: string) => void;
@@ -57,7 +58,7 @@ export default function StudentCard({
     >
       {/* Student Image */}
       <Avatar className="w-20 h-20 sm:w-24 sm:h-24">
-        <AvatarImage src={student?.profile_image_url!} alt={student?.name!} />
+        <AvatarImage src={student?.image_url!} alt={student?.name!} />
         <AvatarFallback className="font-bold text-3xl sm:text-4xl">
           {student?.name?.charAt(0).toUpperCase()}
         </AvatarFallback>

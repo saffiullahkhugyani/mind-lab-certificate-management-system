@@ -2,7 +2,7 @@ import { Json } from "./supabase";
 
 export type Tag = {
   tag_name: string;
-  hours: number ;
+  hours: number;
 }
 
 export type Certificate = {
@@ -16,7 +16,7 @@ export type Certificate = {
   skill_level: string | null,
   skill_type: string | null,
   tags: Tag[] | null,
-  certificate_status: boolean  | null,
+  certificate_status: boolean | null,
 
 }
 
@@ -95,6 +95,19 @@ export type Profiles = {
   nationality?: string | null
 }
 
+export type Student = {
+  age_group?: string | null
+  created_at?: string
+  email?: string | null
+  gender?: string | null
+  id: string
+  image_url?: string | null
+  mobile?: string | null
+  name?: string | null
+  nationality?: string | null
+  profile_id?: string | null
+}
+
 export type Coupons = {
   club_id?: number | null
   coupon_duration?: string | null
@@ -152,7 +165,7 @@ export type AllocatedProgramData = {
 }
 
 export type StudentSupport = {
-  user_id: string | null;
+  student_id: string | null;
   coupon_id: number | null;
   donation_id: number;
   program_id: number | null;
@@ -163,7 +176,7 @@ export type StudentSupport = {
 }
 
 export type CertificateDetails = {
-  user_id: string | null,
+  student_id: string | null,
   id: string | null,
   issue_year: string | null,
   issue_authority: string | null,
@@ -174,7 +187,7 @@ export type CertificateDetails = {
   skill_level: string | null,
   skill_type: string | null,
   tags: Tag[] | null,
-  certificate_status: boolean  | null,
+  certificate_status: boolean | null,
 
 }
 
@@ -203,21 +216,21 @@ export type DonationAllocationLogs = {
 }
 
 export type ProgramCertificate = {
-certificate_country?: string | null
-    certificate_name_arabic?: string | null
-    certificate_name_english?: string | null
-    certificate_status?: boolean | null
-    club_id?: number | null
-    id?: string
-    inserted_at?: string
-    issue_authority?: string | null
-    issue_year?: string | null
-    number_of_hours?: string | null
-    program_id?: number | null
-    skill_category?: string | null
-    skill_level?: string | null
-    skill_type?: string | null
-    tags?: Json | null
+  certificate_country?: string | null
+  certificate_name_arabic?: string | null
+  certificate_name_english?: string | null
+  certificate_status?: boolean | null
+  club_id?: number | null
+  id?: string
+  inserted_at?: string
+  issue_authority?: string | null
+  issue_year?: string | null
+  number_of_hours?: string | null
+  program_id?: number | null
+  skill_category?: string | null
+  skill_level?: string | null
+  skill_type?: string | null
+  tags?: Json | null
 }
 
 export type ProgramCertificateStudentMapping = {

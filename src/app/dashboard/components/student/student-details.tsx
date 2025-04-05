@@ -6,11 +6,11 @@ import { Profiles } from "@/types/customs";
 import Image from "next/image";
 import React from "react";
 import DetailsCard from "./detail-card";
-import { CertificateDetails } from "@/types/types";
+import { CertificateDetails, Student } from "@/types/types";
 import StudentPieChart from "./student-pie-chart";
 
 interface StudentDetailsProps {
-  student: Profiles;
+  student: Student;
   onBack: () => void;
   studentCertificate: CertificateDetails[] | null;
   clubInterest: number | null;
@@ -50,7 +50,7 @@ export default function StudentDetails({
         <Card className=" col-span-1 max-w-md shadow-md border bg-slate-100">
           <CardHeader className="flex flex-col items-center p-4">
             <Avatar className="w-40 h-40 rounded-none border">
-              <AvatarImage src={student?.profile_image_url!} alt="@shadcn" />
+              <AvatarImage src={student?.image_url!} alt="@shadcn" />
               <AvatarFallback className="font-bold text-5xl rounded-none bg-gray-300">
                 {student?.name?.charAt(0).toUpperCase()}
               </AvatarFallback>
@@ -73,7 +73,7 @@ export default function StudentDetails({
                   Age Group
                 </Label>
                 <div className="mt-1 p-2 bg-gray-300 rounded-md text-sm text-gray-800">
-                  {student?.age || "N/A"}
+                  {student?.age_group || "N/A"}
                 </div>
               </div>
               <div>
