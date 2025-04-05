@@ -13,7 +13,7 @@ export async function getStudents() {
     const { data: studentList, error: studentListError } = await supabase
       .from("students")
       .select()
-      .order("name", { ascending: false });
+      .order("name", { ascending: true });
 
     if (studentListError) throw new Error(studentListError.message);
 

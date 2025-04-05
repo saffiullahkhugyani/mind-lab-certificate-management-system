@@ -544,6 +544,7 @@ export type Database = {
           id: string
           mobile: string | null
           name: string | null
+          nationality: string | null
           profile_image_url: string | null
           role_id: number | null
           updated_at: string | null
@@ -555,6 +556,7 @@ export type Database = {
           id: string
           mobile?: string | null
           name?: string | null
+          nationality?: string | null
           profile_image_url?: string | null
           role_id?: number | null
           updated_at?: string | null
@@ -566,6 +568,7 @@ export type Database = {
           id?: string
           mobile?: string | null
           name?: string | null
+          nationality?: string | null
           profile_image_url?: string | null
           role_id?: number | null
           updated_at?: string | null
