@@ -86,19 +86,37 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
 
   try {
 
+    let existingCouponCount = 0;
+    let latestEndDate: string | null = null;
+
     // Manual Assignment: Check only if the user has already coupons
     if (isManual && student_id) {
-      const { data: existingCoupon, error: existingCouponError } = await supabase
+      const { data: existingCoupons, error: existingCouponError } = await supabase
         .from("coupon_student_mapping")
-        .select("id, coupons!inner( club_id, program_id), students!inner(id)")
+        .select("id, coupons!inner(*), students!inner(id)")
         .eq("student_id", student_id)
         .eq("coupons.program_id", program_id!);
 
-      // console.log("Error for existing coupons: ", existingCouponError);
-      // console.log("Data fetched: ", existingCoupon);
+      if (existingCouponError) throw new Error("Failed to fetch existing coupons.");
 
-      if (existingCoupon?.length! > 0)
-        throw new Error("Coupon already exists for this student and program.");
+      if (existingCoupons && existingCoupons.length > 0) {
+        existingCouponCount = existingCoupons.reduce(
+          (sum, c) => sum + (c.coupons?.number_of_coupons || 0),
+          0
+        );
+
+        // find the latest end date among existing coupons for that student & program
+        const dates = existingCoupons.map(c => new Date(c.coupons.end_date!));
+        latestEndDate = new Date(Math.max(...dates.map(d => d.getTime()))).toISOString();
+      }
+
+      const totalAfterAdding = existingCouponCount + parseInt(coupon_duration!);
+      if (totalAfterAdding > 12) {
+        throw new Error(`Max 12 coupons allowed per program. Already assigned ${existingCouponCount}.`);
+      }
+
+      // if (existingCoupons?.length! > 0)
+      //   throw new Error("Coupon already exists for this student and program.");
     }
 
     // Step 1: Fetching program details
@@ -230,13 +248,17 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
     }
 
     // Step 8: fetching start date on the basis of the start_period
-    const startDate = calculateStartDate(start_period!);
+    const couponDates = latestEndDate
+      ? calculateStartDateFromDate(latestEndDate, couponDurationInMonths)
+      : calculateStartDate(start_period!, couponDurationInMonths);
+    // const couponDates = calculateStartDate(start_period!, couponDurationInMonths);
     const finalData = {
       club_id,
       program_id,
       coupon_duration,
-      start_period,
-      start_date: startDate,
+      start_period: existingCouponCount > 0 ? "future period" : start_period,
+      start_date: couponDates.startDate,
+      end_date: couponDates.endDate,
       number_of_coupons: couponDurationInMonths,
     };
 
@@ -626,22 +648,48 @@ function generateUniqueCode(couponId: number): string {
 }
 
 // Calculate the start date based on the period
-const calculateStartDate = (period: string): string => {
+const calculateStartDate = (period: string, numOfCoupons: number) => {
   const today = new Date();
   let startDate: Date;
+  let endDate: Date;
 
   if (period.toLowerCase() === "current period") {
     // Set to 1st day of the current month
     startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    // Last day of the (current month + numCoupons - 1)
+    endDate = new Date(today.getFullYear(), today.getMonth() + numOfCoupons, 0);
   } else if (period.toLowerCase() === "future period") {
     // Set to 1st day of the next month
     startDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    // Last day of the (next month + numCoupons - 1)
+    endDate = new Date(today.getFullYear(), today.getMonth() + 1 + numOfCoupons, 0);
   } else {
     throw new Error("Invalid period value");
   }
 
-  return startDate.toLocaleDateString();
+  return { startDate: startDate.toLocaleDateString(), endDate: endDate.toLocaleDateString() }
 };
+
+// calculate the start date from the last end date
+function calculateStartDateFromDate(startDateString: string, months: number) {
+
+  let startDate: Date;
+  let endDate: Date;
+
+  startDate = new Date(startDateString);
+  startDate.setDate(startDate.getDate() + 1); // Start 1 day after last end date
+
+  endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + months);
+
+  return {
+    startDate: startDate.toLocaleDateString(),
+    endDate: endDate.toLocaleDateString(),
+    // startDate: startDate.toISOString().split("T")[0],
+    // endDate: endDate.toISOString().split("T")[0],
+  };
+}
+
 
 async function validateSponsorSupport(student_id: string, program_id: number) {
   const supabase = createClient()

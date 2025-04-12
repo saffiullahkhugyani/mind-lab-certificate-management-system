@@ -286,6 +286,7 @@ export type Database = {
           program_id: number | null
           start_date: string | null
           start_period: string | null
+          end_date: string | null
         }
         Insert: {
           club_id?: number | null
@@ -296,6 +297,7 @@ export type Database = {
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
+          end_date?: string | null
         }
         Update: {
           club_id?: number | null
@@ -306,6 +308,7 @@ export type Database = {
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
+          end_date?: string | null
         }
         Relationships: [
           {
