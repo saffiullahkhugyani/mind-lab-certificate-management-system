@@ -285,6 +285,7 @@ export type Database = {
           number_of_coupons: number | null
           program_id: number | null
           start_date: string | null
+          end_date: string | null
           start_period: string | null
         }
         Insert: {
@@ -295,6 +296,7 @@ export type Database = {
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
+          end_date?: string | null
           start_period?: string | null
         }
         Update: {
@@ -305,6 +307,7 @@ export type Database = {
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
+          end_date?: string | null
           start_period?: string | null
         }
         Relationships: [

@@ -780,13 +780,14 @@ export async function addStudentCoupon(
     // }
 
     // Step 8: fetching start date on the basis of the start_period
-    const startDate = calculateStartDate(start_period!);
+    const couponDates = calculateStartDate(start_period!, couponDurationInMonths);
     const finalData = {
       club_id,
       program_id,
       coupon_duration,
       start_period,
-      start_date: startDate,
+      start_date: couponDates.startDate,
+      end_date: couponDates.endDate,
       number_of_coupons: couponDurationInMonths,
     };
 
@@ -876,19 +877,24 @@ function generateUniqueCode(couponId: number): string {
 }
 
 // Calculate the start date based on the period
-const calculateStartDate = (period: string): string => {
+const calculateStartDate = (period: string, numOfCoupons: number) => {
   const today = new Date();
   let startDate: Date;
+  let endDate: Date;
 
   if (period.toLowerCase() === "current period") {
     // Set to 1st day of the current month
     startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    // Last day of the (current month + numCoupons - 1)
+    endDate = new Date(today.getFullYear(), today.getMonth() + numOfCoupons, 0);
   } else if (period.toLowerCase() === "future period") {
     // Set to 1st day of the next month
     startDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    // Last day of the (next month + numCoupons - 1)
+    endDate = new Date(today.getFullYear(), today.getMonth() + 1 + numOfCoupons, 0);
   } else {
     throw new Error("Invalid period value");
   }
 
-  return startDate.toLocaleDateString();
+  return { startDate: startDate.toLocaleDateString(), endDate: endDate.toLocaleDateString() }
 };
