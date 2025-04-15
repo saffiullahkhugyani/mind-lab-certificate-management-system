@@ -283,7 +283,6 @@ export default async function sponsorData() {
 }
 
 async function lastCouponExpiry(sponsorUid: string, programId: number) {
-
   const supabase = createClient();
 
   const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
@@ -298,33 +297,26 @@ async function lastCouponExpiry(sponsorUid: string, programId: number) {
 
   if (!couponDonationLink || couponDonationLink.length === 0)
     return null;
-  // throw new Error("No coupon donation link found.");
 
-  // Step 1: Extract only the necessary coupons details
-  const filteredCoupons = couponDonationLink.map((item) => ({
-    coupon_id: item.coupons!.coupon_id,
-    start_date: item.coupons!.start_date,
-    number_of_coupons: item.coupons!.number_of_coupons,
+  // Extract all start and end dates
+  const allDates = couponDonationLink.map(item => ({
+    startDate: parseISO(item.coupons!.start_date!),
+    endDate: parseISO(item.coupons!.end_date!)
   }));
 
-  // Step 2: Find the last coupon (highest coupon_id)
-  const lastCoupon = filteredCoupons.reduce((prev, curr) =>
-    prev.coupon_id > curr.coupon_id ? prev : curr
-  );
+  // Find the earliest start date
+  const earliestStartDate = allDates.reduce((prev, curr) =>
+    prev.startDate < curr.startDate ? prev : curr
+  ).startDate;
 
-
-  // Step 3: Calculate the expiry date
-  const startDate = parseISO(lastCoupon.start_date!);
-  const expiryDate = addMonths(startDate, lastCoupon.number_of_coupons!);
-
-  // console.log("Filtered Coupon:", couponDonationLink);
-  // console.log("Start Date: ", format(startDate, "MMM dd, yyyy").toUpperCase());
-
-  // console.log("End Date: ", format(expiryDate, "MMM dd, yyyy").toUpperCase());
+  // Find the latest end date
+  const latestEndDate = allDates.reduce((prev, curr) =>
+    prev.endDate > curr.endDate ? prev : curr
+  ).endDate;
 
   return {
-    startDate: format(startDate, "MMM dd, yyyy"),
-    lastCouponExpiryDate: format(expiryDate, "MMM dd, yyyy")
+    startDate: format(earliestStartDate, "MMM dd, yyyy"),
+    lastCouponExpiryDate: format(latestEndDate, "MMM dd, yyyy")
   };
 }
 

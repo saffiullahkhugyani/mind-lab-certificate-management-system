@@ -65,16 +65,32 @@ export default function DetailsCard({
           <p className=" text-sm">
             Coupon Enrolled:
             <strong>
-              {` ${new Date(programEnrolledDate!).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}`}
+              {programEnrolledDate
+                ? ` ${new Date(programEnrolledDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    }
+                  )}`
+                : " No data yet"}
             </strong>
           </p>
           <p className="text-sm">
             Coupon Expiration:
-            <strong>{`${couponLastExpiryDate}`}</strong>
+            <strong>
+              {couponLastExpiryDate
+                ? ` ${new Date(couponLastExpiryDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    }
+                  )}`
+                : " No data yet"}
+            </strong>
           </p>
           {/* <p className="font-bold text-sm">{`Coupons used ${Math.round(
             (Number(donatedAmount) - Number(remainingAmount)) /
