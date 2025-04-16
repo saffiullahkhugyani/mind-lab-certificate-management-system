@@ -26,10 +26,15 @@ export default async function Page() {
       >
         <TabsList className="mb-4">
           <TabsTrigger value="receipt">Donation Receipt</TabsTrigger>
+          <TabsTrigger value="donation-overview">Donation Overview</TabsTrigger>
         </TabsList>
 
         <TabsContent value="receipt">
           <DonationReceiptForm sponsors={sponsors.data!} />
+        </TabsContent>
+
+        <TabsContent value="donation-overview">
+          <div>Overview section</div>
         </TabsContent>
       </Tabs>
     </div>

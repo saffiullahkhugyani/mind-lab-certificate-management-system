@@ -12,11 +12,11 @@ const Header = async () => {
 
   return (
     // <header className="z-10z-10 sticky top-0 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-    <header className="z-10 sticky top-0 w-full border-b border-border bg-primary text-white">
+    <header className="z-10 sticky top-0 w-full border-b border-border bg-[#9e1b32] text-white">
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <nav className="flex items-center space-x-4 lg:space-x-6">
           <a className="mr-6 flex items-center space-x-2" href="/">
-            <span className="font-bold">CMS</span>
+            <span className="font-bold text-lg">Sponsor Admin Panel</span>
           </a>{" "}
           {user != null && (
             <div className="flex items-center gap-4">

@@ -43,7 +43,7 @@ export const donationReceiptFormSchema = z.object({
     .min(10, "Description must be at least 10 characters long")
     .max(200, "Description cannot exceed 200 characters"),
   amount: z.number().positive("Amount must be positive"),
-  bank_charges: z.number().positive("Amount must be positive"),
+  bank_charges: z.number().positive("Amount must be positive").optional(),
 });
 
 //  type from donation form schema
@@ -85,9 +85,9 @@ export default function DonationReceiptForm({
         sponsor_id: Number(data.sponsor_id),
         source_of_amount: data.source_of_amount,
         donation_description: data.donation_description,
-        bank_charges: data.bank_charges,
+        bank_charges: data.bank_charges ? data.bank_charges : 0,
         date: data.donation_date,
-        amount: data.amount - data.bank_charges,
+        amount: data.amount - (data.bank_charges ?? 0),
       };
 
       // inserting donation
@@ -223,9 +223,10 @@ export default function DonationReceiptForm({
                           type="number"
                           placeholder="Donation amount"
                           onWheel={(e) => (e.target as HTMLElement).blur()}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value === "" ? null : Number(value));
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -244,9 +245,10 @@ export default function DonationReceiptForm({
                           type="number"
                           placeholder="charges"
                           onWheel={(e) => (e.target as HTMLElement).blur()}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value === "" ? null : Number(value));
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
