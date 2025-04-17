@@ -113,12 +113,21 @@ export async function addProgramCertificate(formData: ProgramCertificate) {
     const { id, ...rest } = formData;
     const certificateData = id === null ? rest : formData;
 
+    const { data: existingCertificateTemplete, error: existingCertificateTempleteError } = await supabase
+      .from("program_certificate")
+      .select("*")
+      .eq("program_id", formData.program_id!);
+
+    if (existingCertificateTemplete && existingCertificateTemplete.length > 0)
+      throw new Error("Templete for this program already exists.");
+    // if (existingCertificateTempleteError) throw new Error("Existing templete error: " + existingCertificateTempleteError.message);
+
     const { data: addProgramCertificate, error: addProgramCertificateError } = await supabase
       .from("program_certificate").insert(certificateData).select().single();
 
     if (addProgramCertificateError) throw new Error(addProgramCertificateError.message);
 
-    console.log("data interted to certificate master: ", addProgramCertificate);
+    console.log("data interted to program certificate: ", addProgramCertificate);
     revalidatePath("/generate-certificate");
     return { success: true, data: addProgramCertificate };
 

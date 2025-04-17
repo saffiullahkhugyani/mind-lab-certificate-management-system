@@ -114,7 +114,6 @@ export default function AssignStudentCertificateForm({
           <div className="col-span-1 space-y-3">
             <SearchableDropdown<Students>
               items={students!}
-              placeholder="Search student..."
               onSelect={(student) => handleStudentSelect(student)}
               getLabel={(item) => item.name!}
               getValue={(item) => item.id!}

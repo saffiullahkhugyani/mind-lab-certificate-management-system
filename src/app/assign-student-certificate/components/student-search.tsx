@@ -29,7 +29,7 @@ interface SearchableDropdownProps<T> {
 
 export function SearchableDropdown<T>({
   items,
-  placeholder = "Search...",
+  placeholder = "Search by name or ID...",
   buttonClassName = " justify-between",
   onSelect,
   getLabel,
@@ -42,10 +42,20 @@ export function SearchableDropdown<T>({
   const selectedItem = items.find((item) => getValue(item) === selectedValue);
 
   // Filter items based on search query
+  // const filteredItems = searchQuery
+  //   ? items.filter((item) =>
+  //       getLabel(item).toLowerCase().includes(searchQuery.trim().toLowerCase())
+  //     )
+  //   : items;
+
+  // search by name or id
   const filteredItems = searchQuery
-    ? items.filter((item) =>
-        getLabel(item).toLowerCase().includes(searchQuery.trim().toLowerCase())
-      )
+    ? items.filter((item) => {
+        const label = getLabel(item).toLowerCase();
+        const value = getValue(item).toLowerCase();
+        const query = searchQuery.trim().toLowerCase();
+        return label.includes(query) || value.includes(query);
+      })
     : items;
 
   return (
@@ -57,7 +67,9 @@ export function SearchableDropdown<T>({
           aria-expanded={open}
           className={cn("w-[500px] justify-between", buttonClassName)}
         >
-          {selectedItem ? getLabel(selectedItem) : "Select a student..."}
+          {selectedItem
+            ? `${getLabel(selectedItem)} (${getValue(selectedItem)})`
+            : "Select a student..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -77,7 +89,7 @@ export function SearchableDropdown<T>({
                 return (
                   <CommandItem
                     key={value}
-                    value={label}
+                    value={`${label} ${value}`}
                     onSelect={() => {
                       setSelectedValue(value);
                       onSelect(item);
@@ -90,7 +102,12 @@ export function SearchableDropdown<T>({
                         selectedValue === value ? "opacity-100" : "opacity-0"
                       )}
                     />
-                    {label}
+                    <span className="flex flex-col">
+                      <span className="font-medium">{label}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ID: {value}
+                      </span>
+                    </span>
                   </CommandItem>
                 );
               })}

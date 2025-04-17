@@ -11,13 +11,27 @@ export async function getStudents() {
     const supabase = createClient();
 
     const { data: studentList, error: studentListError } = await supabase
-      .from("students")
-      .select()
-      .order("name", { ascending: true });
+      .from("coupon_student_mapping")
+      .select("*, students!inner(*)");
 
     if (studentListError) throw new Error(studentListError.message);
 
-    return { success: true, data: studentList };
+    // Step 1: Map the inner students only
+    const allStudents = studentList.map((item) => item.students);
+
+    // Step 2: Create a Map to store only unique students by `id`
+    const uniqueStudentsMap = new Map();
+
+    for (const student of allStudents) {
+      if (!uniqueStudentsMap.has(student.id)) {
+        uniqueStudentsMap.set(student.id, student);
+      }
+    }
+
+    // Step 3: Convert Map values back to array
+    const uniqueStudents = Array.from(uniqueStudentsMap.values());
+
+    return { success: true, data: uniqueStudents };
 
   } catch (error: any) {
     console.log("Fetching student list error: ", error)

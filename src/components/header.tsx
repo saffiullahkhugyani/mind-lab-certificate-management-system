@@ -22,7 +22,9 @@ const Header = async () => {
             <div className="flex items-center gap-4">
               <Link href={"/create-certificate"}>Create Certificate</Link>
               <Link href={"/certificate-list"}>Certificate List</Link>
-              <Link href={"/generate-certificate"}>Generate Certificate</Link>
+              <Link href={"/generate-certificate"}>
+                Generate a Certificate templete
+              </Link>
               <Link href={"/assign-student-certificate"}>
                 Assign Student Certificate
               </Link>
