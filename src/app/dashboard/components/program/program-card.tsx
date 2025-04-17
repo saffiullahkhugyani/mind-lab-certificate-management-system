@@ -12,7 +12,7 @@ interface ProgramCardProps {
   remaingAmount: string;
   programSubsrciptionValue: string;
   programEnrolledDate: string;
-  enrolled: boolean;
+  sponsored: boolean;
   detailsLink: string;
   isExpanded: boolean;
   onClick: () => void;
@@ -28,7 +28,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   remaingAmount,
   programSubsrciptionValue,
   programEnrolledDate,
-  enrolled,
+  sponsored,
   detailsLink,
   isExpanded,
   onClick,
@@ -38,13 +38,20 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   const handleButtonClick = (e: React.MouseEvent) => e.stopPropagation();
   const handleLinkClick = (e: React.MouseEvent) => e.stopPropagation();
 
-  const enrollmentButton = (
+  const sponsorButton = sponsored ? (
+    <span className="block w-full py-1 px-3 text-sm font-semibold text-gray-400 text-right cursor-default">
+      Sponsored
+    </span>
+  ) : (
     <Button
-      onClick={handleButtonClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log("Sponsor button has been clicked");
+      }}
       variant="default"
-      className={`py-1 px-3 text-sm font-bold rounded-md w-full `}
+      className="py-1 px-3 text-sm font-bold rounded-md w-full"
     >
-      {enrolled ? "Enrolled" : "Enroll"}
+      Sponsor
     </Button>
   );
 
@@ -65,9 +72,13 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
       onClick={onClick}
       className={`flex flex-col bg-white border border-gray-300 rounded-md shadow-md p-4 m-2 
         hover:cursor-pointer hover:bg-slate-200 transition-all duration-300
-        ${isExpanded ? "col-span-4 grid grid-cols-4 gap-4 mt-4" : "h-full"}`}
+        ${
+          isExpanded && sponsored
+            ? "col-span-4 grid grid-cols-4 gap-4 mt-4"
+            : "h-full"
+        }`}
     >
-      {isExpanded ? (
+      {isExpanded && sponsored ? (
         <ExpandedView
           image={image}
           title={title}
@@ -76,7 +87,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
           remaingAmount={remaingAmount}
           programSubsrciptionValue={programSubsrciptionValue}
           programEnrolledDate={programEnrolledDate}
-          enrollmentButton={enrollmentButton}
+          sponsorButton={sponsorButton}
           detailsLinkComponent={detailsLinkComponent}
           couponLastExpiryDate={couponLastExpiryDate}
         />
@@ -87,7 +98,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
           description={description}
           donatedAmount={donatedAmount}
           numOfAllocations={numOfAllocations}
-          enrollmentButton={enrollmentButton}
+          sponsorButton={sponsorButton}
           detailsLinkComponent={detailsLinkComponent}
         />
       )}
@@ -103,12 +114,13 @@ const ExpandedView: React.FC<any> = ({
   remaingAmount,
   programSubsrciptionValue,
   programEnrolledDate,
-  enrollmentButton,
+  sponsorButton,
   detailsLinkComponent,
   couponLastExpiryDate,
 }) => (
   <>
     <div className="col-span-1">
+      <div className="mb-4">{sponsorButton}</div>
       <Image
         src={image}
         alt={title}
@@ -121,7 +133,6 @@ const ExpandedView: React.FC<any> = ({
       <p className="text-sm text-gray-700 font-medium mb-4">
         Accumulated donation amount: {donatedAmount}
       </p>
-      {enrollmentButton}
       {detailsLinkComponent}
     </div>
     <div className="grid grid-rows-4 col-span-3">
@@ -163,10 +174,11 @@ const CollapsedView: React.FC<any> = ({
   description,
   donatedAmount,
   numOfAllocations,
-  enrollmentButton,
+  sponsorButton,
   detailsLinkComponent,
 }) => (
   <>
+    <div className="mb-4">{sponsorButton}</div>
     <Image
       src={image}
       alt={title}
@@ -182,7 +194,6 @@ const CollapsedView: React.FC<any> = ({
     <p className="text-sm text-gray-700 font-medium mb-4">
       Number of allocations: {numOfAllocations}
     </p>
-    {enrollmentButton}
     {detailsLinkComponent}
   </>
 );

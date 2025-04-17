@@ -46,7 +46,7 @@ export default function ProgramsTab({
   programList,
 }: ProgramsTabProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedFilter, setSelectedFilter] = useState<string>("enrolled");
+  const [selectedFilter, setSelectedFilter] = useState<string>("sponsored");
   const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
 
@@ -72,8 +72,8 @@ export default function ProgramsTab({
   };
 
   const getFilteredPrograms = () => {
-    const isEnrolled = selectedFilter === "enrolled";
-    const sourcePrograms = isEnrolled ? allocatedProgramData : programList;
+    const isSponsored = selectedFilter === "sponsored";
+    const sourcePrograms = isSponsored ? allocatedProgramData : programList;
 
     return sourcePrograms?.filter((program) => {
       const programName = getProgramName(program).toLowerCase();
@@ -83,13 +83,13 @@ export default function ProgramsTab({
         !selectedClubId || program.club_id === selectedClubId;
 
       // Filter out allocated programs from the program list when showing available programs
-      const isNotAllocated = !isEnrolled
-        ? !allocatedProgramData?.some(
-            (allocated) => allocated.program_id === program.program_id
-          )
-        : true;
+      // const isNotAllocated = !isSponsored
+      //   ? !allocatedProgramData?.some(
+      //       (allocated) => allocated.program_id === program.program_id
+      //     )
+      //   : true;
 
-      return matchesSearchQuery && matchesClubFilter && isNotAllocated;
+      return matchesSearchQuery && matchesClubFilter;
     });
   };
 
@@ -118,11 +118,11 @@ export default function ProgramsTab({
         }
         programSubsrciptionValue={allocatedProgram?.subscription_value!}
         programEnrolledDate={allocatedProgram?.startDate!}
-        enrolled={selectedFilter === "enrolled"}
+        sponsored={selectedFilter === "sponsored"}
         detailsLink={"https://www.iastem.ae"}
         isExpanded={expandedCardId === program.program_id}
         onClick={() => handleCardClick(program.program_id!)}
-        numOfAllocations={allocatedProgram?.allocationDataCount!}
+        numOfAllocations={allocatedProgram?.allocationDataCount! ?? 0}
         couponLastExpiryDate={allocatedProgram?.lastCouponExpiryDate!}
       />
     );
@@ -140,7 +140,7 @@ export default function ProgramsTab({
             />
             <div className="flex items-center space-x-2">
               <Label className="text-md font-bold">Your Contributions</Label>
-              <p>Programs Supported: {allocatedProgramData?.length || 0}</p>
+              <p>Programs Supported {allocatedProgramData?.length || 0}</p>
             </div>
           </div>
           <div className="grid space-y-3 p-2">
@@ -170,11 +170,11 @@ export default function ProgramsTab({
                 className="flex space-x-3"
               >
                 <div className="flex items-center justify-center space-x-2">
-                  <RadioGroupItem value="enrolled" id="r1" />
-                  <Label htmlFor="r1">Enrolled</Label>
+                  <RadioGroupItem value="sponsored" id="r1" />
+                  <Label htmlFor="r1">Sponsored</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="request" id="r2" />
+                  <RadioGroupItem value="request-to-sponsor" id="r2" />
                   <Label htmlFor="r2">Request to sponsor</Label>
                 </div>
               </RadioGroup>
@@ -182,7 +182,7 @@ export default function ProgramsTab({
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-4 justify-items-center p-4 rounded-md shadow-md bg-slate-100">
+      <div className="grid grid-cols-4 gap-4 ustify-items-center p-4 rounded-md shadow-md bg-slate-100">
         {filteredPrograms?.length ? (
           filteredPrograms
         ) : (

@@ -160,8 +160,6 @@ export type AllocatedProgramData = {
   allocationDataCount?: number | null;
   lastCouponExpiryDate?: string | null;
   startDate?: string | null;
-
-
 }
 
 export type StudentSupport = {
