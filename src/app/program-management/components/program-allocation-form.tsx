@@ -37,10 +37,12 @@ type FormFields = z.infer<typeof donationAllocationFormSchema>;
 
 interface DonationAllocationProps {
   programs: Programs[] | null;
+  availableAmount?: number;
 }
 
 export default function ProgramAllocationForm({
   programs,
+  availableAmount,
 }: DonationAllocationProps) {
   const [isPending, startTransition] = useTransition();
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -114,6 +116,13 @@ export default function ProgramAllocationForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4"
       >
+        {/* Available Amount Display */}
+        <div className="mb-4 rounded-md bg-muted px-4 py-3 text-xl font-semibold text-gray-800 shadow">
+          Available donation amount:{" "}
+          <span className="text-xl text-gray-500  font-bold">
+            {availableAmount}
+          </span>
+        </div>
         <FormField
           control={form.control}
           name="program_id"

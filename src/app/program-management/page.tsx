@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CreateProgramForm from "./components/create-program-form";
 import ProgramAllocationForm from "./components/program-allocation-form";
-import { clubsList, programsList } from "./actions";
+import { clubsList, getAvailableDonation, programsList } from "./actions";
 import { readUserSession } from "@/lib/actions/action";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
   const clubs = await clubsList();
   const programs = await programsList();
+  const availableDonationAmount = await getAvailableDonation();
+
+  console.log("Available Donations: ", availableDonationAmount);
 
   const { data: userSession } = await readUserSession();
 
@@ -35,7 +38,10 @@ export default async function Page() {
         </TabsContent>
 
         <TabsContent value="allocation">
-          <ProgramAllocationForm programs={programs} />
+          <ProgramAllocationForm
+            programs={programs}
+            availableAmount={availableDonationAmount.data}
+          />
         </TabsContent>
       </Tabs>
     </div>

@@ -12,77 +12,76 @@ export async function clubsList() {
       .from("clubs")
       .select()
       .order("created_at", { ascending: true });
-  
-    
+
+
     if (fetchError) {
       throw new Error("Failed to fetch clubs. Please try again later.");
     }
 
-    return {success: true, data: clubs}
-    
+    return { success: true, data: clubs }
+
   } catch (error: any) {
     // Handle and return the error to be displayed as a toast
     console.error("Error in fetchinng clubs", error.message);
     return { success: false, error: error.message };
   }
-  
+
 }
 
 export async function addProgram(programData: Programs) {
   const supabase = createClient();
 
-  try { 
+  try {
 
     const { data: existingProgram, error: existingProgramError } = await supabase
       .from("programs")
       .select("*")
       .eq("program_english_name", programData.program_english_name!.trim());
-    
-      if (existingProgramError) {
-        // console.log("Existing Program Error: ", existingProgramError);      
-        throw new Error(existingProgramError.message);
+
+    if (existingProgramError) {
+      // console.log("Existing Program Error: ", existingProgramError);      
+      throw new Error(existingProgramError.message);
     }
-    
+
     if (existingProgram.length > 0) {
       console.log("Existing: ", existingProgram);
       throw new Error("Program already exists");
     }
-      
+
     const { data, error } = await supabase.from("programs")
-        .insert(programData).select()
-    
+      .insert(programData).select()
+
     if (data != null) {
-      return {success: true, message: data}
+      return { success: true, message: data }
     }
-    
+
     if (error) {
       throw new Error(error.message);
     }
-    
-      
+
+
   } catch (error: any) {
     // Handle and return the error to be displayed as a toast
     console.error("Error in adding a program: ", error.message);
     return { success: false, error: error.message };
   }
-  
+
 }
 
 export async function programsList() {
   const supabase = createClient();
   const { data, error } = await supabase.from("programs")
     .select().order("program_english_name", { ascending: true });
-    
-    if (data != null)
-  {
 
-    console.log("programs list: ",data);
+  if (data != null) {
+
+    console.log("programs list: ", data);
   } else {
-    console.log("Error fetching programs list: ",error)
+    console.log("Error fetching programs list: ", error)
   }
 
   return data;
-  
+
 }
 
 export async function donationAllocation(formData: DonationAllocation) {
@@ -113,7 +112,7 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     // Step 3: Allocate amount using FIFO
     let remainingToAllocate = formData.amount!;
-    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number}[] = [];
+    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number }[] = [];
 
     for (const donation of donations) {
       if (remainingToAllocate <= 0) break;
@@ -142,21 +141,21 @@ export async function donationAllocation(formData: DonationAllocation) {
     console.log("Allocation log:", allocationLog);
 
     for (const logData of allocationLog) {
-      
+
       if (logData.allocated_amount > 0) {
         const { error: donationLogError } = await supabase
           .from("donation_allocation_log")
           .insert(logData)
           .select()
-  
-        if (donationLogError) {  
+
+        if (donationLogError) {
           console.log(donationLogError);
           throw new Error("Failed to insert allocation log, Please try again");
-          }
+        }
       }
     }
-  
-    
+
+
 
     // Step 4: Insert the allocation record into the donation_allocation table
     const { data: allocationData, error: insertError } = await supabase
@@ -175,7 +174,7 @@ export async function donationAllocation(formData: DonationAllocation) {
       .from("donation_allocation")
       .select()
       .eq("program_id", allocationData.program_id!);
-    
+
     if (donationAllocationError) throw donationAllocationError;
 
     const totalSumOfProgramDonations = allocatedDonation.reduce((sum, donation) => sum + donation.amount!, 0);
@@ -187,7 +186,7 @@ export async function donationAllocation(formData: DonationAllocation) {
       .select("total_remaining_donation")
       .eq("program_id", allocationData.program_id!)
       .single();
-    
+
     if (errorTotalRemainingDonation) {
       console.error("Error fetching current donation:", errorTotalRemainingDonation!.message);
     } else {
@@ -204,10 +203,10 @@ export async function donationAllocation(formData: DonationAllocation) {
         })
         .eq("program_id", allocationData.program_id!)
         .select();
-      
+
       if (error) throw new Error(error.message);
     }
-    
+
 
 
     return { success: true, data: allocationData };
@@ -217,5 +216,28 @@ export async function donationAllocation(formData: DonationAllocation) {
     console.error("Error in donationAllocation:", error.message);
     return { success: false, error: error.message };
   }
+}
+
+export async function getAvailableDonation() {
+  const supabase = createClient();
+
+  try {
+    const { data: availableDonation, error: availableDonationError } = await supabase.from("donation")
+      .select('*').gt('remaining_amount', 0).order("donation_id", { ascending: true });
+
+    if (availableDonationError) throw new Error(availableDonationError.message);
+
+    const totalRemainingDonation = availableDonation.reduce((sum, donation) => sum + donation.remaining_amount!, 0);
+
+
+    return { success: true, data: totalRemainingDonation };
+
+  } catch (error: any) {
+    // Handle and return the error to be displayed as a toast
+    console.error("Error in fetchinng donations", error.message);
+    return { success: false, error: error.message };
+  }
+
+
 }
 
