@@ -125,6 +125,7 @@ const CertificateList = ({ assignedCertificate }: CertificateListProps) => {
             student_name={selected.student_name!}
             program={selected.program_name!}
             number_of_hours={selected.number_of_hours!}
+            issue_authority={selected.issue_authority!}
             tags={selected.tags!}
             date={selected.date!}
           />

@@ -176,6 +176,7 @@ export type AssignedProgramCertificate = {
   rating?: number | null
   number_of_hours?: string | null
   program_name?: string | null
+  issue_authority?: string | null
   tags?: Tag[] | null
   date?: string
 }

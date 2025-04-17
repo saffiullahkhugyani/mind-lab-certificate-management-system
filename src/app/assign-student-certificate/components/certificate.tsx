@@ -15,6 +15,7 @@ interface CertificateProps {
   student_name: string;
   program: string;
   number_of_hours: string;
+  issue_authority: string;
   tags: Tag[];
   date: string;
 }
@@ -24,6 +25,7 @@ const Certificate: React.FC<CertificateProps> = ({
   student_id,
   certificate_name,
   program,
+  issue_authority,
   number_of_hours,
   tags,
   date,
@@ -121,6 +123,9 @@ const Certificate: React.FC<CertificateProps> = ({
                 <h1 className={styles.name}>{student_name}</h1>
                 <h3 className={styles.basictext}>
                   for outstanding performance in <strong>{program}</strong>
+                </h3>
+                <h3>
+                  Issue Authority: <strong>{issue_authority}</strong>
                 </h3>
                 <h3>
                   <strong>{number_of_hours} credit hours</strong>

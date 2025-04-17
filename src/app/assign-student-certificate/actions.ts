@@ -124,6 +124,7 @@ export async function getAssignedProgramCertificate() {
           program_certificate_id: item.program_certificate.id,
           certificate_name: item.program_certificate.certificate_name_english,
           program_name: item.program_certificate.programs.program_english_name,
+          issue_authority: item.program_certificate.issue_authority,
           number_of_hours: item.program_certificate.number_of_hours,
           tags: Array.isArray(item.program_certificate.tags)
             ? (item.program_certificate.tags as Tag[]).map((tag: Tag) => ({
