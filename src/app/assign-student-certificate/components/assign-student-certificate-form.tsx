@@ -25,7 +25,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { SearchableDropdown } from "./student-search";
 import { assignStudentCertificate } from "../actions";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AssignStudentCertificateFormProps {
   students: Students[];
@@ -43,6 +43,9 @@ const FormSchema = z.object({
     .number()
     .max(5, { message: "Rating cannot be more than 5" })
     .optional(),
+  completion_status: z.boolean({
+    required_error: "Please select completion status",
+  }),
 });
 
 type FormField = z.infer<typeof FormSchema>;
@@ -55,6 +58,7 @@ export default function AssignStudentCertificateForm({
   const [selectedCertificate, setSelectedCertificate] =
     useState<ProgramCertificate | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
 
   const form = useForm<FormField>({
     resolver: zodResolver(FormSchema),
@@ -69,6 +73,7 @@ export default function AssignStudentCertificateForm({
         student_id: data.student_id,
         program_certificate_id: data.certificate_id,
         rating: data.rating ?? 0,
+        completion_status: data.completion_status,
       };
 
       const response = await assignStudentCertificate(
@@ -186,6 +191,40 @@ export default function AssignStudentCertificateForm({
                       }}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="completion_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Completion Status</FormLabel>
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === "completed")
+                    }
+                    value={
+                      field.value === true
+                        ? "completed"
+                        : field.value === false
+                        ? "not_completed"
+                        : ""
+                    }
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="not_completed">
+                        Not Completed
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

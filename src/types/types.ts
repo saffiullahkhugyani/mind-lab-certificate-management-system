@@ -43,6 +43,7 @@ export type ProgramCertificateMapping = {
   student_id: string | null,
   program_certificate_id: string | null,
   rating: number | null,
+  completion_status: boolean | null,
 }
 
 export type SkillType = {
