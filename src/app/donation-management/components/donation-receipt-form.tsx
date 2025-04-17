@@ -43,7 +43,7 @@ export const donationReceiptFormSchema = z.object({
     .min(10, "Description must be at least 10 characters long")
     .max(200, "Description cannot exceed 200 characters"),
   amount: z.number().positive("Amount must be positive"),
-  bank_charges: z.number().positive("Amount must be positive").optional(),
+  charges: z.number().nonnegative("Charges must be zero or more").optional(),
 });
 
 //  type from donation form schema
@@ -87,9 +87,9 @@ export default function DonationReceiptForm({
         sponsor_id: Number(data.sponsor_id),
         source_of_amount: data.source_of_amount,
         donation_description: data.donation_description,
-        bank_charges: data.bank_charges ? data.bank_charges : 0,
+        charges: data.charges ? data.charges : 0,
         date: data.donation_date,
-        amount: data.amount - (data.bank_charges ?? 0),
+        amount: data.amount - (data.charges ?? 0),
       };
 
       // inserting donation
@@ -106,7 +106,7 @@ export default function DonationReceiptForm({
           donation_date: "",
           donation_description: "",
           amount: 0,
-          bank_charges: 0,
+          charges: 0,
           sponsor_id: "",
           sponsor_name: "",
           sponsor_number: "",
@@ -236,13 +236,14 @@ export default function DonationReceiptForm({
                 />
                 <FormField
                   control={form.control}
-                  name="bank_charges"
+                  name="charges"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Charges</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
+                          step={0.01}
                           type="number"
                           placeholder="charges"
                           onWheel={(e) => (e.target as HTMLElement).blur()}
@@ -257,6 +258,14 @@ export default function DonationReceiptForm({
                   )}
                 />
               </div>
+            </div>
+            <div className="mt-5">
+              {form.watch("amount") && (
+                <p className="text-md font-bold text-muted-foreground">
+                  Final Amount:{" "}
+                  {form.watch("amount") - (form.watch("charges") ?? 0)}
+                </p>
+              )}
             </div>
           </div>
 

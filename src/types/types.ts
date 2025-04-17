@@ -45,7 +45,7 @@ export type Sponsors = {
 
 export type Donation = {
   amount?: number | null
-  bank_charges?: number | null
+  charges?: number | null
   date?: string | null
   donation_description?: string | null
   donation_id?: number

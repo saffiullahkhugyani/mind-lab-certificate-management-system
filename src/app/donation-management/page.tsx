@@ -34,7 +34,10 @@ export default async function Page() {
         </TabsContent>
 
         <TabsContent value="donation-overview">
-          <div>Overview section</div>
+          <div>
+            Overview section, adding donation allocation invoices and donation
+            invoices
+          </div>
         </TabsContent>
       </Tabs>
     </div>

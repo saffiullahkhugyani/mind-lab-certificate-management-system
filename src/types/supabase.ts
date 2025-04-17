@@ -330,7 +330,7 @@ export type Database = {
       donation: {
         Row: {
           amount: number | null
-          bank_charges: number | null
+          charges: number | null
           created_at: string | null
           date: string | null
           donation_description: string | null
@@ -341,7 +341,7 @@ export type Database = {
         }
         Insert: {
           amount?: number | null
-          bank_charges?: number | null
+          charges?: number | null
           created_at?: string | null
           date?: string | null
           donation_description?: string | null
@@ -352,7 +352,7 @@ export type Database = {
         }
         Update: {
           amount?: number | null
-          bank_charges?: number | null
+          charges?: number | null
           created_at?: string | null
           date?: string | null
           donation_description?: string | null
