@@ -140,7 +140,6 @@ export default function GenerateCouponForm({
         <h3 className="font-bold text-lg">Search Student</h3>
         <SearchableDropdown<Students>
           items={studentProfiles!}
-          placeholder="Search student..."
           onSelect={(student) => handleStudentSelect(student)}
           getLabel={(item) => item.name!}
           getValue={(item) => item.id!}

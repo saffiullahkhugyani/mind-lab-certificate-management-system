@@ -59,6 +59,8 @@ export default function DonationReceiptForm({
   const sourceOfAmount = ["Card", "Cash", "Bank transfer"];
   const [isPending, startTransition] = useTransition();
 
+  console.log("sponsors", sponsors);
+
   enum SourceOfAmount {
     Card = "Card",
     Cash = "Cash",
@@ -134,7 +136,6 @@ export default function DonationReceiptForm({
       <div className="col-span-2 flex items-center gap-4 mb-4">
         <SearchableDropdown<Sponsors>
           items={sponsors!}
-          placeholder="Search sponsors..."
           onSelect={(sponsor) => handleSponsorSelect(sponsor)}
           getLabel={(item) => item.name!.trim()}
           getValue={(item) => item.sponsor_id.toString().trim()}
