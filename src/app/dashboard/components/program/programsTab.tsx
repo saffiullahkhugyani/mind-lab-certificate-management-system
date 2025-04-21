@@ -137,7 +137,7 @@ export default function ProgramsTab({
         description={program.description!}
         donatedAmount={getDonationAmount(
           program,
-          selectedFilter === "enrolled"
+          selectedFilter === "sponsored"
         )}
         remaingAmount={
           allocatedProgram?.remaining_allocated_amount?.toString()!
