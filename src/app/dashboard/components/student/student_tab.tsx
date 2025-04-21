@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Profiles } from "@/types/customs";
 import {
+  AllocatedProgramData,
   CertificateDetails,
   ProgramCertificateStudentMapping,
   Programs,
@@ -24,6 +25,7 @@ interface StudentProps {
   supportedStudents: StudentSupport[] | null;
   certificateData: CertificateDetails[] | null;
   programs: Programs[] | null;
+  allocatedProgramData: AllocatedProgramData[] | null;
   sponsorId: number;
   studentInterest: StudentInterestData[] | null;
   certificateEarned: ProgramCertificateStudentMapping[] | null;
@@ -34,6 +36,7 @@ export default function StudentTabs({
   supportedStudents,
   certificateData,
   programs,
+  allocatedProgramData,
   sponsorId,
   studentInterest,
   certificateEarned,
@@ -94,10 +97,10 @@ export default function StudentTabs({
     }
   };
 
-  const handleAssignProgram = async (studentId: string) => {
+  const handleAssignProgram = async (programId: number, studentId: string) => {
     console.log(`from handleAssignProgram ${studentId}`);
     try {
-      const res = await assignStudentProgram(studentId, sponsorId);
+      const res = await assignStudentProgram(programId, studentId, sponsorId);
       console.log(res);
 
       if (res.success) {
@@ -146,6 +149,7 @@ export default function StudentTabs({
               supportedStudents={supportedStudents}
               onCancelSupport={handleCancelSupport}
               programs={programs}
+              allocatedProgramData={allocatedProgramData}
               onAssignProgram={handleAssignProgram}
               certificateEarned={certificateEarned}
               studentInterest={studentInterest}
@@ -162,6 +166,7 @@ export default function StudentTabs({
               supportedStudents={supportedStudents}
               onCancelSupport={handleCancelSupport}
               programs={programs}
+              allocatedProgramData={allocatedProgramData}
               onAssignProgram={handleAssignProgram}
               studentInterest={studentInterest}
               certificateEarned={certificateEarned}

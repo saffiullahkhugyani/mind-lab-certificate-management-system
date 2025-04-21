@@ -514,17 +514,18 @@ export async function cancelStudentSupport(
   }
 }
 
-export async function assignStudentProgram(studentId: string, sponsorId: number) {
+export async function assignStudentProgram(programId: number, studentId: string, sponsorId: number) {
 
   try {
     const supanase = createClient();
     const { data: programsData, error: programsDataError } = await supanase
       .from("donation_allocation_log")
       .select(`*, donation!inner(donation_id, sponsor_id), 
-      programs!inner(program_english_name,subscription_value,
+      programs!inner(program_id,program_english_name,subscription_value,
       total_allocated_donation,total_remaining_donation, club_id)`)
       .gt("remaining_allocated_amount", 0)
       .eq("donation.sponsor_id", sponsorId)
+      .eq("programs.program_id", programId)
       .order("id", { ascending: true });
 
     if (programsDataError) throw new Error(programsDataError.message);
@@ -559,7 +560,7 @@ export async function assignStudentProgram(studentId: string, sponsorId: number)
     let finalResult = "testing";
     if (selectedRecords && selectedRecords.length > 0) {
       const couponData = {
-        program_id: selectedRecords.at(0)?.program_id,
+        program_id: programId,
         student_id: studentId,
         coupon_duration: "1 month",
         start_period: "Future period",

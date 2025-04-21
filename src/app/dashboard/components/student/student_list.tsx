@@ -6,6 +6,7 @@ import StudentCard from "./student-card";
 import { Profiles } from "@/types/customs";
 import StudentDetails from "./student-details";
 import {
+  AllocatedProgramData,
   CertificateDetails,
   ProgramCertificateStudentMapping,
   Programs,
@@ -14,14 +15,16 @@ import {
   StudentSupport,
 } from "@/types/types";
 import { addMonths } from "date-fns";
+import AllocateProgramDialog from "./allocate-program-dialog";
 
 interface StudentListProps {
   students: Student[] | null;
   certificateData: CertificateDetails[] | null;
   supportedStudents: StudentSupport[] | null;
   programs: Programs[] | null;
+  allocatedProgramData: AllocatedProgramData[] | null;
   onCancelSupport: (studentId: string) => Promise<void>;
-  onAssignProgram: (studentId: string) => Promise<void>;
+  onAssignProgram: (programId: number, studentId: string) => Promise<void>;
   listType: "all" | "supported";
   studentInterest: StudentInterestData[] | null;
   certificateEarned: ProgramCertificateStudentMapping[] | null;
@@ -45,6 +48,7 @@ export default function StudentList({
   listType,
   supportedStudents,
   programs,
+  allocatedProgramData,
   studentInterest,
   certificateEarned,
 }: StudentListProps) {
@@ -54,6 +58,7 @@ export default function StudentList({
   );
   const [selectedStudent, setSelectedStudent] =
     useState<SelectedStudentData | null>(null);
+
   const [studentCertificates, setStudentCertificates] = useState<
     CertificateDetails[] | null
   >(null);
@@ -65,6 +70,8 @@ export default function StudentList({
   const [activeAction, setActiveAction] = useState<"cancel" | "assign" | null>(
     null
   );
+  const [selectAssigningStudent, setSelectAssigningStudent] =
+    useState<Student | null>(null);
 
   // console.log(supportedStudents);
   useEffect(() => {
@@ -218,6 +225,21 @@ export default function StudentList({
   //   }
   // };
 
+  const handleConfirmAllocateProgram = async (
+    programId: number,
+    studentId: string
+  ) => {
+    try {
+      setActiveAction("assign");
+      setIsProcessing(true);
+      await onAssignProgram(programId, studentId);
+    } catch (error) {
+      console.error("Error canceling support:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const onCancelSupportClick = async (studentId: string) => {
     try {
       setActiveAction("cancel");
@@ -237,11 +259,15 @@ export default function StudentList({
     }
   };
 
-  const onAssignProgramClick = async (studentId: string) => {
+  const onAssignProgramClick = (studentId: string) => {
     try {
+      const student = students?.find((student) => student.id === studentId);
+      setSelectAssigningStudent(student!);
       setActiveAction("assign");
       setIsProcessing(true);
-      await onAssignProgram(studentId);
+      setIsDialogOpen(true);
+      // for FIFO logic assigning student to program directly
+      // await onAssignProgram(studentId);
     } catch (error) {
       console.error("Error canceling support:", error);
     } finally {
@@ -252,7 +278,7 @@ export default function StudentList({
   return (
     <>
       {/* Loading Overlay */}
-      {isProcessing && (
+      {isProcessing && activeAction === "cancel" && (
         <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
           <div className="flex flex-col items-center">
             <div className="loader border-t-4 border-blue-500 w-16 h-16 rounded-full animate-spin"></div>
@@ -330,6 +356,16 @@ export default function StudentList({
             rating={selectedStudent.rating}
             enrolledProgramCount={selectedStudent.enrolledProgramsCount}
             programNotCompletedCount={selectedStudent.programsNotCompleted}
+          />
+        )}
+        {isDialogOpen && (
+          <AllocateProgramDialog
+            isOpen={isDialogOpen}
+            setIsOpen={setIsDialogOpen}
+            selectedStudent={selectAssigningStudent}
+            onConfirmAllocate={handleConfirmAllocateProgram} // Replace with your allocation logic
+            isProcessing={isProcessing}
+            availablePrograms={allocatedProgramData}
           />
         )}
         {/* <CancelSupportDialog

@@ -133,6 +133,7 @@ export default function Dashboard({
             certificateData={certificateData}
             supportedStudents={studentSupport!}
             programs={programs}
+            allocatedProgramData={programAllocatedData}
             sponsorId={sponsor?.sponsor_id!}
             studentInterest={studentInterest}
             certificateEarned={certificateEarned}
