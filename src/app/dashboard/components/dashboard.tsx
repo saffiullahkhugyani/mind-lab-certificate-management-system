@@ -124,6 +124,7 @@ export default function Dashboard({
             allocatedProgramData={programAllocatedData}
             clubList={clubs}
             programList={programs}
+            remainingDonationAmount={sponsor?.totalRemainingDonation}
           />
         </TabsContent>
         <TabsContent value="student">

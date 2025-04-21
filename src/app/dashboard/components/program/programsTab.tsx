@@ -13,11 +13,15 @@ import {
 import React, { ChangeEvent, useState } from "react";
 import ProgramCard from "./program-card";
 import { AllocatedProgramData, Clubs, Programs } from "@/types/types";
+import DonationAllocationDialog from "./donation-allocation-dialog";
+import { donationAllocation } from "../../actions";
+import { toast } from "@/components/ui/use-toast";
 
 interface ProgramsTabProps {
   allocatedProgramData: AllocatedProgramData[] | null;
   clubList: Clubs[] | null;
   programList: Programs[] | null;
+  remainingDonationAmount?: number;
 }
 
 // Helper function to get program name based on program type
@@ -44,11 +48,20 @@ export default function ProgramsTab({
   allocatedProgramData,
   clubList,
   programList,
+  remainingDonationAmount,
 }: ProgramsTabProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedFilter, setSelectedFilter] = useState<string>("sponsored");
   const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedProgramForDonation, setSelectedProgramForDonation] =
+    useState<Programs | null>(null);
+  const [selectedClubForDonation, setSelectedClubForDonation] =
+    useState<Clubs | null>(null);
+  const [totalRemainingDonationAmount, setTotalRemainingDonationAmount] =
+    useState<number | null>(remainingDonationAmount || 0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   console.log("allocatedProgramData", allocatedProgramData);
 
@@ -103,6 +116,19 @@ export default function ProgramsTab({
       (allocated) => allocated.program_id === program.program_id
     );
 
+    // on click handle for the program card to add donation
+    const handleSponsorClick = (program?: Programs) => {
+      const club = clubList?.find((club) => club.club_id === program!.club_id);
+      if (club) {
+        setSelectedProgramForDonation(program!);
+        setSelectedClubForDonation(club);
+        setIsDialogOpen(true);
+      }
+    };
+
+    // function for allocating donation
+    const onAllocateDonation = async () => {};
+
     return (
       <ProgramCard
         key={program.program_id}
@@ -122,11 +148,73 @@ export default function ProgramsTab({
         detailsLink={"https://www.iastem.ae"}
         isExpanded={expandedCardId === program.program_id}
         onClick={() => handleCardClick(program.program_id!)}
+        onSponsorClick={() => handleSponsorClick(program! as Programs)}
         numOfAllocations={allocatedProgram?.allocationDataCount! ?? 0}
         couponLastExpiryDate={allocatedProgram?.lastCouponExpiryDate!}
       />
     );
   });
+
+  const handleDonationAllocation = async ({
+    club_id,
+    program_id,
+    amount,
+  }: {
+    club_id: number;
+    program_id: number;
+    amount: number;
+  }) => {
+    if (amount <= 0) {
+      toast({
+        description: "Amount must be greater than 0",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      console.log("Allocating donation:", { club_id, program_id, amount });
+
+      const donation = {
+        program_id,
+        amount,
+      };
+
+      const response = await donationAllocation(donation);
+
+      if (response.success) {
+        toast({
+          description: `Donation amount ${response.data?.amount} allocated successfully`,
+          variant: "success",
+        });
+
+        // Optional: update remaining amount
+        setTotalRemainingDonationAmount((prev) =>
+          prev !== null ? prev - amount : 0
+        );
+      }
+
+      if (response.error) {
+        toast({
+          description: response.error,
+          variant: "destructive",
+        });
+      }
+
+      setIsDialogOpen(false);
+      setSelectedClubForDonation(null);
+      setSelectedProgramForDonation(null);
+    } catch (error: any) {
+      console.error("Error allocating donation:", error);
+      toast({
+        description: error?.message || "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="grid space-y-2">
@@ -189,6 +277,17 @@ export default function ProgramsTab({
           <p>No programs found.</p>
         )}
       </div>
+      {selectedClubForDonation && selectedProgramForDonation && (
+        <DonationAllocationDialog
+          isOpen={isDialogOpen}
+          setIsOpen={setIsDialogOpen}
+          onConfirmAllocation={handleDonationAllocation}
+          isProcessing={isProcessing}
+          selectedClub={selectedClubForDonation}
+          selectedProgram={selectedProgramForDonation}
+          availableAmount={totalRemainingDonationAmount!}
+        />
+      )}
     </div>
   );
 }

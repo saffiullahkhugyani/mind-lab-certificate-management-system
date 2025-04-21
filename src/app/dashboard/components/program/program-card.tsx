@@ -16,6 +16,7 @@ interface ProgramCardProps {
   detailsLink: string;
   isExpanded: boolean;
   onClick: () => void;
+  onSponsorClick: () => void;
   numOfAllocations: number;
   couponLastExpiryDate?: string;
 }
@@ -32,10 +33,14 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   detailsLink,
   isExpanded,
   onClick,
+  onSponsorClick,
   numOfAllocations,
   couponLastExpiryDate,
 }) => {
-  const handleButtonClick = (e: React.MouseEvent) => e.stopPropagation();
+  const handleSponsorButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSponsorClick();
+  };
   const handleLinkClick = (e: React.MouseEvent) => e.stopPropagation();
 
   const sponsorButton = sponsored ? (
@@ -44,10 +49,11 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
     </span>
   ) : (
     <Button
-      onClick={(e) => {
-        e.stopPropagation();
-        console.log("Sponsor button has been clicked");
-      }}
+      // onClick={(e) => {
+      //   e.stopPropagation();
+      //   console.log("Sponsor button has been clicked");
+      // }}
+      onClick={handleSponsorButtonClick}
       variant="default"
       className="py-1 px-3 text-sm font-bold rounded-md w-full"
     >

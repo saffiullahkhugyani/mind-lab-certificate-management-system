@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { AllocatedProgramData, Coupons, DonationAllocationLogs, Programs, StudentSupport, Tag } from "@/types/types";
+import { AllocatedProgramData, Coupons, DonationAllocation, DonationAllocationLogs, Programs, StudentSupport, Tag } from "@/types/types";
 import { revalidatePath } from "next/cache";
 import { parseISO, addMonths, format } from "date-fns";
 
@@ -42,7 +42,7 @@ export async function studentList() {
 
     });
 
-    console.log("certificate Data: ", certificateData);
+    // console.log("certificate Data: ", certificateData);
 
     {/* Student screen information details fetching */ }
     const { data: studentInterest, error: studentInterestError } = await supabase
@@ -238,7 +238,7 @@ export default async function sponsorData() {
       return acc;
     }, []);
 
-    console.log(shapedAllocatedProgramData);
+    // console.log(shapedAllocatedProgramData);
 
     const shapedAllocatedProgramDataWithLastCouponExpiry = await Promise.all(
       shapedAllocatedProgramData!.map(async (log) => {
@@ -496,11 +496,11 @@ export async function cancelStudentSupport(
         .upsert(recordsToUpsert)
         .select();
 
-      console.log(cancelSupportError);
+      // console.log(cancelSupportError);
       if (cancelSupportError) throw new Error(cancelSupportError.message);
 
-      console.log(recordsToUpsert);
-      console.log(cancelSupport);
+      // console.log(recordsToUpsert);
+      // console.log(cancelSupport);
       return { success: true, data: cancelSupport };
     } else {
       throw new Error("support already cancelled.");
@@ -653,7 +653,7 @@ export async function addStudentCoupon(
       .eq("program_id", program_id!)
       .eq("support_status", false);
 
-    console.log("cancelled support: ", cancelSponsorSupport);
+    // console.log("cancelled support: ", cancelSponsorSupport);
 
     // throw error if there is sponsor support error
     if (cancelSponsorSupportError) throw new Error(cancelSponsorSupportError.message);
@@ -833,7 +833,7 @@ export async function addStudentCoupon(
 {/* Helper functions */ }
 
 async function generateAndStoreCouponCodes(coupon: Coupons) {
-  console.log("coupons from database: ", coupon);
+  // console.log("coupons from database: ", coupon);
   const supabase = createClient();
   if (!coupon.coupon_id || !coupon.number_of_coupons) {
     console.log("Invalid coupon data: Missing coupon_id or number of coupons");
@@ -850,7 +850,7 @@ async function generateAndStoreCouponCodes(coupon: Coupons) {
       .insert({ coupon_id: coupon.coupon_id, coupon_code: newCode })
       .select();
 
-    console.log(data);
+    // console.log(data);
   }
 }
 
@@ -890,3 +890,139 @@ const calculateStartDate = (period: string, numOfCoupons: number) => {
 
   return { startDate: startDate.toLocaleDateString(), endDate: endDate.toLocaleDateString() }
 };
+
+export async function donationAllocation(formData: DonationAllocation) {
+  const supabase = createClient();
+  const userId = (await supabase.auth.getUser()).data.user?.id;
+
+  try {
+    // Step 1: Fetch available donations ordered by sponsor
+    const { data: donations, error: fetchError } = await supabase
+      .from("donation")
+      .select("donation_id, remaining_amount, created_at, sponsor!inner(*)")
+      .gte("remaining_amount", 0)
+      .eq("sponsor.user_id", userId!)
+      .order("created_at", { ascending: true });
+
+    if (fetchError) {
+      throw new Error("Failed to fetch donations. Please try again later.");
+    }
+
+    if (!donations || donations.length === 0) {
+      throw new Error("No donations available for allocation.");
+    }
+
+    // Step 2: Calculate total available funds
+    const totalFunds = donations.reduce((sum, donation) => sum + (donation.remaining_amount ?? 0), 0);
+
+    if (totalFunds < formData.amount!) {
+      throw new Error("Insufficient funds to complete the allocation.");
+    }
+
+    // Step 3: Allocate amount using the available donations
+    let remainingToAllocate = formData.amount!;
+    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number }[] = [];
+
+    for (const donation of donations) {
+      if (remainingToAllocate <= 0) break;
+
+      const allocation = Math.min(remainingToAllocate, donation.remaining_amount!);
+      remainingToAllocate -= allocation;
+
+      // Update donation remaining amount in the database
+      const { error: updateError } = await supabase
+        .from("donation")
+        .update({ remaining_amount: donation.remaining_amount! - allocation })
+        .eq("donation_id", donation.donation_id);
+
+      if (updateError) {
+        throw new Error(`Failed to update donation ID ${donation.donation_id}.`);
+      }
+
+      allocationLog.push({
+        donation_id: donation.donation_id,
+        allocated_amount: allocation,
+        program_id: formData.program_id!,
+        remaining_allocated_amount: allocation
+      });
+    }
+
+    // console.log("Allocation log:", allocationLog);
+
+    for (const logData of allocationLog) {
+
+      if (logData.allocated_amount > 0) {
+        const { error: donationLogError } = await supabase
+          .from("donation_allocation_log")
+          .insert(logData)
+          .select()
+
+        if (donationLogError) {
+          console.log(donationLogError);
+          throw new Error("Failed to insert allocation log, Please try again");
+        }
+      }
+    }
+
+
+
+    // Step 4: Insert the allocation record into the donation_allocation table
+    const { data: allocationData, error: insertError } = await supabase
+      .from("donation_allocation")
+      .upsert(formData)
+      .select()
+      .single();
+
+    if (insertError) {
+      console.log(insertError);
+      throw new Error("Failed to record the allocation. Please try again later.");
+    }
+
+    // Step 5: Updating Prorams Table with total sum of all donations of the programs
+    const { data: allocatedDonation, error: donationAllocationError } = await supabase
+      .from("donation_allocation")
+      .select()
+      .eq("program_id", allocationData.program_id!);
+
+    if (donationAllocationError) throw donationAllocationError;
+
+    const totalSumOfProgramDonations = allocatedDonation.reduce((sum, donation) => sum + donation.amount!, 0);
+
+    // Step 6: Storing the total sum of donation amount to the programs table
+    // Fetch the current value of total_remaining_donation
+    const { data: totalRemainingDonation, error: errorTotalRemainingDonation } = await supabase
+      .from("programs")
+      .select("total_remaining_donation")
+      .eq("program_id", allocationData.program_id!)
+      .single();
+
+    if (errorTotalRemainingDonation) {
+      console.error("Error fetching current donation:", errorTotalRemainingDonation!.message);
+    } else {
+      const currentRemainingDonation = totalRemainingDonation?.total_remaining_donation || 0;
+
+      // Calculate new total_remaining_donation
+      const updatedRemainingDonation = currentRemainingDonation + formData.amount!;
+
+      const { data, error } = await supabase
+        .from("programs")
+        .update({
+          "total_allocated_donation": totalSumOfProgramDonations,
+          "total_remaining_donation": updatedRemainingDonation,
+        })
+        .eq("program_id", allocationData.program_id!)
+        .select();
+
+      if (error) throw new Error(error.message);
+    }
+
+
+
+    return { success: true, data: allocationData };
+
+  } catch (error: any) {
+    // Handle and return the error to be displayed as a toast
+    console.error("Error in donationAllocation:", error.message);
+    return { success: false, error: error.message };
+  }
+}
