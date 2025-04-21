@@ -19,10 +19,13 @@ export default function DonationTab({
 }: DonationProps) {
   // Data for Donation Summary
   const donationSummaryData = [
-    { label: "Total Donations", value: `$${sponsorData?.totalDonationAmount}` },
+    {
+      label: "Total Donations",
+      value: `AED ${sponsorData?.totalDonationAmount}`,
+    },
     {
       label: "Donations To Be Allocated",
-      value: `$${sponsorData?.totalRemainingDonation}`,
+      value: `AED ${sponsorData?.totalRemainingDonation}`,
     },
     {
       label: "Program Funded",

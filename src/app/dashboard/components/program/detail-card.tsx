@@ -28,13 +28,13 @@ export default function DetailsCard({
       {type === "donatedAmount" && (
         <>
           <p className="font-bold text-sm">{title}</p>
-          <p className="font-bold text-3xl">{`$${donatedAmount}`}</p>
+          <p className="font-bold text-3xl">{`AED ${donatedAmount}`}</p>
         </>
       )}
       {type === "remainingAmount" && (
         <>
           <p className="font-bold text-sm">{title}</p>
-          <p className="font-bold text-3xl">{`$${remainingAmount}`}</p>
+          <p className="font-bold text-3xl">{`AED ${remainingAmount}`}</p>
         </>
       )}
       {type === "couponStatistics" && (

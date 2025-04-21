@@ -107,7 +107,7 @@ const DonationAllocationReceiptDetail = ({
                     Number(allocatedProgramData?.subscription_value)
                 )}`}</td>
                 <td className="py-2 text-right px-2">
-                  ${allocatedProgramData?.allocated_amount!}
+                  AED {allocatedProgramData?.allocated_amount!}
                 </td>
               </tr>
             </tbody>
