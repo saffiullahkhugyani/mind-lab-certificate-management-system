@@ -517,16 +517,19 @@ export async function cancelStudentSupport(
 export async function assignStudentProgram(programId: number, studentId: string, sponsorId: number) {
 
   try {
-    const supanase = createClient();
-    const { data: programsData, error: programsDataError } = await supanase
-      .from("donation_allocation_log")
+    const supabase = createClient();
+    let query = supabase.from("donation_allocation_log")
       .select(`*, donation!inner(donation_id, sponsor_id), 
       programs!inner(program_id,program_english_name,subscription_value,
       total_allocated_donation,total_remaining_donation, club_id)`)
       .gt("remaining_allocated_amount", 0)
       .eq("donation.sponsor_id", sponsorId)
-      .eq("programs.program_id", programId)
       .order("id", { ascending: true });
+
+    if (programId !== 0) {
+      query.eq("programs.program_id", programId)
+    }
+    const { data: programsData, error: programsDataError } = await query;
 
     if (programsDataError) throw new Error(programsDataError.message);
 
@@ -560,7 +563,7 @@ export async function assignStudentProgram(programId: number, studentId: string,
     let finalResult = "testing";
     if (selectedRecords && selectedRecords.length > 0) {
       const couponData = {
-        program_id: programId,
+        program_id: selectedRecords.at(0)?.program_id,
         student_id: studentId,
         coupon_duration: "1 month",
         start_period: "Future period",
@@ -573,7 +576,7 @@ export async function assignStudentProgram(programId: number, studentId: string,
         throw new Error(res.error);
       }
 
-      const { data: studentName, error: studentNameError } = await supanase
+      const { data: studentName, error: studentNameError } = await supabase
         .from("students")
         .select("name")
         .eq("id", studentId)
@@ -581,7 +584,7 @@ export async function assignStudentProgram(programId: number, studentId: string,
 
       if (studentNameError) throw new Error(studentNameError.message);
 
-      const { data: programName, error: programNameError } = await supanase
+      const { data: programName, error: programNameError } = await supabase
         .from("programs")
         .select("program_english_name")
         .eq("program_id", res.data?.program_id!)

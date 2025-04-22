@@ -87,7 +87,7 @@ export default function DonationAllocationDialog({
           <div className="mt-4 space-y-4">
             {/* Available Amount Info */}
             <p className="text-sm text-muted-foreground">
-              Available Donation: ${availableAmount.toLocaleString()}
+              Available Donation: AED {availableAmount.toLocaleString()}
             </p>
 
             {/* Selected Club */}

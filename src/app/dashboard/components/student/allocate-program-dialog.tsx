@@ -33,7 +33,7 @@ interface AllocateProgramDialogProps {
 }
 
 const AllocateSupportFormSchema = z.object({
-  program_id: z.coerce.number().min(1, { message: "Please select a program." }),
+  program_id: z.coerce.number(),
 });
 
 type FormFields = z.infer<typeof AllocateSupportFormSchema>;
@@ -57,6 +57,7 @@ export default function AllocateProgramDialog({
   const selectedProgramId = watch("program_id");
 
   useEffect(() => {
+    console.log(isOpen, selectedStudent, form.getValues("program_id"));
     if (isOpen) {
       reset({ program_id: 0 });
     }
@@ -130,11 +131,11 @@ export default function AllocateProgramDialog({
                   return selected ? (
                     <>
                       <p>
-                        Total Donations: $
+                        Total Donations: AED{" "}
                         {(selected.allocated_amount ?? 0).toLocaleString()}
                       </p>
                       <p>
-                        Remaining Amount: $
+                        Remaining Amount: AED{" "}
                         {(
                           selected.remaining_allocated_amount ?? 0
                         ).toLocaleString()}
