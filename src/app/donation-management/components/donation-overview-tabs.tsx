@@ -66,12 +66,13 @@ export default function OverviewReportTabs({
             />
           </div>
         </TabsContent>
-        {/* <TabsContent value="coupons-report">
+        <TabsContent value="coupons-report">
           <div className="mt-4">
-              // Render the Donation Allocation Component 
-            <DataTable columns={columns} data={supportStudentData!} />
+            Under Construction
+            {/* // Render the Donation Allocation Component */}
+            {/* <DataTable columns={columns} data={supportStudentData!} /> */}
           </div>
-        </TabsContent> */}
+        </TabsContent>
       </Tabs>
     </div>
   );
