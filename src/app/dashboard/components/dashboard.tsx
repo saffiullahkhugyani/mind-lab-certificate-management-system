@@ -21,6 +21,7 @@ import {
 } from "@/types/types";
 import { Clubs, Profiles } from "@/types/customs";
 import { useRouter, useSearchParams } from "next/navigation";
+import OverviewTab from "./overview/overview_tab";
 
 interface DashboardProps {
   sponsor: SponsorData | null;
@@ -109,7 +110,13 @@ export default function Dashboard({
 
         {/* Tab Content */}
         <TabsContent value="overview">
-          <div>Coming soon</div>
+          <OverviewTab
+            sponsorData={sponsor}
+            programAllocationData={programAllocatedData}
+            donataionData={donataionData}
+            donationAllocationInvoiceData={donationAllocationInvoiceData!}
+            studentSupport={studentSupport}
+          />
         </TabsContent>
         <TabsContent value="donations">
           <DonationTab

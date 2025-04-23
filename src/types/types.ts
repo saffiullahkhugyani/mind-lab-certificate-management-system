@@ -163,14 +163,19 @@ export type AllocatedProgramData = {
 }
 
 export type StudentSupport = {
+  student_name?: string | null;
   student_id: string | null;
   coupon_id: number | null;
+  coupon_duration?: string | null;
+  coupon_start_date?: string | null;
+  coupon_end_date?: string | null;
   donation_id: number;
   program_id: number | null;
   num_of_coupons: number | null;
   totalCoupons?: number | null;
   numOfEnrolledPrograms?: number | null;
   couponStartDate?: string | null;
+  program_name?: string | null;
 }
 
 export type CertificateDetails = {

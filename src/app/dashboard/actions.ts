@@ -327,14 +327,14 @@ async function studentSupportData(sponsorUid: string) {
 
   const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
     .from("coupon_donation_link")
-    .select('coupons(*), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
+    .select('coupons(*, programs!inner(*)), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
     .eq("donation.sponsor.user_id", sponsorUid);
 
   if (couponDonationLinkError) throw new Error(couponDonationLinkError.message);
 
   const { data: couponUserMapping, error: couponUserMappingError } = await supabase
     .from("coupon_student_mapping")
-    .select("*");
+    .select("*, students!inner(id, name)");
 
   if (couponUserMappingError) throw new Error(couponUserMappingError.message);
 
@@ -360,6 +360,11 @@ async function studentSupportData(sponsorUid: string) {
           program_id: donationData.coupons?.program_id ?? null,
           num_of_coupons: donationData.num_of_coupons,
           couponStartDate: couponStartDate!,
+          coupon_duration: donationData.coupons?.coupon_duration,
+          coupon_start_date: couponStartDate!,
+          coupon_end_date: donationData.coupons?.end_date,
+          student_name: mapping.students?.name,
+          program_name: donationData.coupons?.programs.program_english_name
         });
       });
 
