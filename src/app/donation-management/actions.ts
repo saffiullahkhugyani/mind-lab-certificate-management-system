@@ -47,3 +47,56 @@ export async function addSponsorDonation(formData: Donation) {
   }
 
 }
+
+export async function donationAllocation() {
+
+  try {
+    const supabase = createClient();
+    const { data: donationLog, error: donationLogError } = await supabase
+      .from("donation_allocation_log")
+      .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
+      .order("id", { ascending: true });
+
+
+    if (donationLogError) throw new Error(donationLogError.message);
+    if (!donationLog) throw new Error("No record found for allocated");
+
+
+    const donationAllocationInvoiceData = donationLog.map((log) => ({
+      id: log.id,
+      allocated_amount: log.allocated_amount,
+      description: log.programs.description,
+      subscription_value: log.programs.subscription_value,
+      remaining_allocated_amount: log.remaining_allocated_amount,
+      program_id: log.programs.program_id,
+      club_id: log.programs.club_id,
+      program_name: log.programs?.program_english_name,
+      period: log.programs.period,
+      created_at: new Date(log.created_at).toISOString().split("T")[0],
+      sponsor: log.donation.sponsor,
+    })
+    )
+
+    const { data: donationData, error: donationError } = await supabase
+      .from("donation")
+      .select("*, sponsor!inner(*)")
+      .order("donation_id");
+
+    if (donationError) throw new Error(donationError.message);
+    if (!donationData) throw new Error("No donations found.");
+
+    // revalidatePath("/donation-management")
+    return {
+      success: true, data: {
+        donationInvoiceData: donationData,
+        donationAllocationInvoiceData: donationAllocationInvoiceData,
+      }
+    }
+
+  } catch (error: any) {
+    console.error("Error in donationAllocation:", error.message);
+    return { success: false, error: error.message };
+  }
+
+}
+

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DonationReceiptForm from "./components/donation-receipt-form";
-import { sponsorList } from "./actions";
+import { donationAllocation, sponsorList } from "./actions";
 import { readUserSession } from "@/lib/actions/action";
 import { redirect } from "next/navigation";
+import OverviewReportTabs from "./components/donation-overview-tabs";
 
 export default async function Page() {
   const sponsors = await sponsorList();
-  // const programs = await programsList();
+  const donataionData = await donationAllocation();
 
   const { data: userSession } = await readUserSession();
 
@@ -24,9 +25,13 @@ export default async function Page() {
         defaultValue="receipt"
         className="bg-white p-6 rounded-lg shadow-md"
       >
-        <TabsList className="mb-4">
-          <TabsTrigger value="receipt">Donation Receipt</TabsTrigger>
-          <TabsTrigger value="donation-overview">Donation Overview</TabsTrigger>
+        <TabsList className="space-x-4">
+          <TabsTrigger value="receipt" variant={"customOne"}>
+            Donation Receipt
+          </TabsTrigger>
+          <TabsTrigger value="donation-overview" variant={"customOne"}>
+            Donation Overview
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="receipt">
@@ -35,8 +40,13 @@ export default async function Page() {
 
         <TabsContent value="donation-overview">
           <div>
-            Overview section, adding donation allocation invoices and donation
-            invoices
+            <OverviewReportTabs
+              sponsorDetails={null}
+              donationData={donataionData.data?.donationInvoiceData!}
+              allocatedProgramData={
+                donataionData.data?.donationAllocationInvoiceData!
+              }
+            />
           </div>
         </TabsContent>
       </Tabs>

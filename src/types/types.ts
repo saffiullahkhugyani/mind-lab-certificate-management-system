@@ -1,3 +1,4 @@
+import { Sponsor } from "./customs";
 
 
 
@@ -52,6 +53,7 @@ export type Donation = {
   remaining_amount?: number | null
   source_of_amount?: string | null
   sponsor_id: number
+  sponsor?: Sponsors | null
 }
 
 export type Programs = {
@@ -125,4 +127,50 @@ export type StudentInterestData = {
   program?: string | null
   date_submitted?: string | null
   created_at?: string
+}
+
+export type SponsorData = {
+  sponsor_id: number | null;
+  name: string | null;
+  email: string | null;
+  image: string | null | undefined;
+  number: string | null;
+  totalDonationAmount: number;
+  totalRemainingDonation: number;
+  allocatedDonation: number;
+  programs_funded: number;
+  student_supported: number;
+}
+
+export type AllocatedProgramData = {
+  id: number;
+  allocated_amount: number | null;
+  description: string | null;
+  remaining_allocated_amount: number | null;
+  program_name: string | null;
+  program_id: number | null;
+  club_id: number | null;
+  subscription_value: string | null;
+  period: string | null;
+  created_at: string | null;
+  allocationDataCount?: number | null;
+  lastCouponExpiryDate?: string | null;
+  startDate?: string | null;
+  sponsor?: Sponsor | null;
+}
+
+export type StudentSupport = {
+  student_name?: string | null;
+  student_id: string | null;
+  coupon_id: number | null;
+  coupon_duration?: string | null;
+  coupon_start_date?: string | null;
+  coupon_end_date?: string | null;
+  donation_id: number;
+  program_id: number | null;
+  num_of_coupons: number | null;
+  totalCoupons?: number | null;
+  numOfEnrolledPrograms?: number | null;
+  couponStartDate?: string | null;
+  program_name?: string | null;
 }
