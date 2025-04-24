@@ -158,7 +158,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className=" flex otems-center justify-center space-x-2 m-4">
+      <div className="flex items-center justify-center space-x-2 m-4 flex-wrap">
         <Button
           variant="secondary"
           onClick={() => table.previousPage()}
@@ -166,6 +166,24 @@ export function DataTable<TData, TValue>({
         >
           Previous
         </Button>
+
+        {/* Page Numbers */}
+        {Array.from({ length: table.getPageCount() }).map((_, index) => {
+          const page = index;
+          const isCurrent = page === table.getState().pagination.pageIndex;
+
+          return (
+            <Button
+              key={page}
+              variant={isCurrent ? "default" : "outline"}
+              onClick={() => table.setPageIndex(page)}
+              className={isCurrent ? "font-bold" : ""}
+            >
+              {page + 1}
+            </Button>
+          );
+        })}
+
         <Button
           variant="secondary"
           onClick={() => table.nextPage()}
