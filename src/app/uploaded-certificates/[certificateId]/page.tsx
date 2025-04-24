@@ -12,7 +12,7 @@ export default async function UploadedCertificates({
 }: {
   params: { certificateId: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: userSession } = await readUserSession();
 
   if (!userSession.session) {
