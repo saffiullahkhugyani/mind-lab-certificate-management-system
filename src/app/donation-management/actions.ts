@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server";
-import { Donation, DonationAllocation, Programs } from "@/types/types";
+import { Donation, DonationAllocation, Programs, StudentSupport } from "@/types/types";
 import { revalidatePath } from "next/cache";
 
 export async function sponsorList() {
@@ -98,5 +98,71 @@ export async function donationAllocation() {
     return { success: false, error: error.message };
   }
 
+}
+
+export async function studentCouponsReport() {
+  try {
+    const supabase = createClient();
+
+    const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
+      .from("coupon_donation_link")
+      .select('coupons(*, programs!inner(*)), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons');
+
+    if (couponDonationLinkError) throw new Error(couponDonationLinkError.message);
+
+    const { data: couponUserMapping, error: couponUserMappingError } = await supabase
+      .from("coupon_student_mapping")
+      .select("*, students!inner(id, name)");
+
+    if (couponUserMappingError) throw new Error(couponUserMappingError.message);
+
+
+    const customList: StudentSupport[] = [];
+
+    couponDonationLink.forEach(donationData => {
+      const couponId = donationData.coupons?.coupon_id;
+      const couponStartDate = donationData.coupons?.start_date;
+
+      // Find all user mappings for this coupon
+      const matchingMappings = couponUserMapping.filter(
+        mapping => mapping.coupon_id === couponId
+      );
+
+      // If there are user mappings, create an entry for each user
+      if (matchingMappings.length > 0) {
+        matchingMappings.forEach(mapping => {
+          customList.push({
+            student_id: mapping.student_id,
+            coupon_id: couponId!,
+            donation_id: donationData.donation.donation_id,
+            program_id: donationData.coupons?.program_id ?? null,
+            num_of_coupons: donationData.num_of_coupons,
+            couponStartDate: couponStartDate!,
+            coupon_duration: donationData.coupons?.coupon_duration,
+            coupon_start_date: couponStartDate!,
+            coupon_end_date: donationData.coupons?.end_date,
+            student_name: mapping.students?.name,
+            program_name: donationData.coupons?.programs.program_english_name
+          });
+        });
+
+      } else {
+        // If no user mappings exist, create one entry with null user_id
+        customList.push({
+          student_id: null,
+          coupon_id: couponId!,
+          donation_id: donationData.donation.donation_id,
+          program_id: donationData.coupons?.program_id ?? null,
+          num_of_coupons: donationData.num_of_coupons
+        });
+      }
+    });
+
+    return { success: true, data: customList };
+  } catch (error: any) {
+
+    console.error("Error in coupon report:", error.message);
+    return { success: false, error: error.message };
+  }
 }
 

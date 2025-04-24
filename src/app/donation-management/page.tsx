@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DonationReceiptForm from "./components/donation-receipt-form";
-import { donationAllocation, sponsorList } from "./actions";
+import {
+  donationAllocation,
+  sponsorList,
+  studentCouponsReport,
+} from "./actions";
 import { readUserSession } from "@/lib/actions/action";
 import { redirect } from "next/navigation";
 import OverviewReportTabs from "./components/donation-overview-tabs";
@@ -9,12 +13,15 @@ import OverviewReportTabs from "./components/donation-overview-tabs";
 export default async function Page() {
   const sponsors = await sponsorList();
   const donataionData = await donationAllocation();
+  const couponsReport = await studentCouponsReport();
 
   const { data: userSession } = await readUserSession();
 
   if (!userSession.session) {
     return redirect("/login");
   }
+
+  console.log("coupon Report", couponsReport);
 
   return (
     <div className="p-6 space-x-3 bg-gray-100 w-full">
@@ -46,6 +53,7 @@ export default async function Page() {
               allocatedProgramData={
                 donataionData.data?.donationAllocationInvoiceData!
               }
+              supportStudentData={couponsReport.data}
             />
           </div>
         </TabsContent>

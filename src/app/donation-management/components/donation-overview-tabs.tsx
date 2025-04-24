@@ -7,6 +7,8 @@ import {
 } from "@/types/types";
 import DonationReceipt from "./donation_receipts";
 import DonationAllocationReceipt from "./donation_allocation_receipt";
+import { columns } from "./coupons_report_columns";
+import { DataTable } from "./coupons_report_data_table";
 interface DonationReceiptProps {
   sponsorDetails: SponsorData | null;
   donationData: Donation[] | null;
@@ -70,7 +72,7 @@ export default function OverviewReportTabs({
           <div className="mt-4">
             Under Construction
             {/* // Render the Donation Allocation Component */}
-            {/* <DataTable columns={columns} data={supportStudentData!} /> */}
+            <DataTable columns={columns} data={supportStudentData!} />
           </div>
         </TabsContent>
       </Tabs>
