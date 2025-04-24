@@ -147,10 +147,14 @@ export default async function sponsorData() {
     ) || 0;
 
     // calculate total remaining amount
-    const totalRemainingDonation = donationData?.reduce(
-      (sum, donation) => sum + (donation.remaining_amount || 0),
-      0
-    ) || 0;
+    const totalRemainingDonation = parseFloat(
+      (
+        donationData?.reduce(
+          (sum, donation) => sum + (donation.remaining_amount || 0),
+          0
+        ) || 0
+      ).toFixed(2)
+    );
 
     const { data: donationLog, error: donationLogError } = await supabase
       .from("donation_allocation_log")
