@@ -5,7 +5,7 @@ import SignOut from "./SignOut";
 import DateTimeDisplay from "./date-time";
 
 const Header = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

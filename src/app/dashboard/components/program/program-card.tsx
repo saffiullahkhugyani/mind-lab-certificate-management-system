@@ -127,13 +127,15 @@ const ExpandedView: React.FC<any> = ({
   <>
     <div className="col-span-1">
       <div className="mb-4">{sponsorButton}</div>
-      <Image
-        src={image}
-        alt={title}
-        width={100}
-        height={100}
-        className="h-40 w-full object-cover rounded-md mb-4"
-      />
+      {image ? (
+        <Image
+          src={image}
+          alt={title}
+          width={100}
+          height={100}
+          className="h-40 w-full object-cover rounded-md mb-4"
+        />
+      ) : null}
       <h2 className="text-lg font-bold text-gray-800">{title}</h2>
       <p className="text-sm text-gray-600 mb-4">{description}</p>
       <p className="text-sm text-gray-700 font-medium mb-4">
@@ -185,13 +187,15 @@ const CollapsedView: React.FC<any> = ({
 }) => (
   <>
     <div className="mb-4">{sponsorButton}</div>
-    <Image
-      src={image}
-      alt={title}
-      width={100}
-      height={100}
-      className="h-40 w-full object-cover rounded-md mb-4"
-    />
+    {image ? (
+      <Image
+        src={image}
+        alt={title}
+        width={100}
+        height={100}
+        className="h-40 w-full object-cover rounded-md mb-4"
+      />
+    ) : null}
     <h2 className="text-lg font-bold text-gray-800">{title}</h2>
     <p className="text-sm text-gray-600 mb-4">{description}</p>
     <p className="text-sm text-gray-700 font-medium">

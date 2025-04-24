@@ -7,7 +7,7 @@ import { parseISO, addMonths, format } from "date-fns";
 
 
 export async function studentList() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     const { data: studentList, error: studentListError } = await supabase
@@ -82,7 +82,7 @@ export async function studentList() {
 
 
 export async function clubList() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     const { data: clubList, error: clubListError } = await supabase
@@ -100,7 +100,7 @@ export async function clubList() {
 }
 
 export async function programList() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     const { data: programList, error: programListError } = await supabase
@@ -118,7 +118,7 @@ export async function programList() {
 }
 
 export default async function sponsorData() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const userId = (await supabase.auth.getUser()).data.user?.id;
   try {
 
@@ -141,10 +141,10 @@ export default async function sponsorData() {
     if (!donationData) throw new Error("No donations found.");
 
     // calculate the total donation amount
-    const totalDonationAmount = donationData?.reduce(
+    const totalDonationAmount = parseFloat((donationData?.reduce(
       (sum, donation) => sum + (donation.amount || 0),
       0
-    ) || 0;
+    ) || 0).toFixed(2));
 
     // calculate total remaining amount
     const totalRemainingDonation = parseFloat(
@@ -287,7 +287,7 @@ export default async function sponsorData() {
 }
 
 async function lastCouponExpiry(sponsorUid: string, programId: number) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
     .from("coupon_donation_link")
@@ -327,7 +327,7 @@ async function lastCouponExpiry(sponsorUid: string, programId: number) {
 
 async function studentSupportData(sponsorUid: string) {
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
     .from("coupon_donation_link")
@@ -389,7 +389,7 @@ async function studentSupportData(sponsorUid: string) {
 
 export async function addStudentSupport(studentId: string, programId: number, sponsorId: number) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: exisitingSupport, error: exisitingSupportError } = await supabase
       .from("sponsor_student_support")
@@ -422,7 +422,7 @@ export async function cancelStudentSupport(
   sponsorId: number,
   programs: Programs[],
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // Check existing support status
@@ -526,7 +526,7 @@ export async function cancelStudentSupport(
 export async function assignStudentProgram(programId: number, studentId: string, sponsorId: number) {
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     let query = supabase.from("donation_allocation_log")
       .select(`*, donation!inner(donation_id, sponsor_id), 
       programs!inner(program_id,program_english_name,subscription_value,
@@ -623,7 +623,7 @@ export async function addStudentCoupon(
   sponsorId: Number,
   donationAllocationLog: DonationAllocationLogs[],) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { program_id, club_id, student_id, coupon_duration, start_period } = couponData;
     const { subscription_value, total_remaining_donation } = programDetails;
 
@@ -847,7 +847,7 @@ export async function addStudentCoupon(
 
 async function generateAndStoreCouponCodes(coupon: Coupons) {
   // console.log("coupons from database: ", coupon);
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!coupon.coupon_id || !coupon.number_of_coupons) {
     console.log("Invalid coupon data: Missing coupon_id or number of coupons");
     return;
@@ -905,7 +905,7 @@ const calculateStartDate = (period: string, numOfCoupons: number) => {
 };
 
 export async function donationAllocation(formData: DonationAllocation) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const userId = (await supabase.auth.getUser()).data.user?.id;
 
   try {
