@@ -6,7 +6,7 @@ import CertificateCardItem from "./components/certificate-card-item";
 
 async function getCertificateList() {
   await new Promise((resolve) => setTimeout(resolve, 3000));
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: uploadedCertificates } = await supabase
     .from("upload_certificate")
     .select(`id, certificate_image_url ,profiles(*)`);

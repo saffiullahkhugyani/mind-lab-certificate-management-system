@@ -9,7 +9,7 @@ export async function updatePassword(data: {
     refreshToken: string,
 }) {
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     try {
         const { accessToken, refreshToken } = data;
@@ -20,8 +20,8 @@ export async function updatePassword(data: {
 
         // Set the session using the access token
         const { data: session, error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
+            access_token: accessToken,
+            refresh_token: refreshToken,
         });
 
         if (sessionError) {
@@ -36,7 +36,7 @@ export async function updatePassword(data: {
         const { data: resetData, error: resetError } = await supabase
             .auth
             .updateUser({ password: data.password })
-        
+
         if (resetData) {
             console.log(resetData);
 
@@ -44,9 +44,9 @@ export async function updatePassword(data: {
 
             if (logoutError) throw new Error(logoutError.message);
 
-            return {success: true, data: resetData}
+            return { success: true, data: resetData }
         }
-        if (resetError) { 
+        if (resetError) {
             console.log(resetError);
             throw new Error(resetError.message)
         }

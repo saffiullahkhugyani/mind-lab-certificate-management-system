@@ -7,11 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export default async function UploadedCertificates({
-  params,
-}: {
-  params: { certificateId: string };
-}) {
+type PageProps = {
+  params: Promise<{
+    certificateId: string;
+  }>;
+};
+
+export default async function UploadedCertificates({ params }: PageProps) {
   const supabase = await createClient();
   const { data: userSession } = await readUserSession();
 
@@ -19,7 +21,7 @@ export default async function UploadedCertificates({
     return redirect("/login");
   }
 
-  const { certificateId } = params;
+  const { certificateId } = await params;
 
   const { data } = await supabase
     .from("upload_certificate")
