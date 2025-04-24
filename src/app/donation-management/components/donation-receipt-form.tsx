@@ -43,7 +43,9 @@ export const donationReceiptFormSchema = z.object({
     .min(10, "Description must be at least 10 characters long")
     .max(200, "Description cannot exceed 200 characters"),
   amount: z.number().positive("Amount must be positive"),
-  charges: z.number().nonnegative("Charges must be zero or more").optional(),
+  charges: z
+    .union([z.number().nonnegative("Charges must be zero or more"), z.null()])
+    .optional(),
 });
 
 //  type from donation form schema
@@ -243,6 +245,7 @@ export default function DonationReceiptForm({
                       <FormControl>
                         <Input
                           {...field}
+                          value={field.value ?? ""}
                           step={0.01}
                           type="number"
                           placeholder="charges"
