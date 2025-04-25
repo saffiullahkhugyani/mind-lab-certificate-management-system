@@ -23,10 +23,10 @@ const Header = async () => {
               <Link href={"/create-certificate"}>Create Certificate</Link>
               <Link href={"/certificate-list"}>Certificate List</Link>
               <Link href={"/generate-certificate"}>
-                Generate Certificate Templete
+                Generate a Certificate templete
               </Link>
               <Link href={"/assign-student-certificate"}>
-                Issue Certificate
+                Assign Student Certificate
               </Link>
               {/* <Link href={"/donation-management"}>Donation Management</Link>
               <Link href={"/program-management"}>Program Management</Link>

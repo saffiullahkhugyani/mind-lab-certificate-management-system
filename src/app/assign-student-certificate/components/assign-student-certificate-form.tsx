@@ -295,9 +295,7 @@ export default function AssignStudentCertificateForm({
             </div>
           </div>
           <div>
-            <LoadingButton loading={isPending}>
-              Assign Certificate
-            </LoadingButton>
+            <LoadingButton loading={isPending}>Issue Certificate</LoadingButton>
           </div>
           {/* </div> */}
         </form>
