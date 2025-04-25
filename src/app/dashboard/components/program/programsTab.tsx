@@ -70,6 +70,7 @@ export default function ProgramsTab({
     30: "/aeronautic-program.png",
     31: "/gravity-race-program.png",
     32: "/little-inventors-program.png",
+    39: "/robotics-program.png",
   };
 
   const handleSearchProgram = (event: ChangeEvent<HTMLInputElement>) => {

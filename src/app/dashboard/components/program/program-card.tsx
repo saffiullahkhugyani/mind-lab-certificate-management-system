@@ -44,9 +44,11 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   const handleLinkClick = (e: React.MouseEvent) => e.stopPropagation();
 
   const sponsorButton = sponsored ? (
-    <span className="block w-full py-1 px-3 text-sm font-semibold text-gray-400 text-right cursor-default">
-      Sponsored
-    </span>
+    <div className=" bg-[#586bdc] rounded-md justify-center items-center w-fit">
+      <span className="block py-1 px-3 text-sm font-semibold text-white text-right cursor-default">
+        Sponsored
+      </span>
+    </div>
   ) : (
     <Button
       // onClick={(e) => {
@@ -105,6 +107,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
           donatedAmount={donatedAmount}
           numOfAllocations={numOfAllocations}
           sponsorButton={sponsorButton}
+          sponsored={sponsored}
           detailsLinkComponent={detailsLinkComponent}
         />
       )}
@@ -121,12 +124,13 @@ const ExpandedView: React.FC<any> = ({
   programSubsrciptionValue,
   programEnrolledDate,
   sponsorButton,
+  sponsored,
   detailsLinkComponent,
   couponLastExpiryDate,
 }) => (
   <>
     <div className="col-span-1">
-      <div className="mb-4">{sponsorButton}</div>
+      {!sponsored && <div className="mb-4">{sponsorButton}</div>}
       {image ? (
         <Image
           src={image}
@@ -183,10 +187,11 @@ const CollapsedView: React.FC<any> = ({
   donatedAmount,
   numOfAllocations,
   sponsorButton,
+  sponsored,
   detailsLinkComponent,
 }) => (
   <>
-    <div className="mb-4">{sponsorButton}</div>
+    {sponsored && <div className="mb-4">{sponsorButton}</div>}
     {image ? (
       <Image
         src={image}
@@ -204,6 +209,8 @@ const CollapsedView: React.FC<any> = ({
     <p className="text-sm text-gray-700 font-medium mb-4">
       Number of allocations: {numOfAllocations}
     </p>
+
+    {!sponsored && sponsorButton}
     {detailsLinkComponent}
   </>
 );
