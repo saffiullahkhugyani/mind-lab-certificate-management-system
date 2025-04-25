@@ -3,8 +3,8 @@ import { Database } from '@/types/supabase';
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClientReadOnly() {
-  const cookieStore = cookies();
+export async function createClientReadOnly() {
+  const cookieStore = await cookies();
 
   return createServerClient(
     process.env.PUBLIC_SUPABASE_URL!,
@@ -31,8 +31,8 @@ export function createClientReadOnly() {
 
 }
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient<Database>(
     process.env.PUBLIC_SUPABASE_URL!,

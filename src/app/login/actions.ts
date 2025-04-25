@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
  * @throws Redirects to the login page with an error message if authentication fails.
  */
 export async function emailLogin(data: { email: string; password: string }) {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     try {
         const { error } = await supabase.auth.signInWithPassword(data);
@@ -37,7 +37,7 @@ export async function emailLogin(data: { email: string; password: string }) {
  * @throws Redirects to the login page after signing out.
  */
 export async function signOut() {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     try {
         await supabase.auth.signOut();

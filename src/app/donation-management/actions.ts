@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function sponsorList() {
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: sponsers, error: sponsersError } = await supabase
       .from("sponsor")
       .select()
@@ -25,7 +25,7 @@ export async function addSponsorDonation(formData: Donation) {
 
   try {
 
-    const supabase = createClient();
+    const supabase = await createClient();
     const { remaining_amount, ...rest } = formData;
     const donationData = { ...rest, remaining_amount: rest.amount }
 
@@ -51,7 +51,7 @@ export async function addSponsorDonation(formData: Donation) {
 export async function donationAllocation() {
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: donationLog, error: donationLogError } = await supabase
       .from("donation_allocation_log")
       .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
@@ -102,7 +102,7 @@ export async function donationAllocation() {
 
 export async function studentCouponsReport() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
       .from("coupon_donation_link")

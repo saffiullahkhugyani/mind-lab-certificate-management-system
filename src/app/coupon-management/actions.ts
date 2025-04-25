@@ -6,7 +6,7 @@ import { Coupons, StudentInterestData } from "@/types/types";
 
 {/*Fething clubs list */ }
 export async function clubsList() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data: clubs, error: fetchError } = await supabase
@@ -31,7 +31,7 @@ export async function clubsList() {
 
 {/* Fetching programs list*/ }
 export async function programsList() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.from("programs")
     .select().order("program_id", { ascending: true });
 
@@ -48,7 +48,7 @@ export async function programsList() {
 {/* Fetching students list */ }
 {/* For now fetching all users will be fixed when we add role based access control */ }
 export async function studentsList() {
-  const supabase = createClient();
+  const supabase = await createClient();
   try {
     const { data: students, error: fetchError } = await supabase
       .from("students")
@@ -75,7 +75,7 @@ export async function studentsList() {
 
 { /* adding/generating studnets coupons */ }
 export async function addStudentCoupon(formData: Coupons, isManual = false) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     program_id,
     student_id,
@@ -318,7 +318,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
 
 { /* Add student interest function */ }
 export async function AddStudentInterest(studentInterest: StudentInterestData[]) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const resultMessages: string[] = [];
   const insertedInterestData: StudentInterestData[] = [];
   let successCount = 0;
@@ -413,7 +413,7 @@ export async function AddStudentInterest(studentInterest: StudentInterestData[])
 
 {/* Fetching coupons list */ }
 export async function couponsList() {
-  const supabase = createClient();
+  const supabase = await createClient();
   try {
     const { data: coupons, error: fetchError } = await supabase
       .from("coupons")
@@ -434,7 +434,7 @@ export async function couponsList() {
 
 }
 export async function couponBatchProcess(clubId: number, programId: number) {
-  const supabase = createClient();
+  const supabase = await createClient();
   let addedCouponsList: Coupons[] = []; // to store successfully added coupons
   let errorList: { email: string; message: string }[] = []; // to store errors with email
 
@@ -591,7 +591,7 @@ export async function couponBatchProcess(clubId: number, programId: number) {
 
 // Helper function to find a program with sufficient donation
 async function findProgramWithSufficientDonation(clubId: number) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: programs, error } = await supabase
     .from("programs")
     .select("*")
@@ -612,7 +612,7 @@ async function findProgramWithSufficientDonation(clubId: number) {
 async function generateAndStoreCouponCodes(coupon: Coupons) {
 
   console.log("coupons from database: ", coupon);
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!coupon.coupon_id || !coupon.number_of_coupons) {
     console.log("Invalid coupon data: Missing coupon_id or number of coupons");
     return;
@@ -693,7 +693,7 @@ function calculateStartDateFromDate(startDateString: string, months: number) {
 
 
 async function validateSponsorSupport(student_id: string, program_id: number) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: sponsorSupport, error: sponsorSupportError } = await supabase
     .from("sponsor_student_support")
     .select()

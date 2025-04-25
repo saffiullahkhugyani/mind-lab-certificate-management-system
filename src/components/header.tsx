@@ -4,7 +4,7 @@ import React from "react";
 import SignOut from "./SignOut";
 
 const Header = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -15,9 +15,9 @@ const Header = async () => {
     <header className="z-10 sticky top-0 w-full border-b border-border bg-[#9e1b32] text-white">
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <nav className="flex items-center space-x-4 lg:space-x-6">
-          <a className="mr-6 flex items-center space-x-2" href="/">
+          <Link className="mr-6 flex items-center space-x-2" href="/">
             <span className="font-bold text-lg">Sponsor Admin Panel</span>
-          </a>{" "}
+          </Link>{" "}
           {user != null && (
             <div className="flex items-center gap-4">
               {/* <Link href={"/create-certificate"}>Create Certificate</Link>

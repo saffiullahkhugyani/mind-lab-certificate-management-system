@@ -5,7 +5,7 @@ import { DonationAllocation, Programs } from "@/types/types";
 
 
 export async function clubsList() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data: clubs, error: fetchError } = await supabase
@@ -29,7 +29,7 @@ export async function clubsList() {
 }
 
 export async function addProgram(programData: Programs) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
 
@@ -69,7 +69,7 @@ export async function addProgram(programData: Programs) {
 }
 
 export async function programsList() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.from("programs")
     .select().order("program_english_name", { ascending: true });
 
@@ -85,7 +85,7 @@ export async function programsList() {
 }
 
 export async function donationAllocation(formData: DonationAllocation) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // Step 1: Fetch available donations ordered by creation time (FIFO)
@@ -219,7 +219,7 @@ export async function donationAllocation(formData: DonationAllocation) {
 }
 
 export async function getAvailableDonation() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data: availableDonation, error: availableDonationError } = await supabase.from("donation")
@@ -227,7 +227,7 @@ export async function getAvailableDonation() {
 
     if (availableDonationError) throw new Error(availableDonationError.message);
 
-    const totalRemainingDonation = availableDonation.reduce((sum, donation) => sum + donation.remaining_amount!, 0);
+    const totalRemainingDonation = parseFloat(availableDonation.reduce((sum, donation) => sum + donation.remaining_amount!, 0).toFixed(2));
 
 
     return { success: true, data: totalRemainingDonation };
