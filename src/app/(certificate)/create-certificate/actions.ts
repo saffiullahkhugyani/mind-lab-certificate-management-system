@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 export async function getCertificateList() {
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: uploadedCertificates, error: uploadedCertificatesError } = await supabase
       .from("upload_certificate")
@@ -31,7 +31,7 @@ export async function getCertificateList() {
 // fetching certificates added by admin
 export async function getAssertedCertificatesList() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: assertedCertificates, error: assertedCertificateError } = await supabase
       .from("certificate_master")
@@ -64,7 +64,7 @@ export async function getAssertedCertificatesList() {
 
 export async function getSkillCatrgories() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: skillCategory, error: skillCategoryError } = await supabase
       .from("skill_category")
@@ -82,7 +82,7 @@ export async function getSkillCatrgories() {
 
 export async function getSkillTypes() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: skillTypes, error: skillTypeError } = await supabase
       .from("skill_types")
@@ -99,7 +99,7 @@ export async function getSkillTypes() {
 }
 
 export async function getSkillTags() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
 
@@ -122,7 +122,7 @@ export async function getSkillTags() {
 export async function addCertificate(formData: Certificate) {
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { id, ...rest } = formData;
     const certificateData = id === null ? rest : formData;
 
@@ -145,7 +145,7 @@ export async function addCertificate(formData: Certificate) {
 export async function updateCertificate(formData: Certificate) {
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { id, ...rest } = formData;
     const certificateData = id === null ? rest : formData;
 
@@ -172,7 +172,7 @@ export async function addCertificateMapping({ studentId, certificateV1Id, certif
   console.log("V2 Id:", certificateV2Id);
   try {
 
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: addCertificateMapping, error: certificateMappingError } = await supabase
       .from("certificate_v1_v2_mapping")
       .insert({ student_id: studentId, v1_certificate_id: certificateV1Id, v2_certificate_id: certificateV2Id }).select();
@@ -195,7 +195,7 @@ export async function addCertificateMapping({ studentId, certificateV1Id, certif
 export async function certificateAsserted({ certificateV1Id }: { certificateV1Id: number }) {
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: assertedCertificate, error: assertedCertificateError } = await supabase
       .from("upload_certificate")
       .update({ certificate_asserted: "1" })

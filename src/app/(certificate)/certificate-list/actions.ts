@@ -6,19 +6,18 @@ import { Certificate, Tag } from "@/types/types";
 import { revalidatePath } from "next/cache"
 
 export async function switchCertificateState(certificateId: String, value: boolean) {
-  const supabase = createClient();
-  
-  const certificateStatus = {certificate_status: value}
-    
-    const { data, error } = await supabase.from("certificate_master").
-        update(certificateStatus).eq("id", certificateId).select();
-    
-    if (data != null)
-  {
+  const supabase = await createClient();
 
-    console.log("Status changed: ",data);
+  const certificateStatus = { certificate_status: value }
+
+  const { data, error } = await supabase.from("certificate_master").
+    update(certificateStatus).eq("id", certificateId).select();
+
+  if (data != null) {
+
+    console.log("Status changed: ", data);
   } else {
-    console.log("Error changing status: ",error)
+    console.log("Error changing status: ", error)
   }
 
   revalidatePath("/certificate-list")
@@ -30,34 +29,34 @@ export async function switchCertificateState(certificateId: String, value: boole
 export async function getCertificateList() {
 
   try {
-    const supabase = createClient();
-    
+    const supabase = await createClient();
+
     const { data: certificateMaster, error: certificateMasterError } = await supabase
       .from("certificate_master")
       .select()
       .order("id", { ascending: true });
-    
+
     if (certificateMasterError) throw new Error(certificateMasterError.message);
 
     const transformTags = (tags: Json): Tag[] => {
-            // Ensure 'tags' is an array before processing
-            if (!Array.isArray(tags)) return [];
-        
-            return tags.map((tag: any) => ({
-              tag_name: tag.tag_name || null,
-              hours: typeof tag.hours === "number" ? tag.hours : null,
-            }));
-          };
-    
-        const certificatesWithTransformedTags = certificateMaster!.map((cert) => ({
-        ...cert, // Spread the rest of the properties unchanged
-        tags: transformTags(cert.tags), // Only transform the tags field
+      // Ensure 'tags' is an array before processing
+      if (!Array.isArray(tags)) return [];
+
+      return tags.map((tag: any) => ({
+        tag_name: tag.tag_name || null,
+        hours: typeof tag.hours === "number" ? tag.hours : null,
       }));
+    };
 
-    return {success:true, data: certificatesWithTransformedTags};
+    const certificatesWithTransformedTags = certificateMaster!.map((cert) => ({
+      ...cert, // Spread the rest of the properties unchanged
+      tags: transformTags(cert.tags), // Only transform the tags field
+    }));
 
-   } catch (error: any) {
-    return {success:false, error: error.message}
+    return { success: true, data: certificatesWithTransformedTags };
+
+  } catch (error: any) {
+    return { success: false, error: error.message }
   }
-  
+
 }

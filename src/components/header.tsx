@@ -4,7 +4,7 @@ import React from "react";
 import SignOut from "./SignOut";
 
 const Header = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

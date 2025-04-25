@@ -3,7 +3,7 @@ import { StudentSupport, Tag } from "@/types/types";
 import { addMonths } from "date-fns";
 
 export async function getStudentData(studentId: string) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     try {
         const { data: studentDetail, error: studentDetailError } = await supabase

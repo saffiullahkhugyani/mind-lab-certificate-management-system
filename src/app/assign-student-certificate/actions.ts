@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 
 export async function getStudents() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: studentList, error: studentListError } = await supabase
       .from("coupon_student_mapping")
@@ -41,7 +41,7 @@ export async function getStudents() {
 
 export async function getProgramCertificates() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: programCertificateList, error: programCertificateListError } = await supabase
       .from("program_certificate")
@@ -76,7 +76,7 @@ export async function getProgramCertificates() {
 
 export async function assignStudentCertificate(data: ProgramCertificateMapping) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: existingMapping, error: existingMappingError } = await supabase
       .from("program_certificate_student_mapping")
@@ -96,7 +96,7 @@ export async function assignStudentCertificate(data: ProgramCertificateMapping) 
 
     if (programCertificateMappingError) throw new Error(programCertificateMappingError.message);
 
-    revalidatePath("/assign-program-certificate");
+    revalidatePath("/assign-student-certificate");
     return { success: true, data: programCertificateMapping };
 
   } catch (error: any) {
@@ -108,7 +108,7 @@ export async function assignStudentCertificate(data: ProgramCertificateMapping) 
 
 export async function getAssignedProgramCertificate() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: assignedCertificateMapping, error: ssignedCertificateMappingError } = await supabase
       .from("program_certificate_student_mapping")

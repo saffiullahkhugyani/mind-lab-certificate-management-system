@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 
 export async function getSkillCatrgories() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: skillCategory, error: skillCategoryError } = await supabase
       .from("skill_category")
@@ -25,7 +25,7 @@ export async function getSkillCatrgories() {
 
 export async function getSkillTypes() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data: skillTypes, error: skillTypeError } = await supabase
       .from("skill_types")
@@ -42,7 +42,7 @@ export async function getSkillTypes() {
 }
 
 export async function getSkillTags() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
 
@@ -64,7 +64,7 @@ export async function getSkillTags() {
 
 
 export async function getClubs() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
 
@@ -86,7 +86,7 @@ export async function getClubs() {
 
 
 export async function getProgramsList() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
 
@@ -109,7 +109,7 @@ export async function getProgramsList() {
 export async function addProgramCertificate(formData: ProgramCertificate) {
   console.log("formData: ", formData);
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { id, ...rest } = formData;
     const certificateData = id === null ? rest : formData;
 
@@ -147,7 +147,7 @@ export async function getStudentsAndStore() {
   }
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: students, error: studentsError } = await supabase
       .from("profiles").select("*").eq("role_id", 4);
 

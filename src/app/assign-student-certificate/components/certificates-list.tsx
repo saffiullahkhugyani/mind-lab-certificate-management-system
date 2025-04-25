@@ -19,12 +19,11 @@ const CertificateList = ({ assignedCertificate }: CertificateListProps) => {
   const [selected, setSelected] = useState<AssignedProgramCertificate | null>(
     assignedCertificate?.[0] || null
   );
-
-  console.log(assignedCertificate);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value.trim();
-    console.log(query);
+    const query = event.target.value;
+    setSearchQuery(query); // keep value in sync
     setFilteredCertificate(
       query
         ? assignedCertificate?.filter((certificate) =>

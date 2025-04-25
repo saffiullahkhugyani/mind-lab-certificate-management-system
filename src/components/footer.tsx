@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
 
 const Footer = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
