@@ -15,9 +15,9 @@ const Header = async () => {
     <header className="z-10 sticky top-0 w-full border-b border-border bg-primary text-white">
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <nav className="flex items-center space-x-4 lg:space-x-6">
-          <a className="mr-6 flex items-center space-x-2" href="/">
+          <Link className="mr-6 flex items-center space-x-2" href="/">
             <span className="font-bold">CMS</span>
-          </a>{" "}
+          </Link>{" "}
           {user != null && (
             <div className="flex items-center gap-4">
               <Link href={"/create-certificate"}>Create Certificate</Link>
@@ -26,7 +26,7 @@ const Header = async () => {
                 Generate a Certificate templete
               </Link>
               <Link href={"/assign-student-certificate"}>
-                Assign Student Certificate
+                Issue Certificate
               </Link>
               {/* <Link href={"/donation-management"}>Donation Management</Link>
               <Link href={"/program-management"}>Program Management</Link>
