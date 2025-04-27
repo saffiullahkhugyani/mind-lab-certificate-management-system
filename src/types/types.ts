@@ -243,4 +243,5 @@ export type ProgramCertificateStudentMapping = {
   rating?: number | null;
   student_id?: string | null;
   program_certificate?: ProgramCertificate | null;
+  completion_status?: boolean | null
 }

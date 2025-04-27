@@ -662,6 +662,7 @@ export type Database = {
           program_certificate_id: string | null
           rating: number | null
           student_id: string | null
+          completion_status: boolean | null
         }
         Insert: {
           created_at?: string
@@ -669,6 +670,7 @@ export type Database = {
           program_certificate_id?: string | null
           rating?: number | null
           student_id?: string | null
+          completion_status?: boolean | null
         }
         Update: {
           created_at?: string
@@ -676,6 +678,7 @@ export type Database = {
           program_certificate_id?: string | null
           rating?: number | null
           student_id?: string | null
+          completion_status?: boolean | null
         }
         Relationships: [
           {

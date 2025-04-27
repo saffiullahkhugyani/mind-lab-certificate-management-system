@@ -120,8 +120,10 @@ export default function StudentList({
 
     // Count certificates earned
     const certificatesEarnedCount =
-      certificateEarned?.filter((cert) => cert.student_id === student.id)
-        .length ?? 0;
+      certificateEarned?.filter(
+        (cert) =>
+          cert.student_id === student.id && cert.completion_status === true
+      ).length ?? 0;
 
     // Get all earned certificates for the student that have a valid rating
     const studentCertificatesEarned =
@@ -152,40 +154,45 @@ export default function StudentList({
     ).size;
 
     // Count programs that are not completed
-    const today = new Date();
-    const programsNotCompleted =
-      studentSupport?.filter((support) => {
-        const { couponStartDate, num_of_coupons, program_id } = support;
+    const programNotCompletedCount =
+      certificateEarned?.filter(
+        (cert) =>
+          cert.student_id === student.id && cert.completion_status === false
+      ).length ?? 0;
+    // const today = new Date();
+    // const programsNotCompleted =
+    //   studentSupport?.filter((support) => {
+    //     const { couponStartDate, num_of_coupons, program_id } = support;
 
-        if (!couponStartDate || !num_of_coupons) return false; // Ensure data exists
+    //     if (!couponStartDate || !num_of_coupons) return false; // Ensure data exists
 
-        // Calculate program end date
-        const startDate = new Date(couponStartDate);
-        const programEndDate = addMonths(startDate, num_of_coupons);
-        // programEndDate.setDate(programEndDate.getDate() + num_of_coupons);
+    //     // Calculate program end date
+    //     const startDate = new Date(couponStartDate);
+    //     const programEndDate = addMonths(startDate, num_of_coupons);
+    //     // programEndDate.setDate(programEndDate.getDate() + num_of_coupons);
 
-        // Check if program period has ended
-        const isProgramFinished = today > programEndDate;
+    //     // Check if program period has ended
+    //     const isProgramFinished = today > programEndDate;
 
-        // Check if a certificate exists for this program
-        const hasCertificate = certificateEarned?.some(
-          (cert) =>
-            cert.student_id === student.id &&
-            cert.program_certificate?.program_id === program_id
-        );
+    //     // Check if a certificate exists for this program
+    //     const hasCertificate = certificateEarned?.some(
+    //       (cert) =>
+    //         cert.student_id === student.id &&
+    //         cert.program_certificate?.program_id === program_id
+    //     );
 
-        console.log(
-          isProgramFinished,
-          " = ",
-          startDate,
-          today,
-          " ",
-          programEndDate
-        );
+    //     console.log(
+    //       isProgramFinished,
+    //       " = ",
+    //       startDate,
+    //       today,
+    //       " ",
+    //       programEndDate
+    //     );
 
-        // Program is not completed if period has ended but no certificate exists
-        return isProgramFinished && !hasCertificate;
-      }).length ?? 0;
+    //     // Program is not completed if period has ended but no certificate exists
+    //     return isProgramFinished && !hasCertificate;
+    //   }).length ?? 0;
 
     setStudentCertificates(studentCertificate!);
     setSelectedStudent({
@@ -195,7 +202,7 @@ export default function StudentList({
       certificatesEarnedCount,
       rating: studentRating!,
       enrolledProgramsCount,
-      programsNotCompleted,
+      programsNotCompleted: programNotCompletedCount,
     });
   };
 
