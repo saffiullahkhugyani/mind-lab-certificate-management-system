@@ -7,11 +7,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+interface UploadedCertificatePageProps {
+  params: Promise<{ certificateId: string }>;
+}
+
 export default async function UploadedCertificates({
   params,
-}: {
-  params: { certificateId: string };
-}) {
+}: UploadedCertificatePageProps) {
+  const { certificateId } = await params;
   const supabase = createClient();
   const { data: userSession } = await readUserSession();
 
@@ -19,17 +22,16 @@ export default async function UploadedCertificates({
     return redirect("/login");
   }
 
-  const { certificateId } = params;
-
-  const { data } = await supabase
-    .from("upload_certificate")
-    .select(`id, certificate_image_url ,students(*)`)
-    .eq("id", certificateId)
-    .single();
+  // const { data } = await (await supabase)
+  //   .from("upload_certificate")
+  //   .select(`id, certificate_image_url ,students(*)`)
+  //   .eq("id", certificateId)
+  //   .single();
 
   return (
     <div className="w-full container mx-auto">
-      <div className="flex flex-col items-center h-full">
+      Uploaded certificate under construnction
+      {/* <div className="flex flex-col items-center h-full">
         <Card className="flex flex-row items-center p-4 gap-4 space-x-2 m-2 bg-blue-200">
           <Image
             src={data?.certificate_image_url!}
@@ -44,7 +46,7 @@ export default async function UploadedCertificates({
             </span>
           </div>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }
