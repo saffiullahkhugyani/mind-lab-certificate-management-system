@@ -22,13 +22,20 @@ const CertificateList = ({ assignedCertificate }: CertificateListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value;
+    const query = event.target.value.toLowerCase(); // make query lowercase for case-insensitive match
     setSearchQuery(query); // keep value in sync
+
     setFilteredCertificate(
       query
-        ? assignedCertificate?.filter((certificate) =>
-            certificate.student_name?.toLowerCase().includes(query)
-          ) || []
+        ? assignedCertificate?.filter((certificate) => {
+            const nameMatch = certificate.student_name
+              ?.toLowerCase()
+              .includes(query);
+            const idMatch = certificate.student_id
+              ?.toLowerCase()
+              .includes(query);
+            return nameMatch || idMatch;
+          }) || []
         : assignedCertificate
     );
   };
@@ -70,7 +77,7 @@ const CertificateList = ({ assignedCertificate }: CertificateListProps) => {
         {/* Search Bar */}
         <Input
           type="text"
-          placeholder="Search by student name..."
+          placeholder="Search by student..."
           className="w-full mb-4 p-2 border rounded"
           onChange={handleSearchReceipt}
         />
