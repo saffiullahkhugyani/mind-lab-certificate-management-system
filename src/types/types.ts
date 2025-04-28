@@ -173,4 +173,7 @@ export type StudentSupport = {
   numOfEnrolledPrograms?: number | null;
   couponStartDate?: string | null;
   program_name?: string | null;
+  coupon_code?: string | null;
+  sponsor_id?: number | null;
+  sponsor_name?: string | null;
 }

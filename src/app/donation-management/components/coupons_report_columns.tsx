@@ -58,18 +58,18 @@ export const columns: ColumnDef<StudentSupport>[] = [
     },
   },
   {
-    accessorKey: "coupon_duration",
-    header: ({ column }) => <div>Coupon Duration</div>,
+    accessorKey: "sponsor_name",
+    header: ({ column }) => <div>Sponsor Name</div>,
     cell: ({ row }) => {
-      return <div>{row.getValue("coupon_duration")}</div>;
+      return <div>{row.getValue("sponsor_name")}</div>;
     },
   },
 
   {
-    accessorKey: "num_of_coupons",
-    header: ({ column }) => <div>Number of Coupons</div>,
+    accessorKey: "coupon_code",
+    header: ({ column }) => <div>Coupon Code</div>,
     cell: ({ row }) => {
-      return <div>{row.getValue("num_of_coupons")}</div>;
+      return <div>{row.getValue("coupon_code")}</div>;
     },
   },
 

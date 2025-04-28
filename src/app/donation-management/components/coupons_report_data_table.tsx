@@ -96,6 +96,21 @@ export function DataTable<TData, TValue>({
         <p className="font-bold">Search Certificate</p>
         <div className="flex gap-4 p-4">
           <div className="w-full">
+            <Label>Sponsor Name</Label>
+            <Input
+              placeholder="sponsor name..."
+              value={
+                (table.getColumn("sponsor_name")?.getFilterValue() as string) ??
+                ""
+              }
+              onChange={(event) =>
+                table
+                  .getColumn("sponsor_name")
+                  ?.setFilterValue(event.target.value)
+              }
+            />
+          </div>
+          <div className="w-full">
             <Label>Student Name</Label>
             <Input
               placeholder="Student name..."
