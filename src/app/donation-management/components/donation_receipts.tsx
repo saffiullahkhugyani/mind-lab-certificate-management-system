@@ -22,13 +22,31 @@ const DonationReceipt = ({ donationReceipt }: DonationReceiptProps) => {
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.trim();
-    setFilteredReceipt(
-      query
-        ? donationReceipt?.filter(
-            (receipt) => receipt.donation_id === Number(query)
-          ) || []
-        : donationReceipt
-    );
+
+    // If the query is empty, reset to the full list
+    if (!query) {
+      setFilteredReceipt(donationReceipt);
+      return;
+    }
+
+    // Determine if the query is numeric or a string
+    const isNumericQuery = !isNaN(Number(query));
+
+    const filter = donationReceipt?.filter((receipt) => {
+      const sponsor = receipt.sponsor; // Assuming each receipt has a 'sponsor' object with 'id' and 'name'
+      if (isNumericQuery) {
+        // If the query is numeric, filter by sponsor_id
+        return sponsor && sponsor.sponsor_id === Number(query);
+      } else {
+        // If the query is a string, filter by sponsor_name
+        return (
+          sponsor && sponsor.name!.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+    });
+
+    // Set the filtered data
+    setFilteredReceipt(filter || []);
   };
 
   const handleDateFilter = () => {
@@ -66,7 +84,7 @@ const DonationReceipt = ({ donationReceipt }: DonationReceiptProps) => {
         {/* Search Bar */}
         <Input
           type="text"
-          placeholder="Search by invoice Id..."
+          placeholder="Search by sponsor..."
           className="w-full mb-4 p-2 border rounded"
           onChange={handleSearchReceipt}
         />

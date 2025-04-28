@@ -25,13 +25,30 @@ export default function DonationAllocationReceipt({
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.trim();
+
+    // If the query is empty, reset to the full list
     if (!query) {
       setFilteredReceipt(allocatedProgramData);
       return;
     }
-    const filter = allocatedProgramData?.filter(
-      (receipt) => receipt.id === Number(query)
-    );
+
+    // Determine if the query is numeric or a string
+    const isNumericQuery = !isNaN(Number(query));
+
+    const filter = allocatedProgramData?.filter((receipt) => {
+      const sponsor = receipt.sponsor; // Assuming each receipt has a 'sponsor' object with 'id' and 'name'
+      if (isNumericQuery) {
+        // If the query is numeric, filter by sponsor_id
+        return sponsor && sponsor.sponsor_id === Number(query);
+      } else {
+        // If the query is a string, filter by sponsor_name
+        return (
+          sponsor && sponsor.name!.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+    });
+
+    // Set the filtered data
     setFilteredReceipt(filter || []);
   };
 
@@ -69,7 +86,7 @@ export default function DonationAllocationReceipt({
         {/* Search Bar */}
         <Input
           type="text"
-          placeholder="Search Invoice..."
+          placeholder="Search by sponsor..."
           className="w-full mb-4 p-2 border rounded"
           onChange={handleSearchReceipt}
         />
