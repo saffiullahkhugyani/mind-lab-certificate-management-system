@@ -18,8 +18,9 @@ export default async function Page() {
     <>
       <div className="container">
         <AssignStudentCertificateForm
-          students={studentList.data!}
+          students={studentList.data?.students!}
           programCertificates={progamCertficateList.data!}
+          programCouponData={studentList.data?.couponsData!}
         />
       </div>
 

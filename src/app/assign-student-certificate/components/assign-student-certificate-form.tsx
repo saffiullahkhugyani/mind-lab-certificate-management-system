@@ -18,7 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProgramCertificate, Students } from "@/types/types";
+import {
+  ProgramCertificate,
+  StudentCouponProgramInfo,
+  Students,
+} from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useRef, useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -26,10 +30,12 @@ import { z } from "zod";
 import { SearchableDropdown } from "./student-search";
 import { assignStudentCertificate } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
+import AllocateCouponDialog from "./assign-certificate-coupon-dialog";
 
 interface AssignStudentCertificateFormProps {
   students: Students[];
   programCertificates: ProgramCertificate[];
+  programCouponData: StudentCouponProgramInfo[];
 }
 
 // schema for the form validation
@@ -53,11 +59,15 @@ type FormField = z.infer<typeof FormSchema>;
 export default function AssignStudentCertificateForm({
   students,
   programCertificates,
+  programCouponData,
 }: AssignStudentCertificateFormProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
   const [selectedStudent, setSelectedStudent] = useState<Students | null>(null);
+  const [submittedData, setSubmittedData] = useState<FormField | null>(null);
   const [selectedCertificate, setSelectedCertificate] =
     useState<ProgramCertificate | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<FormField>({
@@ -68,40 +78,86 @@ export default function AssignStudentCertificateForm({
   const formRef = useRef<HTMLFormElement>(null);
 
   const onSubmit: SubmitHandler<FormField> = async (data) => {
-    startTransition(async () => {
+    setSubmittedData(data); // Store the form data
+    handleAssignClick(); // Open the dialog when "Assign" button is clicked
+    // startTransition(async () => {
+    //   const addProgramCertificateData = {
+    //     student_id: data.student_id,
+    //     program_certificate_id: data.certificate_id,
+    //     rating: data.rating ?? 0,
+    //     completion_status: data.completion_status,
+    //   };
+    //   const response = await assignStudentCertificate(
+    //     addProgramCertificateData!
+    //   );
+    //   console.log("response: ", response);
+    //   if (response.success) {
+    //     toast({
+    //       description: "Certificate assigned successfully",
+    //       variant: "success",
+    //     });
+    //   }
+    //   if (response.error) {
+    //     toast({
+    //       description: response.error,
+    //       variant: "destructive",
+    //     });
+    //   }
+    // });
+  };
+
+  const handleStudentSelect = (student: Students) => {
+    setSelectedStudent(student);
+    form.setValue("student_id", student.id ? student.id : "");
+    form.setValue("student_name", student.name ? student.name : "");
+    form.setValue("student_email", student.email ? student.email : "");
+  };
+
+  const onConfirmAssign = async (studentId: string, couponId: string) => {
+    if (!submittedData) return; // Safety check
+
+    setIsProcessing(true); // Start processing
+    try {
       const addProgramCertificateData = {
-        student_id: data.student_id,
-        program_certificate_id: data.certificate_id,
-        rating: data.rating ?? 0,
-        completion_status: data.completion_status,
+        student_id: submittedData.student_id,
+        program_certificate_id: submittedData.certificate_id,
+        rating: submittedData.rating ?? 0,
+        completion_status: submittedData.completion_status,
+        coupon_id: Number(couponId),
       };
 
       const response = await assignStudentCertificate(
-        addProgramCertificateData!
+        addProgramCertificateData
       );
 
-      console.log("response: ", response);
+      console.log("response:", response);
 
       if (response.success) {
         toast({
           description: "Certificate assigned successfully",
           variant: "success",
         });
-      }
-
-      if (response.error) {
+      } else if (response.error) {
         toast({
           description: response.error,
           variant: "destructive",
         });
       }
-    });
+    } catch (error) {
+      console.error("Error assigning certificate:", error);
+      toast({
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false); // Always reset, even if error happens
+      setIsDialogOpen(false); // Close the dialog
+    }
   };
 
-  const handleStudentSelect = (student: Students) => {
-    form.setValue("student_id", student.id ? student.id : "");
-    form.setValue("student_name", student.name ? student.name : "");
-    form.setValue("student_email", student.email ? student.email : "");
+  const handleAssignClick = () => {
+    // Open the dialog when "Assign" button is clicked
+    setIsDialogOpen(true);
   };
 
   return (
@@ -247,6 +303,7 @@ export default function AssignStudentCertificateForm({
                       <Input
                         placeholder="Student Id"
                         {...field}
+                        value={field.value ?? ""}
                         readOnly
                         disabled={true}
                       />
@@ -265,6 +322,7 @@ export default function AssignStudentCertificateForm({
                       <Input
                         placeholder="Student name"
                         {...field}
+                        value={field.value ?? ""}
                         readOnly
                         disabled={true}
                       />
@@ -284,6 +342,7 @@ export default function AssignStudentCertificateForm({
                       <Input
                         placeholder="Student email"
                         {...field}
+                        value={field.value ?? ""}
                         readOnly
                         disabled={true}
                       />
@@ -300,6 +359,14 @@ export default function AssignStudentCertificateForm({
           {/* </div> */}
         </form>
       </Form>
+      <AllocateCouponDialog
+        isOpen={isDialogOpen}
+        setIsOpen={setIsDialogOpen}
+        selectedStudent={selectedStudent}
+        onConfirmAssign={onConfirmAssign}
+        isProcessing={isProcessing}
+        availableCouponPrograms={programCouponData}
+      />
     </div>
   );
 }

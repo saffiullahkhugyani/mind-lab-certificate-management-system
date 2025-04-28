@@ -660,6 +660,7 @@ export type Database = {
           rating: number | null
           completion_status: boolean | null
           student_id: string | null
+          coupon_id: number | null
         }
         Insert: {
           created_at?: string
@@ -668,6 +669,7 @@ export type Database = {
           rating?: number | null
           completion_status?: boolean | null
           student_id?: string | null
+          coupon_id?: number | null
         }
         Update: {
           created_at?: string
@@ -676,6 +678,7 @@ export type Database = {
           rating?: number | null
           completion_status?: boolean | null
           student_id?: string | null
+          coupon_id?: number | null
         }
         Relationships: [
           {
@@ -691,6 +694,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "students"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_certificate_student_mapping_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
           },
         ]
       }

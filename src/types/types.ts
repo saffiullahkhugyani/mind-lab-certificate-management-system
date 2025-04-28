@@ -44,6 +44,7 @@ export type ProgramCertificateMapping = {
   program_certificate_id: string | null,
   rating: number | null,
   completion_status: boolean | null,
+  coupon_id: number | null,
 }
 
 export type SkillType = {
@@ -211,3 +212,10 @@ export type Students = {
   profile_id?: string | null
 }
 
+export type StudentCouponProgramInfo = {
+  student_id?: string | null;
+  student_name?: string | null;
+  coupon_id?: number | null;
+  program_id?: number | null;
+  program_name?: string | null;
+};

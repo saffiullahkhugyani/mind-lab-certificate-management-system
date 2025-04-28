@@ -12,14 +12,25 @@ export async function getStudents() {
 
     const { data: studentList, error: studentListError } = await supabase
       .from("coupon_student_mapping")
-      .select("*, students!inner(*)");
+      .select("*,coupons!inner(*, programs!inner(program_english_name)), students!inner(*)");
 
     if (studentListError) throw new Error(studentListError.message);
 
-    // Step 1: Map the inner students only
+    // Step 1: Map the coupon and program information
+    const couponProgramInfo = studentList.map((item) => {
+      return {
+        student_id: item.student_id || "", // safe access
+        student_name: item.students?.name || "", // safe access
+        coupon_id: item.coupon_id,
+        program_id: item.coupons?.program_id,
+        program_name: item.coupons?.programs?.program_english_name || "",
+      };
+    });
+
+    // Step 2: Map the inner students only
     const allStudents = studentList.map((item) => item.students);
 
-    // Step 2: Create a Map to store only unique students by `id`
+    // Step 3: Create a Map to store only unique students by `id`
     const uniqueStudentsMap = new Map();
 
     for (const student of allStudents) {
@@ -28,10 +39,13 @@ export async function getStudents() {
       }
     }
 
-    // Step 3: Convert Map values back to array
+    // Step 4: Convert Map values back to array
     const uniqueStudents = Array.from(uniqueStudentsMap.values());
 
-    return { success: true, data: uniqueStudents };
+    // console.log("Unique Students: ", uniqueStudents);
+    console.log("Coupon Program Info: ", couponProgramInfo);
+
+    return { success: true, data: { students: uniqueStudents, couponsData: couponProgramInfo } };
 
   } catch (error: any) {
     console.log("Fetching student list error: ", error)
