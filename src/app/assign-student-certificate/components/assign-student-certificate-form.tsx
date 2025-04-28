@@ -229,20 +229,25 @@ export default function AssignStudentCertificateForm({
                       min="1"
                       max="5"
                       placeholder="Enter rating (1-5)"
-                      value={field.value || ""}
+                      value={field.value ?? ""}
                       onChange={(e) => {
                         const value = e.target.value;
 
-                        // If input is empty, set rating as undefined (optional)
                         if (value === "") {
                           field.onChange(undefined);
                           return;
                         }
 
-                        // Parse the number and ensure it's valid
-                        const parsedValue = parseFloat(value);
+                        let parsedValue = parseFloat(value);
+
                         if (!isNaN(parsedValue)) {
-                          field.onChange(parsedValue);
+                          // Clamp to 1-5 range
+                          parsedValue = Math.min(Math.max(parsedValue, 1), 5);
+
+                          // Round to 1 decimal place
+                          const rounded = Math.round(parsedValue * 10) / 10;
+
+                          field.onChange(rounded);
                         }
                       }}
                     />
@@ -251,6 +256,7 @@ export default function AssignStudentCertificateForm({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="completion_status"
