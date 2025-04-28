@@ -44,12 +44,12 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   const handleLinkClick = (e: React.MouseEvent) => e.stopPropagation();
 
   const sponsorButton = sponsored ? (
-    <div className=" bg-[#586bdc] rounded-md justify-center items-center w-fit">
-      <span className="block py-1 px-3 text-sm font-semibold text-white text-right cursor-default">
-        Sponsored
-      </span>
-    </div>
+    // <div className=" bg-[#586bdc] rounded-md justify-center items-center w-fit">
+    <span className="block py-1 px-3 text-sm font-semibold text-gray-400 cursor-default">
+      Sponsored
+    </span>
   ) : (
+    // </div>
     <Button
       // onClick={(e) => {
       //   e.stopPropagation();
