@@ -85,28 +85,28 @@ export type Database = {
       certificate_v1_v2_mapping: {
         Row: {
           id: number
-          user_id: string | null
-          v1_certificate_id: string | null
+          student_id: string | null
+          v1_certificate_id: number | null
           v2_certificate_id: string | null
         }
         Insert: {
           id?: number
-          user_id?: string | null
-          v1_certificate_id?: string | null
+          student_id?: string | null
+          v1_certificate_id?: number | null
           v2_certificate_id?: string | null
         }
         Update: {
           id?: number
-          user_id?: string | null
-          v1_certificate_id?: string | null
+          student_id?: string | null
+          v1_certificate_id?: number | null
           v2_certificate_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "certificate_v1_v2_mapping_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "certificate_v1_v2_mapping_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
           {
@@ -291,33 +291,33 @@ export type Database = {
           coupon_duration: string | null
           coupon_id: number
           created_at: string
+          end_date: string | null
           number_of_coupons: number | null
           program_id: number | null
           start_date: string | null
           start_period: string | null
-          end_date: string | null
         }
         Insert: {
           club_id?: number | null
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          end_date?: string | null
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
-          end_date?: string | null
         }
         Update: {
           club_id?: number | null
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          end_date?: string | null
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
           start_period?: string | null
-          end_date?: string | null
         }
         Relationships: [
           {
@@ -451,6 +451,96 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: number
+          message: string | null
+          notification_type:
+            | Database["public"]["Enums"]["notification_type"]
+            | null
+          recipient_id: string | null
+          sender_id: string | null
+          status: Database["public"]["Enums"]["notification_status"] | null
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: number
+          message?: string | null
+          notification_type?:
+            | Database["public"]["Enums"]["notification_type"]
+            | null
+          recipient_id?: string | null
+          sender_id?: string | null
+          status?: Database["public"]["Enums"]["notification_status"] | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: number
+          message?: string | null
+          notification_type?:
+            | Database["public"]["Enums"]["notification_type"]
+            | null
+          recipient_id?: string | null
+          sender_id?: string | null
+          status?: Database["public"]["Enums"]["notification_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parent_child_relationship: {
+        Row: {
+          child_id: string
+          created_at: string
+          is_parent_request_approved: boolean | null
+          parent_id: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          is_parent_request_approved?: boolean | null
+          parent_id?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          is_parent_request_approved?: boolean | null
+          parent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_child_relationship_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_child_relationship_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_data_testing: {
         Row: {
           eliminated: string | null
@@ -554,11 +644,13 @@ export type Database = {
           email: string | null
           gender: string | null
           id: string
+          is_profile_complete: boolean | null
           mobile: string | null
           name: string | null
           nationality: string | null
           profile_image_url: string | null
           role_id: number | null
+          signup_method: Database["public"]["Enums"]["signup_methods"] | null
           updated_at: string | null
         }
         Insert: {
@@ -566,11 +658,13 @@ export type Database = {
           email?: string | null
           gender?: string | null
           id: string
+          is_profile_complete?: boolean | null
           mobile?: string | null
           name?: string | null
           nationality?: string | null
           profile_image_url?: string | null
           role_id?: number | null
+          signup_method?: Database["public"]["Enums"]["signup_methods"] | null
           updated_at?: string | null
         }
         Update: {
@@ -578,11 +672,13 @@ export type Database = {
           email?: string | null
           gender?: string | null
           id?: string
+          is_profile_complete?: boolean | null
           mobile?: string | null
           name?: string | null
           nationality?: string | null
           profile_image_url?: string | null
           role_id?: number | null
+          signup_method?: Database["public"]["Enums"]["signup_methods"] | null
           updated_at?: string | null
         }
         Relationships: [
@@ -591,6 +687,127 @@ export type Database = {
             columns: ["role_id"]
             isOneToOne: false
             referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      program_certificate: {
+        Row: {
+          certificate_country: string | null
+          certificate_name_arabic: string | null
+          certificate_name_english: string | null
+          certificate_status: boolean | null
+          club_id: number | null
+          id: string
+          inserted_at: string
+          issue_authority: string | null
+          issue_year: string | null
+          number_of_hours: string | null
+          program_id: number | null
+          skill_category: string | null
+          skill_level: string | null
+          skill_type: string | null
+          tags: Json | null
+        }
+        Insert: {
+          certificate_country?: string | null
+          certificate_name_arabic?: string | null
+          certificate_name_english?: string | null
+          certificate_status?: boolean | null
+          club_id?: number | null
+          id?: string
+          inserted_at?: string
+          issue_authority?: string | null
+          issue_year?: string | null
+          number_of_hours?: string | null
+          program_id?: number | null
+          skill_category?: string | null
+          skill_level?: string | null
+          skill_type?: string | null
+          tags?: Json | null
+        }
+        Update: {
+          certificate_country?: string | null
+          certificate_name_arabic?: string | null
+          certificate_name_english?: string | null
+          certificate_status?: boolean | null
+          club_id?: number | null
+          id?: string
+          inserted_at?: string
+          issue_authority?: string | null
+          issue_year?: string | null
+          number_of_hours?: string | null
+          program_id?: number | null
+          skill_category?: string | null
+          skill_level?: string | null
+          skill_type?: string | null
+          tags?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_certificate_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["club_id"]
+          },
+          {
+            foreignKeyName: "program_certificate_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["program_id"]
+          },
+        ]
+      }
+      program_certificate_student_mapping: {
+        Row: {
+          completion_status: boolean | null
+          coupon_id: number | null
+          created_at: string
+          id: number
+          program_certificate_id: string | null
+          rating: number | null
+          student_id: string | null
+        }
+        Insert: {
+          completion_status?: boolean | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          program_certificate_id?: string | null
+          rating?: number | null
+          student_id?: string | null
+        }
+        Update: {
+          completion_status?: boolean | null
+          coupon_id?: number | null
+          created_at?: string
+          id?: number
+          program_certificate_id?: string | null
+          rating?: number | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_certificate_student_mapping_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["coupon_id"]
+          },
+          {
+            foreignKeyName: "program_certificate_student_mapping_program_certificate_id_fkey"
+            columns: ["program_certificate_id"]
+            isOneToOne: false
+            referencedRelation: "program_certificate"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_certificate_student_mapping_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -668,26 +885,26 @@ export type Database = {
           city: string | null
           country: string | null
           player_id: string
-          user_id: string | null
+          student_id: string | null
         }
         Insert: {
           city?: string | null
           country?: string | null
           player_id: string
-          user_id?: string | null
+          student_id?: string | null
         }
         Update: {
           city?: string | null
           country?: string | null
           player_id?: string
-          user_id?: string | null
+          student_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "register_player_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "register_player_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -1004,19 +1221,22 @@ export type Database = {
       }
       subscription: {
         Row: {
+          id: number
           project_id: number
+          student_id: string | null
           subscription: number | null
-          user_id: string
         }
         Insert: {
+          id?: number
           project_id: number
+          student_id?: string | null
           subscription?: number | null
-          user_id: string
         }
         Update: {
+          id?: number
           project_id?: number
+          student_id?: string | null
           subscription?: number | null
-          user_id?: string
         }
         Relationships: [
           {
@@ -1027,10 +1247,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "subscription_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "subscription_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -1066,38 +1286,38 @@ export type Database = {
           certificate_asserted: string | null
           certificate_image_url: string | null
           certificate_name: string | null
-          id: string
+          id: number
           skill_category: string | null
           skill_tag: string | null
           skill_type: string | null
-          user_id: string
+          student_id: string
         }
         Insert: {
           certificate_asserted?: string | null
           certificate_image_url?: string | null
           certificate_name?: string | null
-          id: string
+          id?: number
           skill_category?: string | null
           skill_tag?: string | null
           skill_type?: string | null
-          user_id: string
+          student_id: string
         }
         Update: {
           certificate_asserted?: string | null
           certificate_image_url?: string | null
           certificate_name?: string | null
-          id?: string
+          id?: number
           skill_category?: string | null
           skill_tag?: string | null
           skill_type?: string | null
-          user_id?: string
+          student_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "upload_certificate_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "upload_certificate_student_id_fkey"
+            columns: ["student_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -1138,18 +1358,6 @@ export type Database = {
           },
         ]
       }
-      user_role: {
-        Row: {
-          role: string | null
-        }
-        Insert: {
-          role?: string | null
-        }
-        Update: {
-          role?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -1188,10 +1396,7 @@ export type Database = {
         Returns: string
       }
       get_top_speed: {
-        Args: {
-          player_id: string
-          race_type: string
-        }
+        Args: { player_id: string; race_type: string }
         Returns: {
           race_type_selected: string
           top_speed: number
@@ -1200,326 +1405,18 @@ export type Database = {
     }
     Enums: {
       app_role:
-      | "super-admin"
-      | "admin"
-      | "admin-sponsor"
-      | "sponsor"
-      | "student"
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          user_metadata: Json | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          owner_id: string | null
-          upload_signature: string
-          user_metadata: Json | null
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          owner_id?: string | null
-          upload_signature: string
-          user_metadata?: Json | null
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          owner_id?: string | null
-          upload_signature?: string
-          user_metadata?: Json | null
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      can_insert_object: {
-        Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
-        }
-        Returns: undefined
-      }
-      extension: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      filename: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      foldername: {
-        Args: {
-          name: string
-        }
-        Returns: string[]
-      }
-      get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          size: number
-          bucket_id: string
-        }[]
-      }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-        }
-        Returns: {
-          key: string
-          id: string
-          created_at: string
-        }[]
-      }
-      list_objects_with_delimiter: {
-        Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          start_after?: string
-          next_token?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          metadata: Json
-          updated_at: string
-        }[]
-      }
-      operation: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      search: {
-        Args: {
-          prefix: string
-          bucketname: string
-          limits?: number
-          levels?: number
-          offsets?: number
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          updated_at: string
-          created_at: string
-          last_accessed_at: string
-          metadata: Json
-        }[]
-      }
-    }
-    Enums: {
-      [_ in never]: never
+        | "super-admin"
+        | "admin"
+        | "admin-sponsor"
+        | "sponsor"
+        | "student"
+      notification_status: "pending" | "read" | "accepted" | "rejected"
+      notification_type:
+        | "parent_request"
+        | "event_update"
+        | "system_alert"
+        | "parent_request_accepted"
+      signup_methods: "email" | "google" | "apple"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1527,99 +1424,126 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-  | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-  | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-    Database[PublicTableNameOrOptions["schema"]]["Views"])
-  : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-    Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-    PublicSchema["Views"])
-  ? (PublicSchema["Tables"] &
-    PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-  | keyof PublicSchema["Tables"]
-  | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
   }
-  ? I
-  : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-  | keyof PublicSchema["Tables"]
-  | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
   }
-  ? U
-  : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-  | keyof PublicSchema["Enums"]
-  | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-  ? PublicSchema["Enums"][PublicEnumNameOrOptions]
-  : never
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof Database },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof PublicSchema["CompositeTypes"]
-  | { schema: keyof Database },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
   }
-  ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-  : never = never,
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-  ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      app_role: ["super-admin", "admin", "admin-sponsor", "sponsor", "student"],
+      notification_status: ["pending", "read", "accepted", "rejected"],
+      notification_type: [
+        "parent_request",
+        "event_update",
+        "system_alert",
+        "parent_request_accepted",
+      ],
+      signup_methods: ["email", "google", "apple"],
+    },
+  },
+} as const

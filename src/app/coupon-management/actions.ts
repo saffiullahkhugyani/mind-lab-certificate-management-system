@@ -614,24 +614,41 @@ async function generateAndStoreCouponCodes(coupon: Coupons) {
   console.log("coupons from database: ", coupon);
   const supabase = await createClient();
   if (!coupon.coupon_id || !coupon.number_of_coupons) {
-    console.log("Invalid coupon data: Missing coupon_id or number of coupons");
+    console.log("Invalid coupon data: Missing coupon id or number of coupons");
     return;
   }
+
+  const startDate = new Date(coupon.start_date!);
+  let currentStartDate = new Date(startDate);
 
   // Generate unique codes for coupon
   for (let i = 0; i < coupon.number_of_coupons!; i++) {
     let newCode = generateUniqueCode(coupon.coupon_id);
 
+    // Calculate the end date as the last day of the current month
+    let currentEndDate = new Date(currentStartDate);
+    currentEndDate.setMonth(currentEndDate.getMonth() + 1); // Move to the next month
+    currentEndDate.setDate(0); // Set to the last day of the previous month (which is the desired end date)
+
+
     // Inserting coupon codes
     const { data, error } = await supabase
       .from('coupon_codes')
-      .insert({ coupon_id: coupon.coupon_id, coupon_code: newCode })
+      .insert({
+        coupon_id: coupon.coupon_id, coupon_code: newCode,
+        start_date: currentStartDate.toLocaleDateString(),
+        end_date: currentEndDate.toLocaleDateString()
+      })
       .select();
 
+    if (error) {
+      console.log("Error inserting coupon code:", error.message);
+    }
+
+    // Move start date to next month for next coupon
+    currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Move start date forward by 1 month
+
   }
-
-
-
 }
 
 function generateUniqueCode(couponId: number): string {
