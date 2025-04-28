@@ -92,10 +92,14 @@ export default function StudentList({
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-    const filter = students?.filter((student) =>
-      student.name?.toLowerCase().includes(query)
-    );
-    setFilteredStudents(filter!);
+
+    const filter = students?.filter((student) => {
+      const nameMatches = student.name?.toLowerCase().includes(query);
+      const idMatches = student.id?.toLowerCase().includes(query);
+      return nameMatches || idMatches;
+    });
+
+    setFilteredStudents(filter ?? []); // safer fallback
   };
 
   const handleSelectedStudent = function (student: Student) {
