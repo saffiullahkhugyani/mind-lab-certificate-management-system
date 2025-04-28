@@ -342,38 +342,61 @@ async function studentSupportData(sponsorUid: string) {
 
   if (couponUserMappingError) throw new Error(couponUserMappingError.message);
 
+  const { data: couponCodes, error: couponCodesError } = await supabase.from("coupon_codes")
+    .select('*');
+
+  if (couponCodesError) throw new Error(couponCodesError.message);
 
   const customList: StudentSupport[] = [];
+
+  const processedEntries = new Set();
 
   couponDonationLink.forEach(donationData => {
     const couponId = donationData.coupons?.coupon_id;
     const couponStartDate = donationData.coupons?.start_date;
+    const sponsorId = donationData.donation.sponsor.sponsor_id;
+    const sponsorName = donationData.donation.sponsor.name;
 
-    // Find all user mappings for this coupon
     const matchingMappings = couponUserMapping.filter(
       mapping => mapping.coupon_id === couponId
     );
 
-    // If there are user mappings, create an entry for each user
-    if (matchingMappings.length > 0) {
-      matchingMappings.forEach(mapping => {
-        customList.push({
-          student_id: mapping.student_id,
-          coupon_id: couponId!,
-          donation_id: donationData.donation.donation_id,
-          program_id: donationData.coupons?.program_id ?? null,
-          num_of_coupons: donationData.num_of_coupons,
-          couponStartDate: couponStartDate!,
-          coupon_duration: donationData.coupons?.coupon_duration,
-          coupon_start_date: couponStartDate!,
-          coupon_end_date: donationData.coupons?.end_date,
-          student_name: mapping.students?.name,
-          program_name: donationData.coupons?.programs.program_english_name
-        });
-      });
+    const matchingCouponCode = couponCodes.filter(
+      code => code.coupon_id === couponId
+    );
 
+    if (matchingMappings.length > 0) {
+      for (let i = 0; i < matchingCouponCode.length; i++) {
+        const couponCode = matchingCouponCode[i].coupon_code;
+        const startDate = matchingCouponCode[i].start_date;
+        const endDate = matchingCouponCode[i].end_date;
+
+        if (couponCode) {
+          matchingMappings.forEach(mapping => {
+            const uniqueKey = `${mapping.student_id}-${couponId}-${couponCode}`;
+
+            if (!processedEntries.has(uniqueKey)) {
+              processedEntries.add(uniqueKey);
+
+              customList.push({
+                student_id: mapping.student_id,
+                coupon_id: couponId!,
+                donation_id: donationData.donation.donation_id,
+                program_id: donationData.coupons?.program_id ?? null,
+                num_of_coupons: Number(donationData.coupons?.number_of_coupons),
+                couponStartDate: couponStartDate!,
+                coupon_duration: donationData.coupons?.coupon_duration,
+                coupon_start_date: startDate!,
+                coupon_end_date: endDate,
+                student_name: mapping.students?.name,
+                program_name: donationData.coupons?.programs.program_english_name,
+                coupon_code: couponCode!,
+              });
+            }
+          });
+        }
+      }
     } else {
-      // If no user mappings exist, create one entry with null user_id
       customList.push({
         student_id: null,
         coupon_id: couponId!,

@@ -148,19 +148,28 @@ export type Database = {
           coupon_code: string | null
           coupon_id: number | null
           created_at: string
+          end_date: string | null
           id: number
+          start_date: string | null
+          status: string | null
         }
         Insert: {
           coupon_code?: string | null
           coupon_id?: number | null
           created_at?: string
+          end_date?: string | null
           id?: number
+          start_date?: string | null
+          status?: string | null
         }
         Update: {
           coupon_code?: string | null
           coupon_id?: number | null
           created_at?: string
+          end_date?: string | null
           id?: number
+          start_date?: string | null
+          status?: string | null
         }
         Relationships: [
           {
