@@ -218,4 +218,7 @@ export type StudentCouponProgramInfo = {
   coupon_id?: number | null;
   program_id?: number | null;
   program_name?: string | null;
+  start_date?: string | null;  // Master start date
+  end_date?: string | null;    // Master end date
+  coupon_codes?: string[] | null; //
 };

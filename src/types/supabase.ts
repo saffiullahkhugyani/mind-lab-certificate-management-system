@@ -282,6 +282,7 @@ export type Database = {
           coupon_duration: string | null
           coupon_id: number
           created_at: string
+          end_date: string | null
           number_of_coupons: number | null
           program_id: number | null
           start_date: string | null
@@ -292,6 +293,7 @@ export type Database = {
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          end_date?: string | null
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
@@ -302,6 +304,7 @@ export type Database = {
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          end_date?: string | null
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null

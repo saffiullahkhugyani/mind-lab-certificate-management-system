@@ -8,6 +8,8 @@ import AssignStudentCertificateForm from "./components/assign-student-certificat
 import Certificate from "./components/certificate";
 import CertificateList from "./components/certificates-list";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const studentList = await getStudents();
   const progamCertficateList = await getProgramCertificates();

@@ -1,6 +1,5 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { Profiles } from "@/types/customs";
 import { Json } from "@/types/supabase";
 import { ProgramCertificateMapping, Tag } from "@/types/types";
 import { format } from "date-fns";
@@ -16,16 +15,47 @@ export async function getStudents() {
 
     if (studentListError) throw new Error(studentListError.message);
 
+    const { data: couponCodes, error: couponCodesError } = await supabase
+      .from("coupon_codes")
+      .select("*");
+
+    if (couponCodesError) throw new Error(couponCodesError.message);
+
     // Step 1: Map the coupon and program information
+    // let couponProgramInfo = studentList.map((item) => {
+    //   return {
+    //     student_id: item.student_id || "", // safe access
+    //     student_name: item.students?.name || "", // safe access
+    //     coupon_id: item.coupon_id,
+    //     program_id: item.coupons?.program_id,
+    //     program_name: item.coupons?.programs?.program_english_name || "",
+    //   };
+    // });
+
+    // Group coupon codes by coupon_id (just codes, no dates)
+    const couponCodesGrouped = new Map<number, string[]>();
+
+    couponCodes.forEach(coupon => {
+      if (!couponCodesGrouped.has(coupon.coupon_id!)) {
+        couponCodesGrouped.set(coupon.coupon_id!, []);
+      }
+      couponCodesGrouped.get(coupon.coupon_id!)?.push(coupon.coupon_code!);
+    });
+
+    // Update couponProgramInfo mapping with master dates
     const couponProgramInfo = studentList.map((item) => {
       return {
-        student_id: item.student_id || "", // safe access
-        student_name: item.students?.name || "", // safe access
+        student_id: item.student_id || "",
+        student_name: item.students?.name || "",
         coupon_id: item.coupon_id,
         program_id: item.coupons?.program_id,
         program_name: item.coupons?.programs?.program_english_name || "",
+        start_date: item.coupons?.start_date, // Master start date
+        end_date: item.coupons?.end_date,    // Master end date
+        coupon_codes: couponCodesGrouped.get(item.coupon_id!) || []
       };
     });
+
 
     // Step 2: Map the inner students only
     const allStudents = studentList.map((item) => item.students);
@@ -110,7 +140,10 @@ export async function assignStudentCertificate(data: ProgramCertificateMapping) 
 
     if (programCertificateMappingError) throw new Error(programCertificateMappingError.message);
 
-    revalidatePath("/assign-student-certificate");
+    console.log("Inserting success, revalidating path...");
+    await revalidatePath("/assign-student-certificate");
+    console.log("Revalidated path successfully!");
+
     return { success: true, data: programCertificateMapping };
 
   } catch (error: any) {
