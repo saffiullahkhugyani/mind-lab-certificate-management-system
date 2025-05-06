@@ -177,6 +177,7 @@ export type StudentSupport = {
   couponStartDate?: string | null;
   program_name?: string | null;
   coupon_code?: string | null;
+  coupon_status?: string | null;
 }
 
 export type CertificateDetails = {

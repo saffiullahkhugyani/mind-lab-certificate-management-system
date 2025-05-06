@@ -368,6 +368,7 @@ async function studentSupportData(sponsorUid: string) {
     if (matchingMappings.length > 0) {
       for (let i = 0; i < matchingCouponCode.length; i++) {
         const couponCode = matchingCouponCode[i].coupon_code;
+        const couponStatus = matchingCouponCode[i].status;
         const startDate = matchingCouponCode[i].start_date;
         const endDate = matchingCouponCode[i].end_date;
 
@@ -391,6 +392,7 @@ async function studentSupportData(sponsorUid: string) {
                 student_name: mapping.students?.name,
                 program_name: donationData.coupons?.programs.program_english_name,
                 coupon_code: couponCode!,
+                coupon_status: couponStatus,
               });
             }
           });
@@ -1082,4 +1084,79 @@ export async function donationAllocation(formData: DonationAllocation) {
     console.error("Error in donationAllocation:", error.message);
     return { success: false, error: error.message };
   }
+}
+
+export async function getReportsData(sponsorId: number) {
+  const supabase = await createClient();
+  const userId = (await supabase.auth.getUser()).data.user?.id;
+
+  try {
+    // step 1: Fetching the sponsor data
+    const { data: sponsor } = await supabase.from('sponsor').select('*').eq('id', sponsorId).single();
+
+    // // step 2: Fetching the donation data
+    // const { data: donations } = await supabase.from('donation')
+    //   .select('*').eq('sponsor_id', sponsorId);
+
+    // // step 3: Fetching the donation allocation data
+    // const { data: studentSupport } = await supabase.from('sponsor_student_support')
+    //   .select('*').eq('sponsor_id', sponsorId);
+
+    const { data: donationLog, error: donationLogError } = await supabase
+      .from("donation_allocation_log")
+      .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
+      .eq("donation.sponsor.user_id", userId!)
+      .order("id", { ascending: true });
+
+    const shapedAllocatedProgramData = donationLog!.reduce<AllocatedProgramData[]>((acc, log) => {
+      const programId = log.programs.program_id;
+      const existing = acc.find(item => item.program_id === programId);
+      if (existing) {
+
+        // If program_id exists, update the allocated_amount
+        existing.allocated_amount! += log.allocated_amount;
+        existing.remaining_allocated_amount! += log.remaining_allocated_amount;
+        existing.allocationDataCount! += 1;
+        // existing.lastCouponExpiryDate = log.lastCouponExpiryDate;
+
+      } else {
+
+        // If not, add a new entry 
+        acc.push({
+          id: log.id,
+          allocated_amount: log.allocated_amount,
+          description: log.programs.description,
+          subscription_value: log.programs.subscription_value,
+          remaining_allocated_amount: log.remaining_allocated_amount,
+          program_id: programId,
+          club_id: log.programs.club_id,
+          program_name: log.programs?.program_english_name,
+          period: log.programs.period,
+          created_at: new Date(log.created_at).toISOString().split("T")[0],
+          allocationDataCount: 1,
+          // lastCouponExpiryDate: log.lastCouponExpiryDate,
+        });
+      }
+      return acc;
+    }, []);
+
+    const shapedAllocatedProgramDataWithLastCouponExpiry = await Promise.all(
+      shapedAllocatedProgramData!.map(async (log) => {
+        const lastCouponExpiryDate = await lastCouponExpiry(userId!, log.program_id!);
+        return {
+          ...log,
+          ...lastCouponExpiryDate,
+        };
+      })
+    );
+
+
+    return { success: true, data: { sponsor, shapedAllocatedProgramDataWithLastCouponExpiry } };
+
+
+  } catch (error: any) {
+    console.log("Error in getting reports data:", error.message);
+    return { success: false, error: error.message };
+  }
+
 }

@@ -1,6 +1,11 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import sponsorData, { clubList, programList, studentList } from "../actions";
+import sponsorData, {
+  clubList,
+  getReportsData,
+  programList,
+  studentList,
+} from "../actions";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DonationTab from "../components/donation/donationTab";
