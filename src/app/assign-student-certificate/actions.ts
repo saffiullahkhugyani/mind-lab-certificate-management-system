@@ -140,8 +140,16 @@ export async function assignStudentCertificate(data: ProgramCertificateMapping) 
 
     if (programCertificateMappingError) throw new Error(programCertificateMappingError.message);
 
+    const { data: couponCodeUpdate, error: couponCodeUpdateError } = await supabase
+      .from("coupon_codes")
+      .update({ status: data.completion_status ? "program completed" : "program not completed" })
+      .eq("coupon_id", data.coupon_id!)
+      .select();
+
+    if (couponCodeUpdateError) throw new Error(couponCodeUpdateError.message);
+
     console.log("Inserting success, revalidating path...");
-    await revalidatePath("/assign-student-certificate");
+    revalidatePath("/assign-student-certificate");
     console.log("Revalidated path successfully!");
 
     return { success: true, data: programCertificateMapping };
