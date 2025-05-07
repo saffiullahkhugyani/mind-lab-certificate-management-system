@@ -15,6 +15,7 @@ import {
   SponsorData,
   Student,
   StudentInterestData,
+  StudentNotSupported,
   StudentSupport,
 } from "@/types/types";
 import { Clubs, Profiles } from "@/types/customs";
@@ -33,6 +34,7 @@ interface DashboardProps {
   studentSupport: StudentSupport[] | null;
   studentInterest: StudentInterestData[] | null;
   certificateEarned: ProgramCertificateStudentMapping[] | null;
+  studentNotSupported: StudentNotSupported[] | null;
 }
 
 export default function Dashboard({
@@ -47,6 +49,7 @@ export default function Dashboard({
   studentSupport,
   studentInterest,
   certificateEarned,
+  studentNotSupported,
 }: DashboardProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -114,6 +117,7 @@ export default function Dashboard({
             donataionData={donataionData}
             donationAllocationInvoiceData={donationAllocationInvoiceData!}
             studentSupport={studentSupport}
+            studentNotSupported={studentNotSupported}
           />
         </TabsContent>
         <TabsContent value="donations">

@@ -34,6 +34,7 @@ export default async function DashboardPage() {
       studentSupport={sponsor.data?.studentSupport!}
       studentInterest={students.data?.studentInterest!}
       certificateEarned={students.data?.certificateEarned!}
+      studentNotSupported={sponsor.data?.studentNotSupported!}
     />
   );
   // return (

@@ -5,6 +5,7 @@ import {
   AllocatedProgramData,
   Donation,
   StudentSupport,
+  StudentNotSupported,
 } from "@/types/types";
 
 interface OverviewTabProps {
@@ -13,6 +14,7 @@ interface OverviewTabProps {
   donataionData: Donation[] | null;
   donationAllocationInvoiceData: AllocatedProgramData[] | null;
   studentSupport: StudentSupport[] | null;
+  studentNotSupported: StudentNotSupported[] | null;
 }
 
 export default function OverviewTab({
@@ -21,6 +23,7 @@ export default function OverviewTab({
   donataionData,
   donationAllocationInvoiceData,
   studentSupport,
+  studentNotSupported,
 }: OverviewTabProps) {
   return (
     <OverviewReportTabs
@@ -28,6 +31,7 @@ export default function OverviewTab({
       donationData={donataionData}
       allocatedProgramData={donationAllocationInvoiceData}
       supportStudentData={studentSupport}
+      studentNotSupported={studentNotSupported}
     />
   );
 }

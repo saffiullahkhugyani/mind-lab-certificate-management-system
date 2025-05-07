@@ -1,22 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   AllocatedProgramData,
   Donation,
   SponsorData,
+  StudentNotSupported,
   StudentSupport,
 } from "@/types/types";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import React, { useState } from "react";
 import SponsorReportPDF from "./generate-pdf-report";
-import FilteredReportPDF from "./filtered-pdf-report"; // New component we'll create
+import FilteredReportPDF from "./filtered-pdf-report"; // using other pdf generate component
 import { Loader2, Download, Filter } from "lucide-react";
 
 interface OverviewReportingProps {
@@ -24,6 +19,7 @@ interface OverviewReportingProps {
   donationData: Donation[] | null;
   allocatedProgramData: AllocatedProgramData[] | null;
   supportStudentData?: StudentSupport[] | null;
+  studentNotSupported?: StudentNotSupported[] | null;
 }
 
 export default function OverviewReporting({
@@ -31,6 +27,7 @@ export default function OverviewReporting({
   sponsorDetails,
   donationData,
   supportStudentData,
+  studentNotSupported,
 }: OverviewReportingProps) {
   // State for filters
   const [startDate, setStartDate] = useState<string>("");
@@ -40,6 +37,7 @@ export default function OverviewReporting({
     donations: Donation[] | null;
     allocations: AllocatedProgramData[] | null;
     students: StudentSupport[] | null;
+    studentNotSupported: StudentNotSupported[] | null;
   } | null>(null);
 
   // Get unique program names for dropdown
@@ -64,11 +62,19 @@ export default function OverviewReporting({
 
   // Apply filters
   const applyFilters = () => {
-    if (!donationData || !allocatedProgramData || !supportStudentData) return;
+    console.log("not suppoerted", studentNotSupported);
+    if (
+      !donationData ||
+      !allocatedProgramData ||
+      !supportStudentData ||
+      !studentNotSupported
+    )
+      return;
 
     let filteredDonations = [...donationData];
     let filteredAllocations = [...allocatedProgramData];
     let filteredStudents = [...supportStudentData];
+    let filteredStudentNotSupported = [...studentNotSupported];
 
     // Date filter
     if (startDate) {
@@ -85,6 +91,13 @@ export default function OverviewReporting({
         const itemDate = new Date(item.coupon_start_date || "");
         return itemDate >= start;
       });
+
+      filteredStudentNotSupported = filteredStudentNotSupported.filter(
+        (item) => {
+          const itemDate = new Date(item.date || "");
+          return itemDate >= start;
+        }
+      );
     }
 
     if (endDate) {
@@ -101,6 +114,13 @@ export default function OverviewReporting({
       //   const itemDate = new Date(item.coupon_start_date || "");
       //   return itemDate <= end;
       // });
+
+      filteredStudentNotSupported = filteredStudentNotSupported.filter(
+        (item) => {
+          const itemDate = new Date(item.date || "");
+          return itemDate <= end;
+        }
+      );
     }
 
     // Program filter
@@ -117,6 +137,7 @@ export default function OverviewReporting({
       donations: filteredDonations,
       allocations: filteredAllocations,
       students: filteredStudents,
+      studentNotSupported: filteredStudentNotSupported,
     });
   };
 
@@ -211,6 +232,7 @@ export default function OverviewReporting({
                     donationsData={filteredData.donations}
                     programAllocation={filteredData.allocations}
                     studentSupport={filteredData.students}
+                    studentNotSupported={filteredData.studentNotSupported}
                     filters={{ startDate, endDate, program: selectedProgram }}
                   />
                 }

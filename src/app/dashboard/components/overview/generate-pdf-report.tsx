@@ -14,6 +14,7 @@ import {
   AllocatedProgramData,
   Donation,
   SponsorData,
+  StudentNotSupported,
   StudentSupport,
 } from "@/types/types";
 
@@ -22,6 +23,7 @@ interface generateReportProps {
   programAllocation: AllocatedProgramData[] | null;
   donationsData?: Donation[] | null;
   studentSupport?: StudentSupport[] | null;
+  studentNotSupported?: StudentNotSupported[] | null;
   filters: {
     startDate: string;
     endDate: string;
@@ -228,6 +230,7 @@ const SponsorReportPDF = ({
   programAllocation,
   donationsData,
   studentSupport,
+  studentNotSupported,
   filters,
 }: generateReportProps) => {
   // Calculate totals
@@ -471,6 +474,75 @@ const SponsorReportPDF = ({
             </View>
           ) : (
             <Text style={styles.noData}>No allocation data available</Text>
+          )}
+        </View>
+      </Page>
+
+      {/* Student Not Supported Summary Page*/}
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <View style={styles.headerRow}>
+            <Text style={styles.sectionTitle}>
+              STUDENT NOT SUPPORTED SUMMARY
+            </Text>
+            {filters.startDate && filters.endDate && (
+              <View style={styles.dateFilters}>
+                <Text style={styles.filterLabel}>Filter Dates:</Text>
+                <Text style={styles.filterDate}>{filters.startDate}</Text>
+                <Text style={styles.filterDate}>to</Text>
+                <Text style={styles.filterDate}>{filters.endDate}</Text>
+              </View>
+            )}
+          </View>
+          {studentNotSupported && studentNotSupported.length > 0 ? (
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={[styles.cell, { width: "8%" }]}>#</Text>
+                <Text style={[styles.cell, { width: "20%" }]}>Student Id</Text>
+                <Text style={[styles.cell, { width: "22%" }]}>
+                  Student Name
+                </Text>
+                <Text style={[styles.cell, { width: "20%" }]}>
+                  Program Name
+                </Text>
+                <Text style={[styles.cell, { width: "15%" }]}>
+                  Support Status
+                </Text>
+                <Text style={[styles.cell, { width: "15%" }]}>Date</Text>
+              </View>
+              {studentNotSupported.map((sns, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.tableRow,
+                    index % 2 === 0 ? styles.tableRowAlt : {},
+                  ]}
+                >
+                  <Text style={[styles.cellCenter, { width: "8%" }]}>
+                    {index + 1}
+                  </Text>
+                  <Text style={[styles.cell, { width: "20%" }]}>
+                    {sns.student_id || "N/A"}
+                  </Text>
+                  <Text style={[styles.cell, { width: "22%" }]}>
+                    {sns.student_name || "N/A"}
+                  </Text>
+                  <Text style={[styles.cellCenter, { width: "20%" }]}>
+                    {sns.program_name || "N/A"}
+                  </Text>
+                  <Text style={[styles.cellCenter, { width: "15%" }]}>
+                    {sns.support_status ? " Supported" : "Not Supported"}
+                  </Text>
+                  <Text style={[styles.cell, { width: "15%" }]}>
+                    {sns.date || "N/A"}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.noData}>
+              No student not supported data available
+            </Text>
           )}
         </View>
       </Page>

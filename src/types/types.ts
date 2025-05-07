@@ -247,3 +247,13 @@ export type ProgramCertificateStudentMapping = {
   program_certificate?: ProgramCertificate | null;
   completion_status?: boolean | null
 }
+
+export type StudentNotSupported = {
+  sponsor_id?: number;
+  sponsor_name?: string;
+  student_name?: string;
+  student_id?: string;
+  program_name?: string;
+  support_status?: boolean;
+  date?: string;
+}

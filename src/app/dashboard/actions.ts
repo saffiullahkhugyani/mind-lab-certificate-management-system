@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { AllocatedProgramData, Coupons, DonationAllocation, DonationAllocationLogs, Programs, StudentSupport, Tag } from "@/types/types";
+import { AllocatedProgramData, Coupons, DonationAllocation, DonationAllocationLogs, Programs, StudentNotSupported, StudentSupport, Tag } from "@/types/types";
 import { revalidatePath } from "next/cache";
 import { parseISO, addMonths, format } from "date-fns";
 
@@ -268,6 +268,26 @@ export default async function sponsorData() {
     };
 
     // await lastCouponExpiry(userId!, 29);
+    const studentNotSupportedList: StudentNotSupported[] = [];
+    const { data: studentNotSupported, error: studentNotSupportedError } = await supabase
+      .from("sponsor_student_support")
+      .select("*, sponsor!inner(*), students!inner(*), programs!inner(*)")
+      .eq("sponsor.user_id", userId!);
+
+    if (studentNotSupportedError) throw new Error(studentNotSupportedError.message);
+
+    studentNotSupported.forEach((studentMapping) => {
+      studentNotSupportedList.push({
+        sponsor_id: studentMapping.sponsor_id,
+        sponsor_name: studentMapping.sponsor.name!,
+        student_id: studentMapping.student_id,
+        student_name: studentMapping.students.name!,
+        program_name: studentMapping.programs.program_english_name!,
+        support_status: studentMapping.support_status,
+        date: new Date(studentMapping.created_at).toISOString().split("T")[0]
+      })
+    });
+
 
     return {
       success: true, data: {
@@ -275,7 +295,8 @@ export default async function sponsorData() {
         allocatedProgramData: shapedAllocatedProgramDataWithLastCouponExpiry,
         donataionsData: donationData,
         donationAllocationInvoiceData: donationAllocationInvoiceData,
-        studentSupport: studentSupport
+        studentSupport: studentSupport,
+        studentNotSupported: studentNotSupportedList
       }
     };
 

@@ -3,6 +3,7 @@ import {
   AllocatedProgramData,
   Donation,
   SponsorData,
+  StudentNotSupported,
   StudentSupport,
 } from "@/types/types";
 import DonationReceipt from "./donation_receipt";
@@ -15,6 +16,7 @@ interface DonationReceiptProps {
   donationData: Donation[] | null;
   allocatedProgramData: AllocatedProgramData[] | null;
   supportStudentData?: StudentSupport[] | null;
+  studentNotSupported?: StudentNotSupported[] | null;
 }
 
 export default function OverviewReportTabs({
@@ -22,6 +24,7 @@ export default function OverviewReportTabs({
   sponsorDetails,
   allocatedProgramData,
   supportStudentData,
+  studentNotSupported,
 }: DonationReceiptProps) {
   return (
     <div className="bg-white">
@@ -93,6 +96,7 @@ export default function OverviewReportTabs({
               donationData={donationData}
               allocatedProgramData={allocatedProgramData}
               supportStudentData={supportStudentData}
+              studentNotSupported={studentNotSupported}
             />
           </div>
         </TabsContent>
