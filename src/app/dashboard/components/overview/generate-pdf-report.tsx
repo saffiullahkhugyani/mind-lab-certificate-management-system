@@ -263,7 +263,7 @@ const SponsorReportPDF = ({
         <View style={styles.header}>
           <Text style={styles.title}>SPONSOR CONTRIBUTION OVERVIEW</Text>
           <Text style={styles.subtitle}>
-            Summary of Donation Activity and AllocationThis section provides a
+            Summary of Donation Activity and Allocation. This section provides a
             high-level summary of the sponsor{"'"}s contributions, allocations,
             and program impact.
           </Text>
