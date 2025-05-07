@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   filterDate: {
     fontSize: 10,
-    marginRight: 10,
+    marginRight: 5,
   },
   section: {
     marginBottom: 25,
