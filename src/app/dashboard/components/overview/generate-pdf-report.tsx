@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   filterDate: {
     fontSize: 10,
-    marginRight: 5,
+    marginRight: 2,
   },
   section: {
     marginBottom: 25,
@@ -261,9 +261,11 @@ const SponsorReportPDF = ({
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>SPONSOR CONTRIBUTION REPORT</Text>
+          <Text style={styles.title}>SPONSOR CONTRIBUTION OVERVIEW</Text>
           <Text style={styles.subtitle}>
-            Comprehensive Donation and Allocation Summary
+            Summary of Donation Activity and AllocationThis section provides a
+            high-level summary of the sponsor's contributions, allocations, and
+            program impact.
           </Text>
           {filters.startDate && filters.endDate && (
             <Text style={styles.reportInfo}>
@@ -346,7 +348,7 @@ const SponsorReportPDF = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.section}>
           <View style={styles.headerRow}>
-            <Text style={styles.sectionTitle}>DONATION SUMMARY</Text>
+            <Text style={styles.sectionTitle}>DONATION HISTORY</Text>
             {filters.startDate && filters.endDate && (
               <View style={styles.dateFilters}>
                 <Text style={styles.filterLabel}>Filter Dates:</Text>
@@ -356,6 +358,11 @@ const SponsorReportPDF = ({
               </View>
             )}
           </View>
+          <Text style={styles.subtitle}>
+            Chronological Record of Sponsor Contributions. A detailed list of
+            all monetary donations made during the selected period, including
+            payment methods and timestamps.
+          </Text>
           {donationsData && donationsData.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -415,9 +422,7 @@ const SponsorReportPDF = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.section}>
           <View style={styles.headerRow}>
-            <Text style={styles.sectionTitle}>
-              DONATAION ALLOCATION SUMMARY
-            </Text>
+            <Text style={styles.sectionTitle}>FUND ALLOCATION LOG</Text>
             {filters.startDate && filters.endDate && (
               <View style={styles.dateFilters}>
                 <Text style={styles.filterLabel}>Filter Dates:</Text>
@@ -427,6 +432,11 @@ const SponsorReportPDF = ({
               </View>
             )}
           </View>
+          <Text style={styles.subtitle}>
+            Breakdown of Fund Distribution by Program. Outlines how the donated
+            funds were allocated across various educational programs, showing
+            both the amount and date of allocation.
+          </Text>
           {programAllocation && programAllocation.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -483,17 +493,22 @@ const SponsorReportPDF = ({
         <View style={styles.section}>
           <View style={styles.headerRow}>
             <Text style={styles.sectionTitle}>
-              STUDENT NOT SUPPORTED SUMMARY
+              STUDENTS WITH CANCELED SPONSORSHIP
             </Text>
             {filters.startDate && filters.endDate && (
               <View style={styles.dateFilters}>
                 <Text style={styles.filterLabel}>Filter Dates:</Text>
-                <Text style={styles.filterDate}>{filters.startDate}</Text>
-                <Text style={styles.filterDate}>to</Text>
-                <Text style={styles.filterDate}>{filters.endDate}</Text>
+                <Text style={styles.filterDate}>
+                  {filters.startDate} to {filters.endDate}
+                </Text>
               </View>
             )}
           </View>
+          <Text style={styles.subtitle}>
+            List of Students Whose Support Was Canceled Description, This
+            section includes students whose sponsorships were initially assigned
+            but later canceled by the sponsor during the reporting period.
+          </Text>
           {studentNotSupported && studentNotSupported.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -551,16 +566,23 @@ const SponsorReportPDF = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.section}>
           <View style={styles.headerRow}>
-            <Text style={styles.sectionTitle}>STUDENT SUPPORT SUMMARY</Text>
+            <Text style={styles.sectionTitle}>
+              ACTIVE STUDENT SUPPORT TRACKER
+            </Text>
             {filters.startDate && filters.endDate && (
               <View style={styles.dateFilters}>
                 <Text style={styles.filterLabel}>Filter Dates:</Text>
-                <Text style={styles.filterDate}>{filters.startDate}</Text>
-                <Text style={styles.filterDate}>to</Text>
-                <Text style={styles.filterDate}>{filters.endDate}</Text>
+                <Text style={styles.filterDate}>
+                  {filters.startDate} to {filters.endDate}
+                </Text>
               </View>
             )}
           </View>
+          <Text style={styles.subtitle}>
+            Ongoing and Completed Sponsorship Engagements. Presents students who
+            have been successfully supported by the sponsor, including coupon
+            status, program duration, and outcomes.
+          </Text>
           {studentSupport && studentSupport.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
