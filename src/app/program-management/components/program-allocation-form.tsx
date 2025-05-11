@@ -59,7 +59,10 @@ export default function ProgramAllocationForm({
   // Initialize form with react-hook-form
   const form = useForm<FormFields>({
     resolver: zodResolver(donationAllocationFormSchema),
-    defaultValues: {},
+    defaultValues: {
+      program_id: undefined,
+      amount: undefined, // Start with undefined (empty field)
+    },
   });
 
   const { reset } = form;
@@ -178,8 +181,12 @@ export default function ProgramAllocationForm({
               <FormControl>
                 <Input
                   type="number"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  value={field.value ?? ""} // Show empty string when undefined
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Convert to number only if not empty, otherwise set to undefined
+                    field.onChange(value === "" ? undefined : Number(value));
+                  }}
                   className=""
                 />
               </FormControl>

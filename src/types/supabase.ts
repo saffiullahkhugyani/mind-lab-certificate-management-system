@@ -412,6 +412,7 @@ export type Database = {
       donation_allocation_log: {
         Row: {
           allocated_amount: number
+          allocated_by: number | null
           created_at: string
           donation_id: number
           id: number
@@ -420,6 +421,7 @@ export type Database = {
         }
         Insert: {
           allocated_amount: number
+          allocated_by?: number | null
           created_at?: string
           donation_id: number
           id?: number
@@ -428,6 +430,7 @@ export type Database = {
         }
         Update: {
           allocated_amount?: number
+          allocated_by?: number | null
           created_at?: string
           donation_id?: number
           id?: number
@@ -435,6 +438,13 @@ export type Database = {
           remaining_allocated_amount?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "donation_allocation_log_allocated_by_fkey"
+            columns: ["allocated_by"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "donation_allocation_log_donation_id_fkey"
             columns: ["donation_id"]

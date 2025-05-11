@@ -86,8 +86,15 @@ export async function programsList() {
 
 export async function donationAllocation(formData: DonationAllocation) {
   const supabase = await createClient();
+  const userId = (await supabase.auth.getUser()).data.user?.id
 
   try {
+    // step 0: get user Role id
+    const { data: userRoleId, error: userRoleIdError } = await supabase
+      .from("profiles")
+      .select("role_id")
+      .eq("id", userId!);
+
     // Step 1: Fetch available donations ordered by creation time (FIFO)
     const { data: donations, error: fetchError } = await supabase
       .from("donation")
@@ -112,7 +119,7 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     // Step 3: Allocate amount using FIFO
     let remainingToAllocate = formData.amount!;
-    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number }[] = [];
+    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number, allocated_by: number }[] = [];
 
     for (const donation of donations) {
       if (remainingToAllocate <= 0) break;
@@ -134,7 +141,8 @@ export async function donationAllocation(formData: DonationAllocation) {
         donation_id: donation.donation_id,
         allocated_amount: allocation,
         program_id: formData.program_id!,
-        remaining_allocated_amount: allocation
+        remaining_allocated_amount: allocation,
+        allocated_by: userRoleId?.at(0)?.role_id!
       });
     }
 
