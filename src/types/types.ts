@@ -160,6 +160,7 @@ export type AllocatedProgramData = {
   allocationDataCount?: number | null;
   lastCouponExpiryDate?: string | null;
   startDate?: string | null;
+  allocated_by?: string | null;
 }
 
 export type StudentSupport = {
@@ -178,6 +179,7 @@ export type StudentSupport = {
   program_name?: string | null;
   coupon_code?: string | null;
   coupon_status?: string | null;
+  generated_by?: string | null;
 }
 
 export type CertificateDetails = {

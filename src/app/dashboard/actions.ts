@@ -158,7 +158,7 @@ export default async function sponsorData() {
 
     const { data: donationLog, error: donationLogError } = await supabase
       .from("donation_allocation_log")
-      .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
+      .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at, roles(*)")
       .eq("donation.sponsor.user_id", userId!)
       .order("id", { ascending: true });
 
@@ -196,6 +196,7 @@ export default async function sponsorData() {
       program_name: log.programs?.program_english_name,
       period: log.programs.period,
       created_at: new Date(log.created_at).toISOString().split("T")[0],
+      allocated_by: log.roles?.role ?? "",
     })
     )
 
@@ -352,11 +353,11 @@ async function studentSupportData(sponsorUid: string) {
 
   const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
     .from("coupon_donation_link")
-    .select('coupons(*, programs!inner(*)), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
+    .select('coupons(*, roles(*), programs!inner(*)), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
     .eq("donation.sponsor.user_id", sponsorUid);
 
   if (couponDonationLinkError) throw new Error(couponDonationLinkError.message);
-
+  console.log("coupon donation link:", couponDonationLink);
   const { data: couponUserMapping, error: couponUserMappingError } = await supabase
     .from("coupon_student_mapping")
     .select("*, students!inner(id, name)");
@@ -377,6 +378,7 @@ async function studentSupportData(sponsorUid: string) {
     const couponStartDate = donationData.coupons?.start_date;
     const sponsorId = donationData.donation.sponsor.sponsor_id;
     const sponsorName = donationData.donation.sponsor.name;
+    const role = donationData.coupons?.roles?.role ?? "";
 
     const matchingMappings = couponUserMapping.filter(
       mapping => mapping.coupon_id === couponId
@@ -414,6 +416,7 @@ async function studentSupportData(sponsorUid: string) {
                 program_name: donationData.coupons?.programs.program_english_name,
                 coupon_code: couponCode!,
                 coupon_status: couponStatus,
+                generated_by: role,
               });
             }
           });
@@ -570,9 +573,18 @@ export async function cancelStudentSupport(
 }
 
 export async function assignStudentProgram(programId: number, studentId: string, sponsorId: number) {
+  const supabase = await createClient();
+  const userId = (await supabase.auth.getUser()).data.user?.id;
 
   try {
-    const supabase = await createClient();
+
+    // step 0: fetch user roled id based on userId
+    const { data: userRoledId, error: userRoledIdError } = await supabase
+      .from("profiles")
+      .select("role_id")
+      .eq("id", userId!);
+
+
     let query = supabase.from("donation_allocation_log")
       .select(`*, donation!inner(donation_id, sponsor_id), 
       programs!inner(program_id,program_english_name,subscription_value,
@@ -625,7 +637,8 @@ export async function assignStudentProgram(programId: number, studentId: string,
         club_id: selectedRecords.at(0)?.programs.club_id,
       };
 
-      const res = await addStudentCoupon(couponData, selectedRecords.at(0)?.programs!, sponsorId, selectedRecords);
+      const res = await addStudentCoupon(couponData, selectedRecords.at(0)?.programs!,
+        sponsorId, selectedRecords, userRoledId?.at(0)?.role_id!);
 
       if (!res.success) {
         throw new Error(res.error);
@@ -667,7 +680,9 @@ export async function addStudentCoupon(
   couponData: Coupons,
   programDetails: Programs,
   sponsorId: Number,
-  donationAllocationLog: DonationAllocationLogs[],) {
+  donationAllocationLog: DonationAllocationLogs[],
+  userRoleId: number,
+) {
   try {
     const supabase = await createClient();
     const { program_id, club_id, student_id, coupon_duration, start_period } = couponData;
@@ -840,6 +855,7 @@ export async function addStudentCoupon(
       start_date: couponDates.startDate,
       end_date: couponDates.endDate,
       number_of_coupons: couponDurationInMonths,
+      generated_by: userRoleId,
     };
 
     // Step 9: Inserting coupon record
@@ -976,6 +992,12 @@ export async function donationAllocation(formData: DonationAllocation) {
   const userId = (await supabase.auth.getUser()).data.user?.id;
 
   try {
+    // step 0: fetch user roled id based on userId
+    const { data: userRoledId, error: userRoledIdError } = await supabase
+      .from("profiles")
+      .select("role_id")
+      .eq("id", userId!);
+
     // Step 1: Fetch available donations ordered by sponsor
     const { data: donations, error: fetchError } = await supabase
       .from("donation")
@@ -1001,7 +1023,7 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     // Step 3: Allocate amount using the available donations
     let remainingToAllocate = formData.amount!;
-    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number }[] = [];
+    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number, allocated_by: number }[] = [];
 
     for (const donation of donations) {
       if (remainingToAllocate <= 0) break;
@@ -1023,7 +1045,8 @@ export async function donationAllocation(formData: DonationAllocation) {
         donation_id: donation.donation_id,
         allocated_amount: allocation,
         program_id: formData.program_id!,
-        remaining_allocated_amount: allocation
+        remaining_allocated_amount: allocation,
+        allocated_by: userRoledId?.at(0)?.role_id!
       });
     }
 

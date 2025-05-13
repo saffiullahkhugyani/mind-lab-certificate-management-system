@@ -440,7 +440,7 @@ const SponsorReportPDF = ({
           {programAllocation && programAllocation.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
-                <Text style={[styles.cell, { width: "15%" }]}>#</Text>
+                <Text style={[styles.cell, { width: "6%" }]}>#</Text>
                 <Text style={[styles.cell, { width: "15%" }]}>
                   Allocation Id
                 </Text>
@@ -450,7 +450,8 @@ const SponsorReportPDF = ({
                 {/* <Text style={[styles.cellRight, { width: "15%" }]}>
                   Remaining
                 </Text> */}
-                <Text style={[styles.cell, { width: "20%" }]}>Date</Text>
+                <Text style={[styles.cell, { width: "15%" }]}>Date</Text>
+                <Text style={[styles.cell, { width: "14%" }]}>By</Text>
               </View>
               {programAllocation.map((pa, index) => (
                 <View
@@ -460,7 +461,7 @@ const SponsorReportPDF = ({
                     index % 2 === 0 ? styles.tableRowAlt : {},
                   ]}
                 >
-                  <Text style={[styles.cell, { width: "15%" }]}>
+                  <Text style={[styles.cell, { width: "6%" }]}>
                     {index + 1}
                   </Text>
                   <Text style={[styles.cell, { width: "15%" }]}>{pa.id}</Text>
@@ -476,8 +477,11 @@ const SponsorReportPDF = ({
                   {/* <Text style={[styles.cellRight, { width: "15%" }]}>
                     {pa.remaining_allocated_amount?.toFixed(2)}
                   </Text> */}
-                  <Text style={[styles.cell, { width: "20%" }]}>
+                  <Text style={[styles.cell, { width: "15%" }]}>
                     {new Date(pa.created_at!).toLocaleDateString("en-AE")}
+                  </Text>
+                  <Text style={[styles.cell, { width: "14%" }]}>
+                    {pa.allocated_by! || "N/A"}
                   </Text>
                 </View>
               ))}
@@ -586,15 +590,16 @@ const SponsorReportPDF = ({
           {studentSupport && studentSupport.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
-                <Text style={[styles.cell, { width: "8%" }]}>#</Text>
+                <Text style={[styles.cell, { width: "6%" }]}>#</Text>
                 <Text style={[styles.cell, { width: "20%" }]}>Student</Text>
-                <Text style={[styles.cell, { width: "22%" }]}>Program</Text>
+                <Text style={[styles.cell, { width: "20%" }]}>Program</Text>
                 <Text style={[styles.cell, { width: "15%" }]}>Coupon Code</Text>
-                <Text style={[styles.cell, { width: "20%" }]}>
+                <Text style={[styles.cell, { width: "18%" }]}>
                   Coupon Status
                 </Text>
-                <Text style={[styles.cell, { width: "15%" }]}>Start Date</Text>
-                <Text style={[styles.cell, { width: "15%" }]}>Expiry Date</Text>
+                <Text style={[styles.cell, { width: "12%" }]}>Start Date</Text>
+                <Text style={[styles.cell, { width: "12%" }]}>Expiry Date</Text>
+                <Text style={[styles.cell, { width: "12%" }]}>By</Text>
               </View>
               {studentSupport.map((ss, index) => (
                 <View
@@ -604,26 +609,29 @@ const SponsorReportPDF = ({
                     index % 2 === 0 ? styles.tableRowAlt : {},
                   ]}
                 >
-                  <Text style={[styles.cellCenter, { width: "8%" }]}>
+                  <Text style={[styles.cellCenter, { width: "6%" }]}>
                     {index + 1}
                   </Text>
                   <Text style={[styles.cell, { width: "20%" }]}>
                     {ss.student_name || "N/A"}
                   </Text>
-                  <Text style={[styles.cell, { width: "22%" }]}>
+                  <Text style={[styles.cell, { width: "20%" }]}>
                     {ss.program_name || "N/A"}
                   </Text>
                   <Text style={[styles.cellCenter, { width: "15%" }]}>
                     {ss.coupon_code || "N/A"}
                   </Text>
-                  <Text style={[styles.cellCenter, { width: "20%" }]}>
+                  <Text style={[styles.cellCenter, { width: "18%" }]}>
                     {ss.coupon_status || "N/A"}
                   </Text>
-                  <Text style={[styles.cell, { width: "15%" }]}>
+                  <Text style={[styles.cell, { width: "12%" }]}>
                     {ss.coupon_start_date || "N/A"}
                   </Text>
-                  <Text style={[styles.cell, { width: "15%" }]}>
+                  <Text style={[styles.cell, { width: "12%" }]}>
                     {ss.coupon_end_date || "N/A"}
+                  </Text>
+                  <Text style={[styles.cell, { width: "12%" }]}>
+                    {ss.generated_by || "N/A"}
                   </Text>
                 </View>
               ))}

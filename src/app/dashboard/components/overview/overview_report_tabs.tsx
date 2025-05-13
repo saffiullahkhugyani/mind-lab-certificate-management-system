@@ -29,7 +29,7 @@ export default function OverviewReportTabs({
   return (
     <div className="bg-white">
       {/* Tabs for Donation Receipt and Donation Allocation */}
-      <Tabs defaultValue="coupons-report" className="w-full">
+      <Tabs defaultValue="overview-report" className="w-full">
         {/* Tabs Navigation */}
         <TabsList className="flex border-primary" variant={"underline"}>
           {/* <TabsTrigger
@@ -46,13 +46,13 @@ export default function OverviewReportTabs({
           >
             Donation Allocation
           </TabsTrigger> */}
-          <TabsTrigger
+          {/* <TabsTrigger
             value="coupons-report"
             variant={"underline"}
             className=" text-lg data-[state=active]:bg-[#007847] text-black font-bold data-[state=active]:text-white"
           >
             Coupons Report
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger
             value="overview-report"
             variant={"underline"}
@@ -82,12 +82,12 @@ export default function OverviewReportTabs({
             />
           </div>
         </TabsContent> */}
-        <TabsContent value="coupons-report">
-          <div className="mt-4">
-            {/* Render the Donation Allocation Component */}
-            <DataTable columns={columns} data={supportStudentData!} />
+        {/* <TabsContent value="coupons-report">
+          <div className="mt-4"> */}
+        {/* Render the Donation Allocation Component */}
+        {/* <DataTable columns={columns} data={supportStudentData!} />
           </div>
-        </TabsContent>
+        </TabsContent> */}
         <TabsContent value="overview-report">
           <div className="mt-4">
             {/* Render the Donation Allocation Component */}

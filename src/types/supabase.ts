@@ -291,10 +291,11 @@ export type Database = {
           coupon_duration: string | null
           coupon_id: number
           created_at: string
+          end_date: string | null
+          generated_by: number | null
           number_of_coupons: number | null
           program_id: number | null
           start_date: string | null
-          end_date: string | null
           start_period: string | null
         }
         Insert: {
@@ -302,10 +303,11 @@ export type Database = {
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          end_date?: string | null
+          generated_by?: number | null
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
-          end_date?: string | null
           start_period?: string | null
         }
         Update: {
@@ -313,10 +315,11 @@ export type Database = {
           coupon_duration?: string | null
           coupon_id?: number
           created_at?: string
+          end_date?: string | null
+          generated_by?: number | null
           number_of_coupons?: number | null
           program_id?: number | null
           start_date?: string | null
-          end_date?: string | null
           start_period?: string | null
         }
         Relationships: [
@@ -326,6 +329,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clubs"
             referencedColumns: ["club_id"]
+          },
+          {
+            foreignKeyName: "coupons_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "coupons_program_id_fkey"
@@ -412,6 +422,7 @@ export type Database = {
       donation_allocation_log: {
         Row: {
           allocated_amount: number
+          allocated_by: number | null
           created_at: string
           donation_id: number
           id: number
@@ -420,6 +431,7 @@ export type Database = {
         }
         Insert: {
           allocated_amount: number
+          allocated_by?: number | null
           created_at?: string
           donation_id: number
           id?: number
@@ -428,6 +440,7 @@ export type Database = {
         }
         Update: {
           allocated_amount?: number
+          allocated_by?: number | null
           created_at?: string
           donation_id?: number
           id?: number
@@ -435,6 +448,13 @@ export type Database = {
           remaining_allocated_amount?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "donation_allocation_log_allocated_by_fkey"
+            columns: ["allocated_by"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "donation_allocation_log_donation_id_fkey"
             columns: ["donation_id"]
