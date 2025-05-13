@@ -76,6 +76,7 @@ export async function studentsList() {
 { /* adding/generating studnets coupons */ }
 export async function addStudentCoupon(formData: Coupons, isManual = false) {
   const supabase = await createClient();
+  const userId = (await supabase.auth.getUser()).data.user?.id
   const {
     program_id,
     student_id,
@@ -89,6 +90,12 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
 
     let existingCouponCount = 0;
     let latestEndDate: string | null = null;
+
+    // step 0: get user Role id
+    const { data: userRoleId, error: userRoleIdError } = await supabase
+      .from("profiles")
+      .select("role_id")
+      .eq("id", userId!);
 
     // Manual Assignment: Check only if the user has already coupons
     if (isManual && student_id) {
@@ -261,6 +268,7 @@ export async function addStudentCoupon(formData: Coupons, isManual = false) {
       start_date: couponDates.startDate,
       end_date: couponDates.endDate,
       number_of_coupons: couponDurationInMonths,
+      generated_by: userRoleId?.at(0)?.role_id
     };
 
     // Step 9: Inserting coupon record
