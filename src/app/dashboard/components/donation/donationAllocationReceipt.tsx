@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { AllocatedProgramData, SponsorData } from "@/types/types";
 import DonationAllocationReceiptDetail from "./donationAllocationReceiptDetail";
+import { Button } from "@/components/ui/button";
 
 interface DonationAllocationReceiptProps {
   sponsorDetails: SponsorData | null;
@@ -22,6 +23,8 @@ export default function DonationAllocationReceipt({
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] =
     useState<AllocatedProgramData | null>(allocatedProgramData?.at(0)!);
+  const [currentPage, setCurrentPage] = useState(1);
+  const receiptsPerPage = 10;
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.trim();
@@ -33,6 +36,7 @@ export default function DonationAllocationReceipt({
       (receipt) => receipt.id === Number(query)
     );
     setFilteredReceipt(filter || []);
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   const handleDateFilter = () => {
@@ -47,6 +51,7 @@ export default function DonationAllocationReceipt({
       return (!start || donationDate >= start) && (!end || donationDate <= end);
     });
     setFilteredReceipt(filter || []);
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   useEffect(() => {
@@ -59,6 +64,19 @@ export default function DonationAllocationReceipt({
     );
     setSelectedReceipt(selected || null);
   };
+
+  // Get current receipts for pagination
+  const indexOfLastReceipt = currentPage * receiptsPerPage;
+  const indexOfFirstReceipt = indexOfLastReceipt - receiptsPerPage;
+  const currentReceipts = filteredReceipt?.slice(
+    indexOfFirstReceipt,
+    indexOfLastReceipt
+  );
+  const totalPages = Math.ceil(
+    (filteredReceipt?.length || 0) / receiptsPerPage
+  );
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="grid grid-cols-4 gap-4 bg-white p-4 rounded-lg shadow-md">
@@ -96,7 +114,7 @@ export default function DonationAllocationReceipt({
             defaultValue={filteredReceipt?.at(0)?.id.toString()}
             onValueChange={(value) => handleReceiptSelection(Number(value))}
           >
-            {filteredReceipt?.map((receipt) => (
+            {currentReceipts?.map((receipt) => (
               <div
                 key={receipt.id}
                 className={`flex items-center space-x-2 p-2 ${
@@ -116,6 +134,39 @@ export default function DonationAllocationReceipt({
             ))}
           </RadioGroup>
         </div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-4 space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+              (number) => (
+                <Button
+                  key={number}
+                  variant={currentPage === number ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => paginate(number)}
+                >
+                  {number}
+                </Button>
+              )
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Donation Details */}

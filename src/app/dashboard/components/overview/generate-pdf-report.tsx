@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#1a5276",
     color: "white",
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+    paddingVertical: 3,
+    paddingHorizontal: 3,
     fontSize: 9,
     fontWeight: "bold",
   },
@@ -169,16 +169,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderBottomWidth: 0.5,
     borderBottomColor: "#e0e0e0",
-    paddingVertical: 6,
-    paddingHorizontal: 4,
-    fontSize: 9,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
   },
   tableRowAlt: {
     backgroundColor: "#f8f9fa",
   },
   cell: {
-    paddingRight: 8,
-    textAlign: "left",
+    padding: 5,
   },
   cellRight: {
     paddingRight: 8,
@@ -223,6 +221,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 10,
   },
+  text: {
+    fontSize: 9,
+  },
 });
 
 const SponsorReportPDF = ({
@@ -255,6 +256,10 @@ const SponsorReportPDF = ({
     month: "long",
     day: "numeric",
   });
+
+  function noHyphen(text: string) {
+    return ["", text, ""];
+  }
 
   return (
     <Document>
@@ -516,18 +521,24 @@ const SponsorReportPDF = ({
           {studentNotSupported && studentNotSupported.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
-                <Text style={[styles.cell, { width: "8%" }]}>#</Text>
-                <Text style={[styles.cell, { width: "20%" }]}>Student Id</Text>
-                <Text style={[styles.cell, { width: "22%" }]}>
-                  Student Name
-                </Text>
-                <Text style={[styles.cell, { width: "20%" }]}>
-                  Program Name
-                </Text>
-                <Text style={[styles.cell, { width: "15%" }]}>
-                  Support Status
-                </Text>
-                <Text style={[styles.cell, { width: "15%" }]}>Date</Text>
+                <View style={[styles.cell, { width: "8%" }]}>
+                  <Text style={styles.text}>#</Text>
+                </View>
+                <View style={[styles.cell, { width: "20%" }]}>
+                  <Text style={styles.text}>Student Id</Text>
+                </View>
+                <View style={[styles.cell, { width: "22%" }]}>
+                  <Text style={styles.text}>Student Name</Text>
+                </View>
+                <View style={[styles.cell, { width: "20%" }]}>
+                  <Text style={styles.text}>Program Name</Text>
+                </View>
+                <View style={[styles.cell, { width: "15%" }]}>
+                  <Text style={styles.text}>Support Status</Text>
+                </View>
+                <View style={[styles.cell, { width: "15%" }]}>
+                  <Text style={styles.text}>Date</Text>
+                </View>
               </View>
               {studentNotSupported.map((sns, index) => (
                 <View
@@ -537,24 +548,31 @@ const SponsorReportPDF = ({
                     index % 2 === 0 ? styles.tableRowAlt : {},
                   ]}
                 >
-                  <Text style={[styles.cellCenter, { width: "8%" }]}>
-                    {index + 1}
-                  </Text>
-                  <Text style={[styles.cell, { width: "20%" }]}>
-                    {sns.student_id || "N/A"}
-                  </Text>
-                  <Text style={[styles.cell, { width: "22%" }]}>
-                    {sns.student_name || "N/A"}
-                  </Text>
-                  <Text style={[styles.cellCenter, { width: "20%" }]}>
-                    {sns.program_name || "N/A"}
-                  </Text>
-                  <Text style={[styles.cellCenter, { width: "15%" }]}>
-                    {sns.support_status ? " Supported" : "Not Supported"}
-                  </Text>
-                  <Text style={[styles.cell, { width: "15%" }]}>
-                    {sns.date || "N/A"}
-                  </Text>
+                  <View style={[styles.cell, { width: "8%" }]}>
+                    <Text style={styles.text}>{index + 1}</Text>
+                  </View>
+                  <View style={[styles.cell, { width: "20%" }]}>
+                    <Text style={styles.text}>{sns.student_id || "N/A"}</Text>
+                  </View>
+                  <View style={[styles.cell, { width: "22%" }]}>
+                    <Text style={styles.text} hyphenationCallback={noHyphen}>
+                      {sns.student_name || "N/A"}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, { width: "20%" }]}>
+                    <Text style={styles.text} hyphenationCallback={noHyphen}>
+                      {sns.program_name || "N/A"}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, { width: "15%" }]}>
+                    <Text style={styles.text}>
+                      {sns.support_status ? " Supported" : "Not Supported"}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.cell, { width: "15%" }]}>
+                    <Text style={styles.text}>{sns.date || "N/A"}</Text>
+                  </View>
                 </View>
               ))}
             </View>
@@ -590,16 +608,30 @@ const SponsorReportPDF = ({
           {studentSupport && studentSupport.length > 0 ? (
             <View style={styles.table}>
               <View style={styles.tableHeader}>
-                <Text style={[styles.cell, { width: "6%" }]}>#</Text>
-                <Text style={[styles.cell, { width: "20%" }]}>Student</Text>
-                <Text style={[styles.cell, { width: "20%" }]}>Program</Text>
-                <Text style={[styles.cell, { width: "15%" }]}>Coupon Code</Text>
-                <Text style={[styles.cell, { width: "18%" }]}>
-                  Coupon Status
-                </Text>
-                <Text style={[styles.cell, { width: "12%" }]}>Start Date</Text>
-                <Text style={[styles.cell, { width: "12%" }]}>Expiry Date</Text>
-                <Text style={[styles.cell, { width: "12%" }]}>By</Text>
+                <View style={[styles.cell, { width: "6%" }]}>
+                  <Text style={styles.text}>#</Text>
+                </View>
+                <View style={[styles.cell, { width: "20%" }]}>
+                  <Text style={styles.text}>Student</Text>
+                </View>
+                <View style={[styles.cell, { width: "20%" }]}>
+                  <Text style={styles.text}>Program</Text>
+                </View>
+                <View style={[styles.cell, { width: "15%" }]}>
+                  <Text style={styles.text}>Coupon Code</Text>
+                </View>
+                <View style={[styles.cell, { width: "18%" }]}>
+                  <Text style={styles.text}>Coupon Status</Text>
+                </View>
+                <View style={[styles.cell, { width: "12%" }]}>
+                  <Text style={styles.text}>Start Date</Text>
+                </View>
+                <View style={[styles.cell, { width: "12%" }]}>
+                  <Text style={styles.text}>Expiry Date</Text>
+                </View>
+                <View style={[styles.cell, { width: "12%" }]}>
+                  <Text style={styles.text}>By</Text>
+                </View>
               </View>
               {studentSupport.map((ss, index) => (
                 <View
@@ -609,30 +641,42 @@ const SponsorReportPDF = ({
                     index % 2 === 0 ? styles.tableRowAlt : {},
                   ]}
                 >
-                  <Text style={[styles.cellCenter, { width: "6%" }]}>
-                    {index + 1}
-                  </Text>
-                  <Text style={[styles.cell, { width: "20%" }]}>
-                    {ss.student_name || "N/A"}
-                  </Text>
-                  <Text style={[styles.cell, { width: "20%" }]}>
-                    {ss.program_name || "N/A"}
-                  </Text>
-                  <Text style={[styles.cellCenter, { width: "15%" }]}>
-                    {ss.coupon_code || "N/A"}
-                  </Text>
-                  <Text style={[styles.cellCenter, { width: "18%" }]}>
-                    {ss.coupon_status || "N/A"}
-                  </Text>
-                  <Text style={[styles.cell, { width: "12%" }]}>
-                    {ss.coupon_start_date || "N/A"}
-                  </Text>
-                  <Text style={[styles.cell, { width: "12%" }]}>
-                    {ss.coupon_end_date || "N/A"}
-                  </Text>
-                  <Text style={[styles.cell, { width: "12%" }]}>
-                    {ss.generated_by || "N/A"}
-                  </Text>
+                  <View style={[styles.cell, { width: "6%" }]}>
+                    <Text style={styles.text}>{index + 1}</Text>
+                  </View>
+                  <View style={[styles.cell, { width: "20%" }]}>
+                    <Text style={styles.text} hyphenationCallback={noHyphen}>
+                      {ss.student_name || "N/A"}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, { width: "20%" }]}>
+                    <Text style={styles.text} hyphenationCallback={noHyphen}>
+                      {ss.program_name || "N/A"}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, { width: "15%" }]}>
+                    <Text style={styles.text}>{ss.coupon_code || "N/A"}</Text>
+                  </View>
+                  <View style={[styles.cell, { width: "18%" }]}>
+                    <Text style={styles.text} hyphenationCallback={noHyphen}>
+                      {ss.coupon_status || "N/A"}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, { width: "12%" }]}>
+                    <Text style={styles.text}>
+                      {ss.coupon_start_date || "N/A"}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, { width: "12%" }]}>
+                    <Text style={styles.text}>
+                      {ss.coupon_end_date || "N/A"}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, { width: "12%" }]}>
+                    <Text style={styles.text} hyphenationCallback={noHyphen}>
+                      {ss.generated_by || "N/A"}
+                    </Text>
+                  </View>
                 </View>
               ))}
             </View>

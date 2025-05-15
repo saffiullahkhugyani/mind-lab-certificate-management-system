@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Donation, SponsorData } from "@/types/types";
+import { Button } from "@/components/ui/button";
 
 interface DonationReceiptProps {
   sponsorDetails: SponsorData | null;
@@ -23,6 +24,17 @@ const DonationReceipt = ({
   const [selectedReceipt, setSelectedReceipt] = useState<Donation | null>(
     donationReceipt?.[0] || null
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const receiptsPerPage = 10;
+
+  // Calculate pagination
+  const indexOfLastReceipt = currentPage * receiptsPerPage;
+  const indexOfFirstReceipt = indexOfLastReceipt - receiptsPerPage;
+  const currentReceipts =
+    filteredReceipt?.slice(indexOfFirstReceipt, indexOfLastReceipt) || [];
+  const totalPages = Math.ceil(
+    (filteredReceipt?.length || 0) / receiptsPerPage
+  );
 
   const handleSearchReceipt = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.trim();
@@ -33,11 +45,13 @@ const DonationReceipt = ({
           ) || []
         : donationReceipt
     );
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   const handleDateFilter = () => {
     if (!startDate && !endDate) {
       setFilteredReceipt(donationReceipt);
+      setCurrentPage(1); // Reset to first page when clearing filters
       return;
     }
     const start = startDate ? new Date(startDate).getTime() : null;
@@ -48,6 +62,7 @@ const DonationReceipt = ({
       return (!start || donationDate >= start) && (!end || donationDate <= end);
     });
     setFilteredReceipt(filtered || []);
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   useEffect(() => {
@@ -59,6 +74,10 @@ const DonationReceipt = ({
       (receipt) => receipt.donation_id === donationId
     );
     setSelectedReceipt(selected || null);
+  };
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -97,7 +116,7 @@ const DonationReceipt = ({
             value={selectedReceipt?.donation_id?.toString()}
             onValueChange={(value) => handleReceiptSelection(Number(value))}
           >
-            {filteredReceipt?.map((receipt) => (
+            {currentReceipts?.map((receipt) => (
               <div
                 key={receipt.donation_id}
                 className={`flex items-center space-x-2 p-2 ${
@@ -117,6 +136,49 @@ const DonationReceipt = ({
             ))}
           </RadioGroup>
         </div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-4 space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              let pageNumber;
+              if (totalPages <= 5) {
+                pageNumber = i + 1;
+              } else if (currentPage <= 3) {
+                pageNumber = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNumber = totalPages - 4 + i;
+              } else {
+                pageNumber = currentPage - 2 + i;
+              }
+              return (
+                <Button
+                  key={pageNumber}
+                  variant={currentPage === pageNumber ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => paginate(pageNumber)}
+                >
+                  {pageNumber}
+                </Button>
+              );
+            })}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Donation Details */}
