@@ -63,8 +63,6 @@ export default function ProgramsTab({
     useState<number | null>(remainingDonationAmount || 0);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  console.log("allocatedProgramData", allocatedProgramData);
-
   const imageMap: Record<number, string> = {
     29: "/robotics-program.png",
     30: "/aeronautic-program.png",

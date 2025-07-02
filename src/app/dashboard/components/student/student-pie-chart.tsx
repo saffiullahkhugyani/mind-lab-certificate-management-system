@@ -175,12 +175,6 @@ export default function StudentPieChart({
       })
       .filter(Boolean); // Remove any null values
 
-    console.log(FormatedChartCertData);
-
-    console.log(FormatedChartSkillLevelData);
-    console.log(FormatedChartSkillTypeData);
-    console.log(FormatedChartCertData);
-
     return {
       FormatedChartCertData,
       FormatedChartSkillLevelData,
@@ -189,8 +183,6 @@ export default function StudentPieChart({
   }
 
   const result = countCertificates(studentCertificate!);
-  // console.log(result);
-  console.log(studentCertificate);
 
   return (
     <Card className="flex items-center bg-slate-200 h-full">

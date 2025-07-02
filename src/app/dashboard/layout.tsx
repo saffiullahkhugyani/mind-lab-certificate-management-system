@@ -13,7 +13,5 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   useUserStore.setState({ user: userSession.session.user });
 
-  console.log(userSession.session.user.user_metadata);
-
   return <div className="w-full">{children}</div>;
 }

@@ -1,13 +1,21 @@
-"use server"
+"use server";
 
-import { createClient } from "@/lib/supabase/server"
-import { AllocatedProgramData, Coupons, DonationAllocation, DonationAllocationLogs, Programs, StudentNotSupported, StudentSupport, Tag } from "@/types/types";
+import { createClient } from "@/lib/supabase/server";
+import {
+  AllocatedProgramData,
+  Coupons,
+  DonationAllocation,
+  DonationAllocationLogs,
+  Programs,
+  StudentNotSupported,
+  StudentSupport,
+  Tag,
+} from "@/types/types";
 import { revalidatePath } from "next/cache";
 import { parseISO, addMonths, format } from "date-fns";
 
-
 export async function studentList() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   try {
     const { data: studentList, error: studentListError } = await supabase
@@ -16,22 +24,23 @@ export async function studentList() {
 
     if (studentListError) throw new Error(studentListError.message);
 
-    const { data: certificateDetails, error: certificateDetailsError } = await supabase
-      .from('certificate_v1_v2_mapping')
-      .select("student_id, certificate_master!inner(*)");
+    const { data: certificateDetails, error: certificateDetailsError } =
+      await supabase
+        .from("certificate_v1_v2_mapping")
+        .select("student_id, certificate_master!inner(*)");
 
-    if (certificateDetailsError) throw new Error(certificateDetailsError.message);
+    if (certificateDetailsError)
+      throw new Error(certificateDetailsError.message);
 
     const certificateData = certificateDetails.map((certificate) => {
-
       const { student_id, certificate_master } = certificate;
 
       /// Safely handle the `tags` field
       const tags = Array.isArray(certificate_master.tags)
         ? (certificate_master.tags as Tag[]).map((tag) => ({
-          tag_name: tag!.tag_name,
-          hours: tag!.hours,
-        }))
+            tag_name: tag!.tag_name,
+            hours: tag!.hours,
+          }))
         : []; // Fallback if `tags` is not an array
 
       return {
@@ -39,50 +48,50 @@ export async function studentList() {
         ...certificate_master, // Spread all other properties from `certificate_master`
         tags, // Replace tags with the processed tags array
       };
-
     });
 
     // console.log("certificate Data: ", certificateData);
 
-    {/* Student screen information details fetching */ }
-    const { data: studentInterest, error: studentInterestError } = await supabase
-      .from("student_interest")
-      .select();
+    {
+      /* Student screen information details fetching */
+    }
+    const { data: studentInterest, error: studentInterestError } =
+      await supabase.from("student_interest").select();
 
     if (studentInterestError) throw new Error(studentInterestError.message);
 
     // Extract emails from studentList
-    const studentEmails = new Set(studentList.map(student => student.email));
+    const studentEmails = new Set(studentList.map((student) => student.email));
 
     // Filter studentInterest where user_email exists in studentList
-    const filteredStudentInterest = studentInterest.filter(interest =>
-      interest.user_email && studentEmails.has(interest.user_email)
+    const filteredStudentInterest = studentInterest.filter(
+      (interest) =>
+        interest.user_email && studentEmails.has(interest.user_email)
     );
 
-    const { data: certificateEarned, error: certificateEarnedError } = await supabase
-      .from("program_certificate_student_mapping")
-      .select("*, program_certificate!inner(*)");
+    const { data: certificateEarned, error: certificateEarnedError } =
+      await supabase
+        .from("program_certificate_student_mapping")
+        .select("*, program_certificate!inner(*)");
 
     if (certificateEarnedError) throw new Error(certificateEarnedError.message);
 
     return {
-      success: true, data: {
+      success: true,
+      data: {
         studentList: studentList,
         certificateData: certificateData,
         studentInterest: filteredStudentInterest,
         certificateEarned: certificateEarned,
-      }
+      },
     };
-
   } catch (error: any) {
     return { success: false, error: error.message };
   }
-
 }
 
-
 export async function clubList() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   try {
     const { data: clubList, error: clubListError } = await supabase
@@ -91,16 +100,14 @@ export async function clubList() {
 
     if (clubListError) throw new Error(clubListError.message);
 
-    return { success: true, data: clubList }
-
+    return { success: true, data: clubList };
   } catch (error: any) {
-    return { success: false, error: error.message }
+    return { success: false, error: error.message };
   }
-
 }
 
 export async function programList() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   try {
     const { data: programList, error: programListError } = await supabase
@@ -109,19 +116,16 @@ export async function programList() {
 
     if (programListError) throw new Error(programListError.message);
 
-    return { success: true, data: programList }
-
+    return { success: true, data: programList };
   } catch (error: any) {
-    return { success: false, error: error.message }
+    return { success: false, error: error.message };
   }
-
 }
 
 export default async function sponsorData() {
   const supabase = await createClient();
   const userId = (await supabase.auth.getUser()).data.user?.id;
   try {
-
     const { data: sponsorData, error: sponsorError } = await supabase
       .from("sponsor")
       .select("*, profiles (profile_image_url)")
@@ -141,10 +145,14 @@ export default async function sponsorData() {
     if (!donationData) throw new Error("No donations found.");
 
     // calculate the total donation amount
-    const totalDonationAmount = parseFloat((donationData?.reduce(
-      (sum, donation) => sum + (donation.amount || 0),
-      0
-    ) || 0).toFixed(2));
+    const totalDonationAmount = parseFloat(
+      (
+        donationData?.reduce(
+          (sum, donation) => sum + (donation.amount || 0),
+          0
+        ) || 0
+      ).toFixed(2)
+    );
 
     // calculate total remaining amount
     const totalRemainingDonation = parseFloat(
@@ -158,10 +166,11 @@ export default async function sponsorData() {
 
     const { data: donationLog, error: donationLogError } = await supabase
       .from("donation_allocation_log")
-      .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at, roles(*)")
+      .select(
+        "id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at, roles(*)"
+      )
       .eq("donation.sponsor.user_id", userId!)
       .order("id", { ascending: true });
-
 
     if (donationLogError) throw new Error(donationLogError.message);
     if (!donationLog) throw new Error("No record found for allocated");
@@ -170,11 +179,11 @@ export default async function sponsorData() {
 
     const uniqueStudents = new Set<string | null>();
 
-    studentSupport.forEach(support => {
+    studentSupport.forEach((support) => {
       if (support.student_id) {
         uniqueStudents.add(support.student_id);
       }
-    })
+    });
 
     // console.log("Data for sponsor",
     //     donationLog!.map((log) => ({
@@ -197,8 +206,7 @@ export default async function sponsorData() {
       period: log.programs.period,
       created_at: new Date(log.created_at).toISOString().split("T")[0],
       allocated_by: log.roles?.role ?? "",
-    })
-    )
+    }));
 
     // First, map over the donation logs to handle async operations
     // const mappedData = await Promise.all(
@@ -211,20 +219,19 @@ export default async function sponsorData() {
     //   })
     // );
 
-    const shapedAllocatedProgramData = donationLog!.reduce<AllocatedProgramData[]>((acc, log) => {
+    const shapedAllocatedProgramData = donationLog!.reduce<
+      AllocatedProgramData[]
+    >((acc, log) => {
       const programId = log.programs.program_id;
-      const existing = acc.find(item => item.program_id === programId);
+      const existing = acc.find((item) => item.program_id === programId);
       if (existing) {
-
         // If program_id exists, update the allocated_amount
         existing.allocated_amount! += log.allocated_amount;
         existing.remaining_allocated_amount! += log.remaining_allocated_amount;
         existing.allocationDataCount! += 1;
         // existing.lastCouponExpiryDate = log.lastCouponExpiryDate;
-
       } else {
-
-        // If not, add a new entry 
+        // If not, add a new entry
         acc.push({
           id: log.id,
           allocated_amount: log.allocated_amount,
@@ -247,7 +254,10 @@ export default async function sponsorData() {
 
     const shapedAllocatedProgramDataWithLastCouponExpiry = await Promise.all(
       shapedAllocatedProgramData!.map(async (log) => {
-        const lastCouponExpiryDate = await lastCouponExpiry(userId!, log.program_id!);
+        const lastCouponExpiryDate = await lastCouponExpiry(
+          userId!,
+          log.program_id!
+        );
         return {
           ...log,
           ...lastCouponExpiryDate,
@@ -270,12 +280,14 @@ export default async function sponsorData() {
 
     // await lastCouponExpiry(userId!, 29);
     const studentNotSupportedList: StudentNotSupported[] = [];
-    const { data: studentNotSupported, error: studentNotSupportedError } = await supabase
-      .from("sponsor_student_support")
-      .select("*, sponsor!inner(*), students!inner(*), programs!inner(*)")
-      .eq("sponsor.user_id", userId!);
+    const { data: studentNotSupported, error: studentNotSupportedError } =
+      await supabase
+        .from("sponsor_student_support")
+        .select("*, sponsor!inner(*), students!inner(*), programs!inner(*)")
+        .eq("sponsor.user_id", userId!);
 
-    if (studentNotSupportedError) throw new Error(studentNotSupportedError.message);
+    if (studentNotSupportedError)
+      throw new Error(studentNotSupportedError.message);
 
     studentNotSupported.forEach((studentMapping) => {
       studentNotSupportedList.push({
@@ -285,23 +297,21 @@ export default async function sponsorData() {
         student_name: studentMapping.students.name!,
         program_name: studentMapping.programs.program_english_name!,
         support_status: studentMapping.support_status,
-        date: new Date(studentMapping.created_at).toISOString().split("T")[0]
-      })
+        date: new Date(studentMapping.created_at).toISOString().split("T")[0],
+      });
     });
 
-
     return {
-      success: true, data: {
+      success: true,
+      data: {
         sponsorData: shapedSponsorData,
         allocatedProgramData: shapedAllocatedProgramDataWithLastCouponExpiry,
         donataionsData: donationData,
         donationAllocationInvoiceData: donationAllocationInvoiceData,
         studentSupport: studentSupport,
-        studentNotSupported: studentNotSupportedList
-      }
+        studentNotSupported: studentNotSupportedList,
+      },
     };
-
-
   } catch (error: any) {
     console.log("Error in sponsor data:", error.message);
     return { success: false, error: error.message };
@@ -311,23 +321,24 @@ export default async function sponsorData() {
 async function lastCouponExpiry(sponsorUid: string, programId: number) {
   const supabase = await createClient();
 
-  const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
-    .from("coupon_donation_link")
-    .select('coupons!inner(*), donation!inner(sponsor!inner(*)), num_of_coupons')
-    .eq("donation.sponsor.user_id", sponsorUid)
-    .eq("coupons.program_id", programId)
-    .order("id", { ascending: true });
+  const { data: couponDonationLink, error: couponDonationLinkError } =
+    await supabase
+      .from("coupon_donation_link")
+      .select(
+        "coupons!inner(*), donation!inner(sponsor!inner(*)), num_of_coupons"
+      )
+      .eq("donation.sponsor.user_id", sponsorUid)
+      .eq("coupons.program_id", programId)
+      .order("id", { ascending: true });
 
-  if (couponDonationLinkError)
-    return null;
+  if (couponDonationLinkError) return null;
 
-  if (!couponDonationLink || couponDonationLink.length === 0)
-    return null;
+  if (!couponDonationLink || couponDonationLink.length === 0) return null;
 
   // Extract all start and end dates
-  const allDates = couponDonationLink.map(item => ({
+  const allDates = couponDonationLink.map((item) => ({
     startDate: parseISO(item.coupons!.start_date!),
-    endDate: parseISO(item.coupons!.end_date!)
+    endDate: parseISO(item.coupons!.end_date!),
   }));
 
   // Find the earliest start date
@@ -342,30 +353,32 @@ async function lastCouponExpiry(sponsorUid: string, programId: number) {
 
   return {
     startDate: format(earliestStartDate, "MMM dd, yyyy"),
-    lastCouponExpiryDate: format(latestEndDate, "MMM dd, yyyy")
+    lastCouponExpiryDate: format(latestEndDate, "MMM dd, yyyy"),
   };
 }
 
-
 async function studentSupportData(sponsorUid: string) {
-
   const supabase = await createClient();
 
-  const { data: couponDonationLink, error: couponDonationLinkError } = await supabase
-    .from("coupon_donation_link")
-    .select('coupons(*, roles(*), programs!inner(*)), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons')
-    .eq("donation.sponsor.user_id", sponsorUid);
+  const { data: couponDonationLink, error: couponDonationLinkError } =
+    await supabase
+      .from("coupon_donation_link")
+      .select(
+        "coupons(*, roles(*), programs!inner(*)), donation!inner(donation_id, sponsor!inner(*)), num_of_coupons"
+      )
+      .eq("donation.sponsor.user_id", sponsorUid);
 
   if (couponDonationLinkError) throw new Error(couponDonationLinkError.message);
-  console.log("coupon donation link:", couponDonationLink);
-  const { data: couponUserMapping, error: couponUserMappingError } = await supabase
-    .from("coupon_student_mapping")
-    .select("*, students!inner(id, name)");
+  const { data: couponUserMapping, error: couponUserMappingError } =
+    await supabase
+      .from("coupon_student_mapping")
+      .select("*, students!inner(id, name)");
 
   if (couponUserMappingError) throw new Error(couponUserMappingError.message);
 
-  const { data: couponCodes, error: couponCodesError } = await supabase.from("coupon_codes")
-    .select('*');
+  const { data: couponCodes, error: couponCodesError } = await supabase
+    .from("coupon_codes")
+    .select("*");
 
   if (couponCodesError) throw new Error(couponCodesError.message);
 
@@ -373,7 +386,7 @@ async function studentSupportData(sponsorUid: string) {
 
   const processedEntries = new Set();
 
-  couponDonationLink.forEach(donationData => {
+  couponDonationLink.forEach((donationData) => {
     const couponId = donationData.coupons?.coupon_id;
     const couponStartDate = donationData.coupons?.start_date;
     const sponsorId = donationData.donation.sponsor.sponsor_id;
@@ -381,11 +394,11 @@ async function studentSupportData(sponsorUid: string) {
     const role = donationData.coupons?.roles?.role ?? "";
 
     const matchingMappings = couponUserMapping.filter(
-      mapping => mapping.coupon_id === couponId
+      (mapping) => mapping.coupon_id === couponId
     );
 
     const matchingCouponCode = couponCodes.filter(
-      code => code.coupon_id === couponId
+      (code) => code.coupon_id === couponId
     );
 
     if (matchingMappings.length > 0) {
@@ -396,7 +409,7 @@ async function studentSupportData(sponsorUid: string) {
         const endDate = matchingCouponCode[i].end_date;
 
         if (couponCode) {
-          matchingMappings.forEach(mapping => {
+          matchingMappings.forEach((mapping) => {
             const uniqueKey = `${mapping.student_id}-${couponId}-${couponCode}`;
 
             if (!processedEntries.has(uniqueKey)) {
@@ -413,7 +426,8 @@ async function studentSupportData(sponsorUid: string) {
                 coupon_start_date: startDate!,
                 coupon_end_date: endDate,
                 student_name: mapping.students?.name,
-                program_name: donationData.coupons?.programs.program_english_name,
+                program_name:
+                  donationData.coupons?.programs.program_english_name,
                 coupon_code: couponCode!,
                 coupon_status: couponStatus,
                 generated_by: role,
@@ -428,7 +442,7 @@ async function studentSupportData(sponsorUid: string) {
         coupon_id: couponId!,
         donation_id: donationData.donation.donation_id,
         program_id: donationData.coupons?.program_id ?? null,
-        num_of_coupons: donationData.num_of_coupons
+        num_of_coupons: donationData.num_of_coupons,
       });
     }
   });
@@ -436,24 +450,33 @@ async function studentSupportData(sponsorUid: string) {
   return customList;
 }
 
-export async function addStudentSupport(studentId: string, programId: number, sponsorId: number) {
+export async function addStudentSupport(
+  studentId: string,
+  programId: number,
+  sponsorId: number
+) {
   try {
     const supabase = await createClient();
 
-    const { data: exisitingSupport, error: exisitingSupportError } = await supabase
-      .from("sponsor_student_support")
-      .select("*")
-      .eq("program_id", programId)
-      .eq("student_id", studentId)
-      .eq("sponsor_id", sponsorId);
+    const { data: exisitingSupport, error: exisitingSupportError } =
+      await supabase
+        .from("sponsor_student_support")
+        .select("*")
+        .eq("program_id", programId)
+        .eq("student_id", studentId)
+        .eq("sponsor_id", sponsorId);
 
     if (exisitingSupportError) throw new Error(exisitingSupportError.message);
-    if (exisitingSupport.length > 0) throw new Error("Support already exists.")
-
+    if (exisitingSupport.length > 0) throw new Error("Support already exists.");
 
     const { data: addSupport, error: addSupportError } = await supabase
       .from("sponsor_student_support")
-      .insert({ sponsor_id: sponsorId, student_id: studentId, program_id: programId, support_status: true })
+      .insert({
+        sponsor_id: sponsorId,
+        student_id: studentId,
+        program_id: programId,
+        support_status: true,
+      })
       .select()
       .single();
 
@@ -461,7 +484,6 @@ export async function addStudentSupport(studentId: string, programId: number, sp
 
     return { success: true, data: addSupport };
   } catch (error: any) {
-
     return { success: false, error: error.message };
   }
 }
@@ -469,7 +491,7 @@ export async function addStudentSupport(studentId: string, programId: number, sp
 export async function cancelStudentSupport(
   studentId: string,
   sponsorId: number,
-  programs: Programs[],
+  programs: Programs[]
 ) {
   const supabase = await createClient();
 
@@ -479,7 +501,7 @@ export async function cancelStudentSupport(
       .from("sponsor_student_support")
       .select("*")
       .eq("student_id", studentId)
-      .eq("sponsor_id", sponsorId)
+      .eq("sponsor_id", sponsorId);
 
     if (existingError) {
       throw new Error(existingError.message);
@@ -491,16 +513,19 @@ export async function cancelStudentSupport(
     //   throw new Error("Support already cancelled.");
     // }
 
-    // Prepare records for upsert 
+    // Prepare records for upsert
     const recordsToUpsert = programs
-      .filter(program => program.program_id) // Filter out programs with undefined program_id
+      .filter((program) => program.program_id) // Filter out programs with undefined program_id
       .map((program) => {
         const existingRecord = existingSupport?.find(
           (record) => record.program_id === program.program_id
         );
 
         // skip if program id is undefined or record is already cancelled
-        if (!program.program_id || (existingRecord && !existingRecord.support_status)) {
+        if (
+          !program.program_id ||
+          (existingRecord && !existingRecord.support_status)
+        ) {
           return null;
         }
 
@@ -510,11 +535,11 @@ export async function cancelStudentSupport(
           student_id: studentId,
           program_id: program.program_id,
           support_status: false,
-        }
-
-
-      }).filter((record): record is Exclude<typeof record, null> => record !== null); // Remove null records
-
+        };
+      })
+      .filter(
+        (record): record is Exclude<typeof record, null> => record !== null
+      ); // Remove null records
 
     // Update or insert based on existing support
     // const supportData = {
@@ -548,7 +573,6 @@ export async function cancelStudentSupport(
     // }
 
     if (recordsToUpsert && recordsToUpsert.length > 0) {
-
       const { data: cancelSupport, error: cancelSupportError } = await supabase
         .from("sponsor_student_support")
         .upsert(recordsToUpsert)
@@ -563,43 +587,47 @@ export async function cancelStudentSupport(
     } else {
       throw new Error("support already cancelled.");
     }
-
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'An unexpected error occurred'
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }
 
-export async function assignStudentProgram(programId: number, studentId: string, sponsorId: number) {
+export async function assignStudentProgram(
+  programId: number,
+  studentId: string,
+  sponsorId: number
+) {
   const supabase = await createClient();
   const userId = (await supabase.auth.getUser()).data.user?.id;
 
   try {
-
     // step 0: fetch user roled id based on userId
     const { data: userRoledId, error: userRoledIdError } = await supabase
       .from("profiles")
       .select("role_id")
       .eq("id", userId!);
 
-
-    let query = supabase.from("donation_allocation_log")
-      .select(`*, donation!inner(donation_id, sponsor_id), 
+    let query = supabase
+      .from("donation_allocation_log")
+      .select(
+        `*, donation!inner(donation_id, sponsor_id), 
       programs!inner(program_id,program_english_name,subscription_value,
-      total_allocated_donation,total_remaining_donation, club_id)`)
+      total_allocated_donation,total_remaining_donation, club_id)`
+      )
       .gt("remaining_allocated_amount", 0)
       .eq("donation.sponsor_id", sponsorId)
       .order("id", { ascending: true });
 
     if (programId !== 0) {
-      query.eq("programs.program_id", programId)
+      query.eq("programs.program_id", programId);
     }
     const { data: programsData, error: programsDataError } = await query;
 
     if (programsDataError) throw new Error(programsDataError.message);
-
 
     // const selectedProgram = programsData.find(
     //   (record) => record.remaining_allocated_amount >= Number(record.programs.subscription_value)
@@ -611,7 +639,9 @@ export async function assignStudentProgram(programId: number, studentId: string,
 
     let selectedRecords = [];
     let sumAmount = 0;
-    const requiredAmount = Number(sortedRecords[0]?.programs.subscription_value || 0);
+    const requiredAmount = Number(
+      sortedRecords[0]?.programs.subscription_value || 0
+    );
 
     for (const record of sortedRecords) {
       sumAmount += record.remaining_allocated_amount;
@@ -637,8 +667,13 @@ export async function assignStudentProgram(programId: number, studentId: string,
         club_id: selectedRecords.at(0)?.programs.club_id,
       };
 
-      const res = await addStudentCoupon(couponData, selectedRecords.at(0)?.programs!,
-        sponsorId, selectedRecords, userRoledId?.at(0)?.role_id!);
+      const res = await addStudentCoupon(
+        couponData,
+        selectedRecords.at(0)?.programs!,
+        sponsorId,
+        selectedRecords,
+        userRoledId?.at(0)?.role_id!
+      );
 
       if (!res.success) {
         throw new Error(res.error);
@@ -661,31 +696,31 @@ export async function assignStudentProgram(programId: number, studentId: string,
       if (programNameError) throw new Error(programNameError?.message);
 
       finalResult = `Coupon of ${programName.program_english_name} assigned to ${studentName.name}`;
-
     } else {
       throw new Error("No sufficient donation for the programs");
     }
 
     return { success: true, data: finalResult! };
-
   } catch (error: any) {
     console.error(error.message);
     return { success: false, error: error.message };
   }
 }
 
-
-{ /* adding/generating studnets coupons */ }
+{
+  /* adding/generating studnets coupons */
+}
 export async function addStudentCoupon(
   couponData: Coupons,
   programDetails: Programs,
   sponsorId: Number,
   donationAllocationLog: DonationAllocationLogs[],
-  userRoleId: number,
+  userRoleId: number
 ) {
   try {
     const supabase = await createClient();
-    const { program_id, club_id, student_id, coupon_duration, start_period } = couponData;
+    const { program_id, club_id, student_id, coupon_duration, start_period } =
+      couponData;
     const { subscription_value, total_remaining_donation } = programDetails;
 
     // Step 1: checking if coupon already exists
@@ -707,30 +742,30 @@ export async function addStudentCoupon(
     const subscriptionValue = Number(subscription_value);
     const totalRemainingDonation = total_remaining_donation;
 
-
     // Step 3: donation log data
     // const { data: donationAllocationLog, error: donationAllocationLogError } = await supabase
     //   .from("donation_allocation_log")
-    //   .select(`id, program_id, donation!inner(donation_id, sponsor_id), 
+    //   .select(`id, program_id, donation!inner(donation_id, sponsor_id),
     //     allocated_amount, remaining_allocated_amount`)
     //   .eq("id", donationAllocationLogId)
 
     // if (donationAllocationLogError) throw new Error("Failed to fetch donation allocation logs");
 
-
     // Step 4: fetching data for cancelled sponsor support
-    const { data: cancelSponsorSupport, error: cancelSponsorSupportError } = await supabase
-      .from("sponsor_student_support")
-      .select("*, sponsor!inner(sponsor_id, name)")
-      .eq("sponsor_id", sponsorId)
-      .eq("student_id", student_id!)
-      .eq("program_id", program_id!)
-      .eq("support_status", false);
+    const { data: cancelSponsorSupport, error: cancelSponsorSupportError } =
+      await supabase
+        .from("sponsor_student_support")
+        .select("*, sponsor!inner(sponsor_id, name)")
+        .eq("sponsor_id", sponsorId)
+        .eq("student_id", student_id!)
+        .eq("program_id", program_id!)
+        .eq("support_status", false);
 
     // console.log("cancelled support: ", cancelSponsorSupport);
 
     // throw error if there is sponsor support error
-    if (cancelSponsorSupportError) throw new Error(cancelSponsorSupportError.message);
+    if (cancelSponsorSupportError)
+      throw new Error(cancelSponsorSupportError.message);
     if (cancelSponsorSupport && cancelSponsorSupport.length > 0) {
       throw new Error(`Support already cancelled`);
     }
@@ -745,14 +780,14 @@ export async function addStudentCoupon(
 
     const { error: updateError } = await supabase
       .from("programs")
-      .update({ "total_remaining_donation": deduction })
+      .update({ total_remaining_donation: deduction })
       .eq("program_id", program_id!);
 
     if (updateError) throw new Error("Failed to update remaining donation.");
 
     // Track remaining coupons to be allocated
     let remainingCoupons = couponDurationInMonths;
-    const donationLinks: { donation_id: number, num_coupons: number }[] = [];
+    const donationLinks: { donation_id: number; num_coupons: number }[] = [];
     let remainingToDeductFromLogs = remainingDeduction;
 
     // Step 6: Deduction logic and coupon Donation link
@@ -764,11 +799,14 @@ export async function addStudentCoupon(
     // Find logs that have >= 50% of subscription value
     const halfSubscriptionValue = subscriptionValue / 2;
     const priorityLogs = sortedLogs.filter(
-      log => log.remaining_allocated_amount! >= halfSubscriptionValue
+      (log) => log.remaining_allocated_amount! >= halfSubscriptionValue
     );
 
     // Process priority logs first, then remaining logs if needed
-    const logsToProcess = [...priorityLogs, ...sortedLogs.filter(log => !priorityLogs.includes(log))];
+    const logsToProcess = [
+      ...priorityLogs,
+      ...sortedLogs.filter((log) => !priorityLogs.includes(log)),
+    ];
 
     for (const log of logsToProcess) {
       // if (remainingCoupons <= 0) break;
@@ -805,15 +843,22 @@ export async function addStudentCoupon(
         }
       }
 
-      const deduct = Math.min(remainingToDeductFromLogs, log.remaining_allocated_amount!);
+      const deduct = Math.min(
+        remainingToDeductFromLogs,
+        log.remaining_allocated_amount!
+      );
       remainingToDeductFromLogs -= deduct;
 
       // Update the donation_allocation_log table
-      const { data: updateAllocatedLogs, error: logUpdateError } = await supabase
-        .from("donation_allocation_log")
-        .update({ remaining_allocated_amount: log.remaining_allocated_amount! - deduct })
-        .eq("program_id", log.program_id!)
-        .eq("id", log.id!);
+      const { data: updateAllocatedLogs, error: logUpdateError } =
+        await supabase
+          .from("donation_allocation_log")
+          .update({
+            remaining_allocated_amount:
+              log.remaining_allocated_amount! - deduct,
+          })
+          .eq("program_id", log.program_id!)
+          .eq("id", log.id!);
 
       if (logUpdateError) throw new Error(logUpdateError.message);
     }
@@ -846,7 +891,10 @@ export async function addStudentCoupon(
     // }
 
     // Step 8: fetching start date on the basis of the start_period
-    const couponDates = calculateStartDate(start_period!, couponDurationInMonths);
+    const couponDates = calculateStartDate(
+      start_period!,
+      couponDurationInMonths
+    );
     const finalData = {
       club_id,
       program_id,
@@ -867,7 +915,9 @@ export async function addStudentCoupon(
 
     if (insertCouponError) throw new Error(insertCouponError.message);
 
-    {/*Linking coupon to donation*/ }
+    {
+      /*Linking coupon to donation*/
+    }
     for (const link of donationLinks) {
       if (link.num_coupons > 0) {
         const { error: linkError } = await supabase
@@ -875,40 +925,36 @@ export async function addStudentCoupon(
           .insert({
             coupon_id: insertCoupon.coupon_id!,
             donation_id: link.donation_id,
-            num_of_coupons: link.num_coupons
+            num_of_coupons: link.num_coupons,
           });
 
-        if (linkError)
-          throw new Error("Failed to link coupon to donation");
+        if (linkError) throw new Error("Failed to link coupon to donation");
       }
     }
 
     // Step 10: mapping student and coupon
     const { data: mappingCoupons, error: mappingError } = await supabase
       .from("coupon_student_mapping")
-      .insert({ "student_id": student_id, "coupon_id": insertCoupon.coupon_id });
+      .insert({ student_id: student_id, coupon_id: insertCoupon.coupon_id });
 
     if (mappingError) throw new Error(mappingError.message);
 
     // Step 11: Generate and store coupon codes
     await generateAndStoreCouponCodes(insertCoupon);
 
-    revalidatePath('/dashboard', 'page');
+    revalidatePath("/dashboard", "page");
     return { success: true, data: insertCoupon };
-
-
   } catch (error: any) {
     console.error(error.message);
     return { success: false, error: error.message };
   }
 }
 
-
-
-{/* Helper functions */ }
+{
+  /* Helper functions */
+}
 
 async function generateAndStoreCouponCodes(coupon: Coupons) {
-
   console.log("coupons from database: ", coupon);
   const supabase = await createClient();
   if (!coupon.coupon_id || !coupon.number_of_coupons) {
@@ -928,14 +974,14 @@ async function generateAndStoreCouponCodes(coupon: Coupons) {
     currentEndDate.setMonth(currentEndDate.getMonth() + 1); // Move to the next month
     currentEndDate.setDate(0); // Set to the last day of the previous month (which is the desired end date)
 
-
     // Inserting coupon codes
     const { data, error } = await supabase
-      .from('coupon_codes')
+      .from("coupon_codes")
       .insert({
-        coupon_id: coupon.coupon_id, coupon_code: newCode,
+        coupon_id: coupon.coupon_id,
+        coupon_code: newCode,
         start_date: currentStartDate.toLocaleDateString(),
-        end_date: currentEndDate.toLocaleDateString()
+        end_date: currentEndDate.toLocaleDateString(),
       })
       .select();
 
@@ -945,10 +991,8 @@ async function generateAndStoreCouponCodes(coupon: Coupons) {
 
     // Move start date to next month for next coupon
     currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Move start date forward by 1 month
-
   }
 }
-
 
 function generateUniqueCode(couponId: number): string {
   const timestamp = Date.now(); // Current time in milliseconds
@@ -979,12 +1023,19 @@ const calculateStartDate = (period: string, numOfCoupons: number) => {
     // Set to 1st day of the next month
     startDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
     // Last day of the (next month + numCoupons - 1)
-    endDate = new Date(today.getFullYear(), today.getMonth() + 1 + numOfCoupons, 0);
+    endDate = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1 + numOfCoupons,
+      0
+    );
   } else {
     throw new Error("Invalid period value");
   }
 
-  return { startDate: startDate.toLocaleDateString(), endDate: endDate.toLocaleDateString() }
+  return {
+    startDate: startDate.toLocaleDateString(),
+    endDate: endDate.toLocaleDateString(),
+  };
 };
 
 export async function donationAllocation(formData: DonationAllocation) {
@@ -1015,7 +1066,10 @@ export async function donationAllocation(formData: DonationAllocation) {
     }
 
     // Step 2: Calculate total available funds
-    const totalFunds = donations.reduce((sum, donation) => sum + (donation.remaining_amount ?? 0), 0);
+    const totalFunds = donations.reduce(
+      (sum, donation) => sum + (donation.remaining_amount ?? 0),
+      0
+    );
 
     if (totalFunds < formData.amount!) {
       throw new Error("Insufficient funds to complete the allocation.");
@@ -1023,12 +1077,21 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     // Step 3: Allocate amount using the available donations
     let remainingToAllocate = formData.amount!;
-    const allocationLog: { donation_id: number; allocated_amount: number, program_id: number, remaining_allocated_amount: number, allocated_by: number }[] = [];
+    const allocationLog: {
+      donation_id: number;
+      allocated_amount: number;
+      program_id: number;
+      remaining_allocated_amount: number;
+      allocated_by: number;
+    }[] = [];
 
     for (const donation of donations) {
       if (remainingToAllocate <= 0) break;
 
-      const allocation = Math.min(remainingToAllocate, donation.remaining_amount!);
+      const allocation = Math.min(
+        remainingToAllocate,
+        donation.remaining_amount!
+      );
       remainingToAllocate -= allocation;
 
       // Update donation remaining amount in the database
@@ -1038,7 +1101,9 @@ export async function donationAllocation(formData: DonationAllocation) {
         .eq("donation_id", donation.donation_id);
 
       if (updateError) {
-        throw new Error(`Failed to update donation ID ${donation.donation_id}.`);
+        throw new Error(
+          `Failed to update donation ID ${donation.donation_id}.`
+        );
       }
 
       allocationLog.push({
@@ -1046,19 +1111,18 @@ export async function donationAllocation(formData: DonationAllocation) {
         allocated_amount: allocation,
         program_id: formData.program_id!,
         remaining_allocated_amount: allocation,
-        allocated_by: userRoledId?.at(0)?.role_id!
+        allocated_by: userRoledId?.at(0)?.role_id!,
       });
     }
 
     // console.log("Allocation log:", allocationLog);
 
     for (const logData of allocationLog) {
-
       if (logData.allocated_amount > 0) {
         const { error: donationLogError } = await supabase
           .from("donation_allocation_log")
           .insert(logData)
-          .select()
+          .select();
 
         if (donationLogError) {
           console.log(donationLogError);
@@ -1066,8 +1130,6 @@ export async function donationAllocation(formData: DonationAllocation) {
         }
       }
     }
-
-
 
     // Step 4: Insert the allocation record into the donation_allocation table
     const { data: allocationData, error: insertError } = await supabase
@@ -1078,40 +1140,52 @@ export async function donationAllocation(formData: DonationAllocation) {
 
     if (insertError) {
       console.log(insertError);
-      throw new Error("Failed to record the allocation. Please try again later.");
+      throw new Error(
+        "Failed to record the allocation. Please try again later."
+      );
     }
 
     // Step 5: Updating Prorams Table with total sum of all donations of the programs
-    const { data: allocatedDonation, error: donationAllocationError } = await supabase
-      .from("donation_allocation")
-      .select()
-      .eq("program_id", allocationData.program_id!);
+    const { data: allocatedDonation, error: donationAllocationError } =
+      await supabase
+        .from("donation_allocation")
+        .select()
+        .eq("program_id", allocationData.program_id!);
 
     if (donationAllocationError) throw donationAllocationError;
 
-    const totalSumOfProgramDonations = allocatedDonation.reduce((sum, donation) => sum + donation.amount!, 0);
+    const totalSumOfProgramDonations = allocatedDonation.reduce(
+      (sum, donation) => sum + donation.amount!,
+      0
+    );
 
     // Step 6: Storing the total sum of donation amount to the programs table
     // Fetch the current value of total_remaining_donation
-    const { data: totalRemainingDonation, error: errorTotalRemainingDonation } = await supabase
-      .from("programs")
-      .select("total_remaining_donation")
-      .eq("program_id", allocationData.program_id!)
-      .single();
+    const { data: totalRemainingDonation, error: errorTotalRemainingDonation } =
+      await supabase
+        .from("programs")
+        .select("total_remaining_donation")
+        .eq("program_id", allocationData.program_id!)
+        .single();
 
     if (errorTotalRemainingDonation) {
-      console.error("Error fetching current donation:", errorTotalRemainingDonation!.message);
+      console.error(
+        "Error fetching current donation:",
+        errorTotalRemainingDonation!.message
+      );
     } else {
-      const currentRemainingDonation = totalRemainingDonation?.total_remaining_donation || 0;
+      const currentRemainingDonation =
+        totalRemainingDonation?.total_remaining_donation || 0;
 
       // Calculate new total_remaining_donation
-      const updatedRemainingDonation = currentRemainingDonation + formData.amount!;
+      const updatedRemainingDonation =
+        currentRemainingDonation + formData.amount!;
 
       const { data, error } = await supabase
         .from("programs")
         .update({
-          "total_allocated_donation": totalSumOfProgramDonations,
-          "total_remaining_donation": updatedRemainingDonation,
+          total_allocated_donation: totalSumOfProgramDonations,
+          total_remaining_donation: updatedRemainingDonation,
         })
         .eq("program_id", allocationData.program_id!)
         .select();
@@ -1119,10 +1193,7 @@ export async function donationAllocation(formData: DonationAllocation) {
       if (error) throw new Error(error.message);
     }
 
-
-
     return { success: true, data: allocationData };
-
   } catch (error: any) {
     // Handle and return the error to be displayed as a toast
     console.error("Error in donationAllocation:", error.message);
@@ -1136,7 +1207,11 @@ export async function getReportsData(sponsorId: number) {
 
   try {
     // step 1: Fetching the sponsor data
-    const { data: sponsor } = await supabase.from('sponsor').select('*').eq('id', sponsorId).single();
+    const { data: sponsor } = await supabase
+      .from("sponsor")
+      .select("*")
+      .eq("id", sponsorId)
+      .single();
 
     // // step 2: Fetching the donation data
     // const { data: donations } = await supabase.from('donation')
@@ -1148,24 +1223,25 @@ export async function getReportsData(sponsorId: number) {
 
     const { data: donationLog, error: donationLogError } = await supabase
       .from("donation_allocation_log")
-      .select("id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at")
+      .select(
+        "id, allocated_amount, remaining_allocated_amount, donation!inner(sponsor!inner(*)), programs!inner(*), created_at"
+      )
       .eq("donation.sponsor.user_id", userId!)
       .order("id", { ascending: true });
 
-    const shapedAllocatedProgramData = donationLog!.reduce<AllocatedProgramData[]>((acc, log) => {
+    const shapedAllocatedProgramData = donationLog!.reduce<
+      AllocatedProgramData[]
+    >((acc, log) => {
       const programId = log.programs.program_id;
-      const existing = acc.find(item => item.program_id === programId);
+      const existing = acc.find((item) => item.program_id === programId);
       if (existing) {
-
         // If program_id exists, update the allocated_amount
         existing.allocated_amount! += log.allocated_amount;
         existing.remaining_allocated_amount! += log.remaining_allocated_amount;
         existing.allocationDataCount! += 1;
         // existing.lastCouponExpiryDate = log.lastCouponExpiryDate;
-
       } else {
-
-        // If not, add a new entry 
+        // If not, add a new entry
         acc.push({
           id: log.id,
           allocated_amount: log.allocated_amount,
@@ -1186,7 +1262,10 @@ export async function getReportsData(sponsorId: number) {
 
     const shapedAllocatedProgramDataWithLastCouponExpiry = await Promise.all(
       shapedAllocatedProgramData!.map(async (log) => {
-        const lastCouponExpiryDate = await lastCouponExpiry(userId!, log.program_id!);
+        const lastCouponExpiryDate = await lastCouponExpiry(
+          userId!,
+          log.program_id!
+        );
         return {
           ...log,
           ...lastCouponExpiryDate,
@@ -1194,13 +1273,12 @@ export async function getReportsData(sponsorId: number) {
       })
     );
 
-
-    return { success: true, data: { sponsor, shapedAllocatedProgramDataWithLastCouponExpiry } };
-
-
+    return {
+      success: true,
+      data: { sponsor, shapedAllocatedProgramDataWithLastCouponExpiry },
+    };
   } catch (error: any) {
     console.log("Error in getting reports data:", error.message);
     return { success: false, error: error.message };
   }
-
 }
